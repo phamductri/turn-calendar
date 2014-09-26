@@ -1,0 +1,34 @@
+<!doctype html>
+<html ng-app="demo">
+<head>
+
+	<meta charset="utf-8">
+
+	<title>calendar demo</title>
+
+	<link rel="stylesheet" href="../dist/calendar.css">
+
+	<style>
+
+		/* ... */
+
+	</style>
+
+</head>
+<body ng-controller="mainCtrl">
+	
+	<script src="../bower_components/angular/angular.js"></script>
+	<script src="../dist/calendar.js"></script>
+	<script>
+
+		angular
+		.module('demo', ['turn/calendar'])
+		.controller('mainCtrl', function ($scope) {
+
+			// ...
+			
+		});
+
+	</script>
+</body>
+</html>

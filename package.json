@@ -1,0 +1,25 @@
+{
+  "name": "calendar",
+  "version": "0.0.0",
+  "description": "Generic calendar component for Turn",
+  "main": "dist/calendar.js",
+  "scripts": {
+    "test": "grunt test --verbose"
+  },
+  "author": "Tri Pham <tri.pham@turn.com>",
+  "license": "Apache2",
+  "repository": "git://stash.turn.com:7999/cnsl/calendar.git",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-coffee": "^0.10.1",
+    "grunt-contrib-concat": "^0.4.0",
+    "grunt-contrib-jasmine": "^0.5.2",
+    "grunt-contrib-sass": "^0.7.3",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-coveralls": "^0.3.0",
+    "grunt-html2js": "^0.2.7",
+    "grunt-ngmin": "0.0.3",
+    "grunt-template-jasmine-istanbul": "^0.2.6"
+  }
+}
