@@ -9,13 +9,15 @@ module.exports = (grunt) ->
     'grunt-contrib-watch'
     'grunt-coveralls'
     'grunt-html2js'
-    'grunt-ngmin'
+    'grunt-ngmin',
+    'grunt-express'
   ]
   .forEach grunt.loadNpmTasks
 
   # task sets
   build = ['html2js', 'ngmin', 'concat', 'sass', 'clean']
   test = ['html2js', 'coffee', 'jasmine:unit']
+  serve = ['express', 'watch']
 
   # task defs
   grunt.initConfig
@@ -99,6 +101,13 @@ module.exports = (grunt) ->
         files:
           'dist/calendar.css': 'src/calendar.scss'
 
+    express:
+      all:
+        options:
+          port: 9000
+          bases: './demo/'
+          livereload: true
+
     watch:
       main:
         files: [
@@ -110,6 +119,7 @@ module.exports = (grunt) ->
         options:
           interrupt: true
           spawn: false
+          livereload: 9106
       test:
         files: './test/*.js'
         tasks: test
@@ -119,3 +129,4 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'default', build
   grunt.registerTask 'test', test
+  grunt.registerTask 'serve', serve

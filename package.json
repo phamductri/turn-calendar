@@ -20,6 +20,7 @@
     "grunt-coveralls": "^0.3.0",
     "grunt-html2js": "^0.2.7",
     "grunt-ngmin": "0.0.3",
-    "grunt-template-jasmine-istanbul": "^0.2.6"
+    "grunt-template-jasmine-istanbul": "^0.2.6",
+    "grunt-express": "^1.4.1"
   }
 }
