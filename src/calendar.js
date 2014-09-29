@@ -1,32 +1,29 @@
 angular
-.module('turn/calendar', ['calendarTemplates'])
-.value('calendarOptions', {
+    .module('turn/calendar', ['calendarTemplates'])
+    .value('calendarOptions', {
 
-	// ...
-	
-})
-.directive('calendar', function () {
 
-	return {
-		restrict: '',
-		scope: {
+    })
+    .directive('calendar', function () {
 
-			// ...
-			
-		},
-		templateUrl: 'calendar.html',
-		link: function (scope, element) {
+        return {
+            restrict: '',
+            scope: {
 
-			angular.extend(scope, {
+            },
+            templateUrl: 'calendar.html',
+            link: function (scope, element) {
 
-				// ...
+                angular.extend(scope, {
 
-			});
 
-			// teardown
-			scope.$on('$destroy', function(){});
+                });
 
-		}
-	};
+                // Tear down
+                scope.$on('$destroy', function () {
+                });
 
-});
+            }
+        };
+
+    });
