@@ -105,7 +105,7 @@ module.exports = (grunt) ->
       all:
         options:
           port: 9000
-          bases: './demo/'
+          bases: ['./demo/', './']
           livereload: true
 
     watch:
