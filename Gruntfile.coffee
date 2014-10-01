@@ -127,6 +127,6 @@ module.exports = (grunt) ->
           interrupt: true
           spawn: false
 
-  grunt.registerTask 'default', build
+  grunt.registerTask 'build', build
   grunt.registerTask 'test', test
   grunt.registerTask 'serve', serve

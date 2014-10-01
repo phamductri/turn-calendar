@@ -17,12 +17,14 @@
 <script>
 
     angular
-            .module('demo', ['turn/calendar'])
+            .module('demo', ['calendar'])
             .controller('mainCtrl', function ($scope) {
 
 
             });
 
 </script>
+
+<calendar use-monday="true" starting-month="11" starting-year="2013" forward-months="6" backward-months="6"></calendar>
 </body>
 </html>

@@ -1,0 +1,21 @@
+<button ng-click="enableCalendar()">{{selectedDate}}</button>
+<div ng-show="calendarEnabled">
+    <table ng-repeat="month in monthArray" style="display: inline-block;" >
+        <thead>
+            <tr>
+                <th colspan="7">{{monthNames[$index]}}</th>
+            </tr>
+            <tr>
+                <th ng-repeat="dayName in dayNames">{{dayName}}</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            <tr ng-repeat="days in month">
+                <td ng-repeat="day in days">{{day.getDate()}}</td>
+
+            </tr>
+
+        </tbody>
+    </table>
+</div>
