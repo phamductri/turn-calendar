@@ -74,8 +74,8 @@ angular
         const MAX_DAY = 42;
 
         /**
-         * Determine the month for starting month, if not specify from input it
-         * will use the current month
+         * Determine the starting month for base month, if not specify from input
+         * it will use the current month
          *
          * @returns {number} - Starting month of the base month of calendar
          */
@@ -92,6 +92,12 @@ angular
             return month;
         };
 
+        /**
+         * Determine the starting year of base month, if not specify will use
+         * the current year
+         *
+         * @returns {number} - The starting year of base month of calendar
+         */
         var setYear = function () {
 
             var year, currentDate = new Date();
@@ -109,7 +115,7 @@ angular
 
         var isMonthValid = function (month) {
             return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
-        }
+        };
 
         var setForwardMonths = function (monthArray, month, year) {
 
@@ -132,8 +138,6 @@ angular
                         yearReset = true;
                     }
                 }
-
-
 
                 monthArray.push(generateDayArray(year, newMonth));
                 $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
@@ -172,7 +176,7 @@ angular
                 $scope.monthNames.unshift(MONTH_NAME[newMonth] + ' ' + year);
             }
 
-        }
+        };
 
         var generateMonthArray = function () {
             var year = setYear(),
@@ -191,8 +195,6 @@ angular
             return monthArray;
 
         };
-
-
 
         /**
          * Function to determine the first day of the 42 day to be shown on a
@@ -250,7 +252,7 @@ angular
 
 
             for (var i = 0; i < MAX_DAY; i++) {
-                dayArray.push(new Date(currentDate));
+                dayArray.push(generateMetaDateObject(new Date(currentDate)));
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
@@ -259,8 +261,51 @@ angular
 
         $scope.selectedDate = new Date().toLocaleDateString();
 
+        $scope.selectedStartDate = null;
+        $scope.selectedEndDate = null;
 
+        var generateMetaDateObject = function (date) {
+            return {
+                date: date,
+                isSelected: false,
+                isHover: false
+            };
+        };
 
+        var isSetStartDate = function (date) {
+            return (!$scope.selectedStartDate && !$scope.selectedEndDate)
+                   || ($scope.selectedStartDate && !$scope.selectedEndDate && date < $scope.selectedStartDate)
+                   || ($scope.selectedStartDate && $scope.selectedEndDate && date > $scope.selectedStartDate && date < $scope.selectedEndDate);
+        };
+
+        var isSetEndDate = function (date) {
+            return ($scope.selectedStartDate && !$scope.selectedEndDate && date > $scope.selectedStartDate)
+                   || ($scope.selectedStartDate && $scope.selectedEndDate && date > $scope.selectedEndDate);
+        };
+
+        var refreshTheview = function () {
+
+        };
+
+        $scope.setDayClick = function (day) {
+
+            day.isSelected = !day.isSelected;
+
+            if (isSetStartDate(day.date)) {
+                $scope.selectedStartDate = day.date;
+            } else if (isSetEndDate(day.date)) {
+                $scope.selectedEndDate = day.date;
+            }
+
+            if (day.date === $scope.selectedStartDate) {
+                $scope.selectedStartDate = null;
+            }
+
+            if (day.date === $scope.selectedEndDate) {
+                $scope.selectedEndDate = null;
+            }
+
+        };
 
         $scope.dayNames = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
@@ -268,7 +313,7 @@ angular
             $scope.dayNames.push('Su');
         } else {
             $scope.dayNames.unshift('Su');
-        }
+        };
 
         $scope.monthArray = generateMonthArray();
 
@@ -281,6 +326,8 @@ angular
         $scope.enableCalendar = function () {
             $scope.calendarEnabled = !$scope.calendarEnabled;
         };
+
+
     }])
     .directive('calendar', function () {
 
@@ -291,7 +338,8 @@ angular
                 startingYear: '=',
                 backwardMonths: '=',
                 forwardMonths: '=',
-                useMonday: '='
+                useMonday: '=',
+                range: '='
             },
             controller: 'CalendarController',
             templateUrl: 'calendar.html'

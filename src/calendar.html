@@ -1,5 +1,14 @@
 <button ng-click="enableCalendar()">{{selectedDate}}</button>
 <div ng-show="calendarEnabled">
+    <div>
+        <span>
+            From <input type="text"> to <input type="text">
+        </span>
+        <span>Prior : </span>
+        <!--button ng-repeat="previous in previousRange">{{previous}}</button-->
+
+    </div>
+
     <table ng-repeat="month in monthArray" style="display: inline-block;" >
         <thead>
             <tr>
@@ -12,10 +21,23 @@
         </thead>
         <tbody>
             <tr ng-repeat="days in month">
-                <td ng-repeat="day in days">{{day.getDate()}}</td>
+                <td ng-repeat="day in days"
+                    ng-class="{calendarMouseOver: hover, calendarSelectedDaily: day.isSelected}"
+                    ng-mouseenter="hover = true"
+                    ng-mouseleave="hover = false"
+                    ng-click="setDayClick(day)"
+                >{{day.date.getDate()}}</td>
 
             </tr>
 
         </tbody>
     </table>
+    <div>
+        <button>
+            Cancel
+        </button>
+        <button>
+            Apply
+        </button>
+    </div>
 </div>
