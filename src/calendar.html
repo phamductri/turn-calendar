@@ -1,16 +1,19 @@
-<button ng-click="enableCalendar()">{{selectedDate}}</button>
+<button ng-click="enableCalendar()">{{currentSelectedStartDate.date.toLocaleDateString()}} - {{currentSelectedEndDate.date.toLocaleDateString()}}</button>
 <div ng-show="calendarEnabled">
     <div>
         <span>
-            From <input type="text"> to <input type="text">
+            From <input type="text" value="{{selectedStartDate.date.toLocaleDateString()}}">
+            to <input type="text" value="{{selectedEndDate.date.toLocaleDateString()}}">
         </span>
         <span>Prior : </span>
         <!--button ng-repeat="previous in previousRange">{{previous}}</button-->
 
     </div>
 
-    <table ng-repeat="month in monthArray" style="display: inline-block;" >
-        <thead>
+    <div>
+        <button style="display: inline-block;" ng-click="previousMonth()" >Previous</button>
+        <table ng-repeat="month in monthArray" style="display: inline-block;" >
+            <thead>
             <tr>
                 <th colspan="7">{{monthNames[$index]}}</th>
             </tr>
@@ -18,25 +21,33 @@
                 <th ng-repeat="dayName in dayNames">{{dayName}}</th>
             </tr>
 
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr ng-repeat="days in month">
                 <td ng-repeat="day in days"
-                    ng-class="{calendarMouseOver: hover, calendarSelectedDaily: day.isSelected}"
-                    ng-mouseenter="hover = true"
-                    ng-mouseleave="hover = false"
+                    ng-class="{calendarMouseOver: day.isHover,
+                               calendarSelectedDaily: day.selectMode == 'daily',
+                               calendarSelectedWeekly: day.selectMode == 'weekly',
+                               calendarSelectedMonthly: day.selectMode == 'monthly',
+                               calendarUnavailable: day.isUnavailable}"
+                    ng-mouseenter="mouseEnter(day)"
+                    ng-mouseleave="mouseLeave(day)"
                     ng-click="setDayClick(day)"
-                >{{day.date.getDate()}}</td>
+                        >{{day.date.getDate()}}</td>
 
             </tr>
 
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+        <button style="display: inline-block;" ng-click="nextMonth()" >Next</button>
+    </div>
+
+
     <div>
-        <button>
+        <button ng-click="cancel()">
             Cancel
         </button>
-        <button>
+        <button ng-click="apply()">
             Apply
         </button>
     </div>

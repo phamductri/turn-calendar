@@ -1,7 +1,21 @@
 .calendarMouseOver {
-    background-color: #72ceeb;
-    opacity: .3;
+    background-color: rgba(114, 206, 235, 0.3);
 }
 .calendarSelectedDaily {
     background-color: #217f9f;
+    color: #ffffff;
+}
+
+.calendarSelectedWeekly {
+    background-color: #0aa4d2;
+    color: #ffffff;
+}
+
+.calendarSelectedMonthly {
+    background-color: rgba(0, 173, 239, .2);
+    color: #ffffff;
+}
+
+.calendarUnavailable {
+    color: #c4c3c3;
 }
