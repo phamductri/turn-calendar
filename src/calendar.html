@@ -1,12 +1,12 @@
-<button ng-click="enableCalendar()">{{currentSelectedStartDate.date.toLocaleDateString()}} - {{currentSelectedEndDate.date.toLocaleDateString()}}</button>
+<button ng-click="enableCalendar()">{{currentSelectedStartDate.date.toLocaleDateString()}} <span ng-show="currentSelectedStartDate.date != null">-</span> {{currentSelectedEndDate.date.toLocaleDateString()}}</button>
 <div ng-show="calendarEnabled">
     <div>
         <span>
             From <input type="text" value="{{selectedStartDate.date.toLocaleDateString()}}">
             to <input type="text" value="{{selectedEndDate.date.toLocaleDateString()}}">
         </span>
-        <span>Prior : </span>
-        <!--button ng-repeat="previous in previousRange">{{previous}}</button-->
+        <span ng-show="priorButtons.length > 0">Prior : </span>
+        <button ng-repeat="range in priorButtons" ng-click="selectRange(range)">{{range.value}}</button>
 
     </div>
 
