@@ -102,7 +102,11 @@ angular
          */
         const MAX_DAY = 42;
 
-
+        /**
+         * Number of day in a week
+         *
+         * @type {number}
+         */
         const DAY_IN_WEEK = 7;
 
         /**
@@ -126,8 +130,6 @@ angular
         } else {
             $scope.dayNames.unshift('Su');
         }
-
-
 
         /**
          * Determine the starting month for base month, if not specify from input
@@ -171,6 +173,13 @@ angular
             return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
         };
 
+        /**
+         * Add the number of forward months into base month
+         *
+         * @param {array} monthArray - The current month array
+         * @param {number} month - The month to be added
+         * @param {year} year - The year of the month to be added
+         */
         var setForwardMonths = function (monthArray, month, year) {
 
             if (!isMonthValid($scope.forwardMonths)) {
@@ -200,6 +209,13 @@ angular
 
         };
 
+        /**
+         * Add the backward months into the base month
+         *
+         * @param {array} monthArray - The month array
+         * @param {number} month - The month to be added
+         * @param {number} year - The year to be added
+         */
         var setBackwardMonths = function (monthArray, month, year) {
 
             if (!isMonthValid($scope.backwardMonths)) {
@@ -303,6 +319,7 @@ angular
          * @returns {array} A 2 dimension array contains the weeks to be shown
          */
         var generateDayArray = function (year, month) {
+
             var currentDate = new Date(getFirstDate(year, month)),
                 dayArray = [];
 
@@ -315,10 +332,16 @@ angular
         };
 
 
-
+        /**
+         * Detect if the date in question compatible with minSelectDate
+         * or maxSelectDate
+         *
+         * @param {object} date - The date in question
+         * @returns {boolean} - True if compatible, false if not
+         */
         var isUnavailable = function (date) {
             return date <= new Date($scope.minSelectDate)
-                   || date >= new Date($scope.maxSelectDate);
+                || date >= new Date($scope.maxSelectDate);
         };
 
 
@@ -356,7 +379,7 @@ angular
 
                 if (compareRange > selectRange) {
                     return !day.isUnavailable &&
-                            ((day.date > tempDateForward && day.date < compareRangeForward) ||
+                        ((day.date > tempDateForward && day.date < compareRangeForward) ||
                             (day.date > compareRangeBackward && day.date < tempDateBackward));
                 }
             }
@@ -519,12 +542,12 @@ angular
                 return;
             }
 
-            if (isSelectRange($scope.weeklySelectRange,  $scope.monthlySelectRange, day)) {
+            if (isSelectRange($scope.weeklySelectRange, $scope.monthlySelectRange, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
 
-            if (isSelectRange($scope.monthlySelectRange,  $scope.weeklySelectRange, day)) {
+            if (isSelectRange($scope.monthlySelectRange, $scope.weeklySelectRange, day)) {
                 paletteTheMonth(day, true, false, '');
                 return;
             }
@@ -532,8 +555,26 @@ angular
             day.isHover = false;
         };
 
+        /**
+         * A meta date object that wrap around a plain Javascript date object,
+         * it keeps several attributes to keep track of information about the
+         * date in question
+         *
+         * selectedMode : cursor select mode, whether the current mode is 'daily',
+         * 'weekly', or 'monthly'
+         *
+         * isHover: whether if the current date is being hovered, or being selected
+         *
+         * isUnavailable: the date is not available for hovering or selection
+         *
+         * @param {object} date - Plain Javascript date object
+         * @param {number} currentMonth - If the month of date does not match
+         * current month, return an empty object
+         * @returns {object} A meta date object
+         */
         var generateMetaDateObject = function (date, currentMonth) {
 
+            // If the month does not match, return empty object
             if (date.getMonth() !== currentMonth) {
                 return {};
             }
@@ -548,8 +589,7 @@ angular
 
         var isDaily = function () {
             return (!$scope.weeklySelectRange && !$scope.monthlySelectRange) ||
-                   (!isSelectRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedEndDate) &&
-                    !isSelectRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedEndDate));
+                (!isSelectRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedEndDate) && !isSelectRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedEndDate));
         };
 
         /**
@@ -651,8 +691,6 @@ angular
             return $scope.selectedStartDate && !$scope.selectedEndDate;
         };
 
-
-
         var setEndDate = function (day) {
 
             if (day.date < $scope.selectedStartDate.date) {
@@ -673,6 +711,12 @@ angular
 
         };
 
+        /**
+         * Function to execute to determine whether to set start date, end date,
+         * or reset the calendar
+         *
+         * @param {object} day - A meta date object
+         */
         $scope.setDayClick = function (day) {
 
             if (day.isUnavailable) {
@@ -802,6 +846,10 @@ angular
             }
         };
 
+        /**
+         * Function to set the default selection if the user specify a default
+         * prior button
+         */
         var setDefaultRange = function () {
 
             var defaultRange = null;
