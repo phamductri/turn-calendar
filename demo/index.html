@@ -17,7 +17,7 @@
 <script>
 
     angular
-            .module('demo', ['calendar'])
+            .module('demo', ['turn/calendar'])
             .controller('mainCtrl', function ($scope) {
 
 
@@ -25,9 +25,14 @@
 
 </script>
 
-<calendar use-monday="true" starting-month="11" starting-year="2013"
-          forward-months="3" backward-months="3" min-select-date="'09/13/2013'"
-          weekly-select-range="30" monthly-select-range="60"
-          prior-range="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"></calendar>
+<turn-calendar use-monday="true" starting-month="11" starting-year="2013"
+               forward-months="3" backward-months="3" min-select-date="'9/13/2013'"
+               weekly-select-range="30" monthly-select-range="60"
+               prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"
+               month-name="['Tháng Một', 'Tháng Hai', 'Tháng Ba', 'Tháng Bốn', 'Tháng Năm', 'Tháng Sáu', 'Tháng Bảy',
+               'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai']"
+               day-name="['Chủ nhật','Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']">
+
+</turn-calendar>
 </body>
 </html>
