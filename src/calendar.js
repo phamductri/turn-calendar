@@ -768,7 +768,7 @@ angular
             $scope.calendarEnabled = !$scope.calendarEnabled;
         };
 
-        $scope.apply = function () {
+        $scope.applyCalendar = function () {
             $scope.currentSelectedStartDate = $scope.selectedStartDate;
             $scope.currentSelectedEndDate = $scope.selectedEndDate;
             $scope.calendarEnabled = false;
