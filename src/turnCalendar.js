@@ -957,7 +957,7 @@ angular
                 dayName: '&'
             },
             controller: 'CalendarController',
-            templateUrl: 'calendar.html'
+            templateUrl: 'turnCalendar.html'
         };
 
     });

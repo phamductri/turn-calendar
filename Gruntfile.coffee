@@ -1,5 +1,4 @@
 module.exports = (grunt) ->
-
   [
     'grunt-contrib-clean'
     'grunt-contrib-coffee'
@@ -29,14 +28,15 @@ module.exports = (grunt) ->
         './dist/template.js'
       ]
 
+
     coffee:
       files:
         'test/test.js': 'test/test.coffee'
 
     concat:
       main:
-        src: ['./dist/calendar.js', './dist/template.js']
-        dest: './dist/calendar.js'
+        src: ['./dist/turnCalendar.js', './dist/template.js']
+        dest: './dist/turnCalendar.js'
 
     coveralls:
       options:
@@ -55,7 +55,7 @@ module.exports = (grunt) ->
     jasmine:
       coverage:
         src: [
-          './src/calendar.js'
+          './src/turnCalendar.js'
         ]
         options:
           specs: ['./test/unit.js']
@@ -81,7 +81,7 @@ module.exports = (grunt) ->
             './dist/template.js'
           ]
       unit:
-        src: './src/calendar.js'
+        src: './src/turnCalendar.js'
         options:
           specs: './test/unit.js'
           vendor: [
@@ -93,13 +93,13 @@ module.exports = (grunt) ->
 
     ngmin:
       main:
-        src: ['./src/calendar.js']
-        dest: './dist/calendar.js'
+        src: ['./src/turnCalendar.js']
+        dest: './dist/turnCalendar.js'
 
     sass:
       main:
         files:
-          'dist/calendar.css': 'src/calendar.scss'
+          'dist/turnCalendar.css': 'src/turnCalendar.scss'
 
     express:
       all:
