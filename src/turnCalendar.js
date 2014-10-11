@@ -85,25 +85,22 @@
  */
 angular
     .module('turn/calendar', ['calendarTemplates'])
-    .constant('turnCalendarDefaults', {
-        startingYear: new Date().getFullYear(),
-        startingMonth: new Date().getMonth(),
+    .controller('CalendarController', ['$scope', function ($scope) {
+
 
         /**
          * Default month name to display on calendar
          *
          * @type {array}
          */
-        monthName:  ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        var MONTH_NAME = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         /**
          * Default day name to display on calendar
          *
          * @type {array}
          */
-        dayName: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-    })
-    .controller('CalendarController', ['$scope', function ($scope) {
+        var DAY_NAME = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
         /**
          * Constraint on maximum months allowed to display, either as forward
@@ -151,16 +148,61 @@ angular
          */
         $scope.dayNames = [];
 
+        if ($scope.dayName()) {
+            DAY_NAME = $scope.dayName();
+        }
 
-        var dayName = $scope.dayName(), sunday = dayName.shift();
-
-        $scope.dayNames = $scope.dayNames.concat(dayName);
+        var sunday = DAY_NAME.shift();
+        $scope.dayNames = $scope.dayNames.concat(DAY_NAME);
 
         if ($scope.useMonday) {
             $scope.dayNames.push(sunday);
         } else {
             $scope.dayNames.unshift(sunday);
         }
+
+        if ($scope.monthName()) {
+            MONTH_NAME = $scope.monthName();
+        }
+
+        /**
+         * Determine the starting month for base month, if not specify from input
+         * it will use the current month
+         *
+         * @returns {number} - Starting month of the base month of calendar
+         */
+        var setBaseMonth = function () {
+
+            var month, currentDate = new Date();
+
+            if ($scope.startingMonth && $scope.startingMonth >= 0) {
+                month = $scope.startingMonth;
+            } else {
+                month = currentDate.getMonth();
+            }
+
+            return month;
+        };
+
+        /**
+         * Determine the starting year of base month, if not specify will use
+         * the current year
+         *
+         * @returns {number} - The starting year of base month of calendar
+         */
+        var setBaseYear = function () {
+
+            var year, currentDate = new Date();
+
+            if ($scope.startingYear) {
+                year = $scope.startingYear;
+            } else {
+                year = currentDate.getFullYear();
+            }
+
+            return year;
+        };
+
 
         var isMonthValid = function (month) {
             return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
@@ -196,7 +238,7 @@ angular
                 }
 
                 monthArray.push(generateDayArray(year, newMonth));
-                $scope.monthNames.push($scope.monthName()[newMonth] + ' ' + year);
+                $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
 
             }
 
@@ -236,7 +278,7 @@ angular
                 }
 
                 monthArray.unshift(generateDayArray(year, newMonth));
-                $scope.monthNames.unshift($scope.monthName()[newMonth] + ' ' + year);
+                $scope.monthNames.unshift(MONTH_NAME[newMonth] + ' ' + year);
             }
 
         };
@@ -248,13 +290,13 @@ angular
          * @returns {array} The array that contains
          */
         var generateMonthArray = function () {
-            var year = $scope.startingYear,
-                month = $scope.startingMonth,
+            var year = setBaseYear(),
+                month = setBaseMonth(),
                 baseMonth = generateDayArray(year, month),
                 monthArray = [];
 
             monthArray.push(baseMonth);
-            $scope.monthNames.push($scope.monthName()[month] + ' ' + year);
+            $scope.monthNames.push(MONTH_NAME[month] + ' ' + year);
 
             setForwardMonths(monthArray, month, year);
 
@@ -778,7 +820,7 @@ angular
             $scope.monthArray.push(newMonthArray);
 
             $scope.monthNames.shift();
-            $scope.monthNames.push($scope.monthName()[newMonth] + ' ' + year);
+            $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
             discolorSelectedDateRange();
 
             // Remember to color current selected start and end dates
@@ -813,7 +855,7 @@ angular
             $scope.monthArray.unshift(newMonthArray);
 
             $scope.monthNames.pop();
-            $scope.monthNames.unshift($scope.monthName()[newMonth] + ' ' + year);
+            $scope.monthNames.unshift(MONTH_NAME[newMonth] + ' ' + year);
 
             discolorSelectedDateRange();
 
@@ -897,7 +939,7 @@ angular
 
 
     }])
-    .directive('turnCalendar', function (turnCalendarDefaults) {
+    .directive('turnCalendar', function () {
 
         return {
             restrict: 'AE',
@@ -916,16 +958,7 @@ angular
                 dayName: '&'
             },
             controller: 'CalendarController',
-            templateUrl: 'turnCalendar.html',
-            compile: function (element, attrs) {
-
-                // Set up default attributes
-                angular.forEach(turnCalendarDefaults, function (value, attr) {
-                    if (angular.isUndefined(attrs[attr])) {
-                        attrs[attr] = value;
-                    }
-                });
-            }
+            templateUrl: 'turnCalendar.html'
         };
 
     });

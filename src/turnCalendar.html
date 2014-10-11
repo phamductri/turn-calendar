@@ -1,55 +1,61 @@
-<button ng-click="enableCalendar()">{{currentSelectedStartDate.date.toLocaleDateString()}} <span ng-show="currentSelectedStartDate.date">-</span> {{currentSelectedEndDate.date.toLocaleDateString()}}</button>
-<div ng-show="calendarEnabled">
-    <div>
+<button ng-click="enableCalendar()">{{currentSelectedStartDate.date.toLocaleDateString()}} <span
+        ng-show="currentSelectedStartDate.date">-</span> {{currentSelectedEndDate.date.toLocaleDateString()}}
+</button>
+<div>
+    <div class="calendarDiv" ng-show="calendarEnabled">
+        <div class="calendarInput">
         <span>
-            From <input type="text" value="{{selectedStartDate.date.toLocaleDateString()}}">
-            to <input type="text" value="{{selectedEndDate.date.toLocaleDateString()}}">
+            From <input size="10" type="text" value="{{selectedStartDate.date.toLocaleDateString()}}">
+            to <input size="10" type="text" value="{{selectedEndDate.date.toLocaleDateString()}}">
         </span>
-        <span ng-show="priorButtons.length">Prior : </span>
-        <button ng-repeat="range in priorButtons" ng-click="selectRange(range)">{{range.value}}</button>
-        <span ng-show="priorButtons.length">days</span>
+            <span ng-show="priorButtons.length">Prior : </span>
+            <button ng-repeat="range in priorButtons" ng-click="selectRange(range)">{{range.value}}</button>
+            <span ng-show="priorButtons.length">days</span>
 
-    </div>
+        </div>
 
-    <div>
-        <button style="display: inline-block;" ng-click="previousMonth()" >Previous</button>
-        <table ng-repeat="month in monthArray" style="display: inline-block;" >
-            <thead>
-            <tr>
-                <th colspan="7">{{monthNames[$index]}}</th>
-            </tr>
-            <tr>
-                <th ng-repeat="dayName in dayNames">{{dayName}}</th>
-            </tr>
 
-            </thead>
-            <tbody>
-            <tr ng-repeat="days in month">
-                <td ng-repeat="day in days"
-                    ng-class="{calendarMouseOver: day.isHover,
+        <div class="calendarTableContainer">
+            <div class="calendarNavigation1" ng-click="previousMonth()"></div>
+            <table class="calendarTable" ng-repeat="month in monthArray" style="display: inline-block;">
+                <thead>
+                <tr>
+                    <th colspan="7">{{monthNames[$index]}}</th>
+                </tr>
+                <tr>
+                    <th ng-repeat="dayName in dayNames">{{dayName}}</th>
+                </tr>
+
+                </thead>
+                <tbody>
+                <tr ng-repeat="days in month">
+                    <td ng-repeat="day in days"
+                        ng-class="{calendarMouseOver: day.isHover,
                                calendarSelectedDaily: day.selectMode == 'daily',
                                calendarSelectedWeekly: day.selectMode == 'weekly',
                                calendarSelectedMonthly: day.selectMode == 'monthly',
                                calendarUnavailable: day.isUnavailable}"
-                    ng-mouseenter="mouseEnter(day)"
-                    ng-mouseleave="mouseLeave(day)"
-                    ng-click="setDayClick(day)"
-                        >{{day.date.getDate()}}</td>
+                        ng-mouseenter="mouseEnter(day)"
+                        ng-mouseleave="mouseLeave(day)"
+                        ng-click="setDayClick(day)"
+                            >{{day.date.getDate()}}
+                    </td>
 
-            </tr>
+                </tr>
 
-            </tbody>
-        </table>
-        <button style="display: inline-block;" ng-click="nextMonth()" >Next</button>
-    </div>
+                </tbody>
+            </table>
+            <div class="calendarNavigation2" ng-click="nextMonth()"></div>
+        </div>
 
+        <div class="calendarSubmit">
+            <button ng-click="cancel()">
+                Cancel
+            </button>
+            <button ng-click="applyCalendar()">
+                Apply
+            </button>
+        </div>
 
-    <div>
-        <button ng-click="cancel()">
-            Cancel
-        </button>
-        <button ng-click="applyCalendar()">
-            Apply
-        </button>
     </div>
 </div>
