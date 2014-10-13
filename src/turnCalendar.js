@@ -19,12 +19,15 @@
  * months count from the current instance, notice the s. For example, if the
  * current month is September, and you want to display July and August in your
  * calendar pop up, set backwardMonths=2. Maximum allowed value is 6. Minimum
- * allowed is 1.
+ * allowed is 1. If you don't set anything or setting values not in allowed
+ * range, there won't be any backward months to display.
  *
  * @param {number} forwardMonths - The number of calendar instances of next
  * months count from the current instance, notice the s at the end. For example:
  * current month is September, and you want to display October and November, set
- * forwardMonths=2. Maximum allowed value is 6. Minimum allowed is 1.
+ * forwardMonths=2. Maximum allowed value is 6. Minimum allowed is 1. If you
+ * don't set anything or setting values not in allowed range, there won't be
+ * any forward months to display.
  *
  * @param {boolean} useMonday - The week start on Monday instead of Sunday like
  * regular calendar. If not specify or set to true the calendar will use Sunday
@@ -321,7 +324,18 @@ angular
                 firstDate;
 
             if ($scope.useMonday) {
-                firstDate = new Date(firstDayOfMonth.setDate(2 - dayOfWeek));
+
+                /**
+                 * Edge case, if the first day on month is a Sunday, and the config
+                 * is to use Monday as first day of week, then going backward 6 days
+                 * previous to use as first day in 42 days view
+                 */
+                if (dayOfWeek === 0) {
+                    firstDate = new Date(firstDayOfMonth.setDate(-5));
+                } else {
+                    firstDate = new Date(firstDayOfMonth.setDate(2 - dayOfWeek));
+                }
+
             } else {
                 firstDate = new Date(firstDayOfMonth.setDate(1 - dayOfWeek))
             }

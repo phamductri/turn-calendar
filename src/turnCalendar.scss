@@ -1,26 +1,26 @@
-.calendarMouseOver {
+.calendar-mouse-over {
     background-color: rgba(114, 206, 235, 0.3);
 }
-.calendarSelectedDaily {
+.calendar-selected-daily {
     background-color: #217f9f;
     color: #ffffff;
 }
 
-.calendarSelectedWeekly {
+.calendar-selected-weekly {
     background-color: #217f9f;
     color: #ffffff;
 }
 
-.calendarSelectedMonthly {
+.calendar-selected-monthly {
     background-color: #217f9f;
     color: #ffffff;
 }
 
-.calendarUnavailable {
+.calendar-unavailable {
     color: #c4c3c3;
 }
 
-.calendarTable {
+.calendar-table {
     border-collapse: collapse;
     border-spacing: 0;
     text-align: center;
@@ -29,7 +29,7 @@
     float: left;
 }
 
-.calendarDiv {
+.calendar-div {
     border: 1px solid;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10pt;
@@ -37,13 +37,13 @@
     display: inline-block;
 }
 
-.calendarInput {
+.calendar-input {
     border-bottom: 1px solid;
     margin-bottom: 10px;
     padding: 5px;
 }
 
-.calendarNavigation1 {
+.calendar-navigation-left {
     display: inline-block;
     height: 150px;
     position: relative;
@@ -54,7 +54,7 @@
     margin-right: 5px;
 }
 
-.calendarNavigation2 {
+.calendar-navigation-right {
     display: inline-block;
     height: 150px;
     position: relative;
@@ -65,8 +65,33 @@
     margin-right: 10px;
 }
 
+.calendar-arrow-right {
 
-.calendarSubmit {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-left: 15px solid grey;
+    margin: auto;
+    position: relative;
+    top: 40%;
+
+}
+
+.calendar-arrow-left {
+
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-right: 15px solid grey;
+    margin: auto;
+    position: relative;
+    top: 40%;
+
+}
+
+.calendar-submit {
     clear: both;
     float: right;
     margin: 10px;
