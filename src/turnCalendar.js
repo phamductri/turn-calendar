@@ -13,7 +13,7 @@
  * and so on.
  *
  * @param {number} startingYear - The starting year of the calendar, if not
- * specify will use the current year
+ * specify will use the current year.
  *
  * @param {number} backwardMonths - The number of calendar instances of previous
  * months count from the current instance, notice the s. For example, if the
@@ -31,39 +31,41 @@
  *
  * @param {boolean} useMonday - The week start on Monday instead of Sunday like
  * regular calendar. If not specify or set to true the calendar will use Sunday
- * as the first day of week
+ * as the first day of week.
  *
  * @param {string} minSelectDate - The minimum date which any dates which are
  * earlier than that date will not be able to be selected, accept a string in
- * MM-DD-YYYY or MM/DD/YYYY format
+ * MM-DD-YYYY or MM/DD/YYYY format.
  *
  * @param {string} maxSelectDate - The maximum date which any dates which are
  * later than that date will not be able to be selected, accept a string in
- * MM-DD-YYYY or MM/DD/YYYY format
+ * MM-DD-YYYY or MM/DD/YYYY format.
  *
  * @param {number} weeklySelectRange - A number in which if the hovered/selected
  * SECOND date is beyond the FIRST selected date, the mouse pointer will change
- * to WEEKLY hover/selected mode
+ * to WEEKLY hover/selected mode.
  *
  * @param {number} monthlySelectRange - A number in which if the hovered/selected
  * SECOND date is beyond the FIRST selected date, the mouse pointer will change
- * to MONTHLY hover/selected mode
+ * to MONTHLY hover/selected mode.
  *
  * @param {array} priorRangePresets - An array of object that specify the range
  * buttons to appear for user to select prior range from the CURRENT date. If
  * you want a pre-selected range add a property called isDefault: true. The
  * object MUST have a property called 'value' to display it. Value is a number.
  * The range will conform with minSelectDate, maxSelectDate, weeklySelectDate,
- * monthlySelectDate parameters if these parameters are set.
+ * monthlySelectDate parameters if these parameters are set. If you currently
+ * in a different month view, clicking on any of the prior button will reset
+ * your current view back to the CURRENT month.
  *
  * @param {array} monthName - An array of string that will override the default
  * English month name, if you want to display the month in your language, if
- * not specify will display month in English abbreviation
+ * not specify will display month in English abbreviation.
  *
  * @param {array} dayName - An array of string that will override the default
  * English day name, set this option if you want to display the day in your
  * language, if not specify will display the day in English abbreviation. The
- * array should begin with Sunday, ended with Saturday
+ * array should begin with Sunday, ended with Saturday.
  *
  * @example
  *
@@ -288,17 +290,34 @@ angular
 
         /**
          * Function to generate an array that contains several months per specify
-         * by the config from user
+         * by the config from user. By default the year and month will be set
+         * according to config values. If there is an input year and an input
+         * month from internal calls the year and month setting from config will
+         * be overriden
          *
+         * @param {number} inputYear - Input year as base year
+         * @param {number} inputMonth - Input month as base month
          * @returns {array} The array that contains
          */
-        var generateMonthArray = function () {
+        var generateMonthArray = function (inputYear, inputMonth) {
             var year = setBaseYear(),
-                month = setBaseMonth(),
-                baseMonth = generateDayArray(year, month),
+                month = setBaseMonth();
+
+            if (inputYear) {
+                year = inputYear;
+            }
+
+            if (inputMonth) {
+                month = inputMonth;
+            }
+
+            var baseMonth = generateDayArray(year, month),
                 monthArray = [];
 
             monthArray.push(baseMonth);
+
+            // Reset the month names
+            $scope.monthNames = [];
             $scope.monthNames.push(MONTH_NAME[month] + ' ' + year);
 
             setForwardMonths(monthArray, month, year);
@@ -771,7 +790,7 @@ angular
 
         };
 
-        $scope.monthArray = generateMonthArray();
+        $scope.monthArray = generateMonthArray(null, null);
 
         // Allow to show the calendar or hide it
         $scope.calendarEnabled = false;
@@ -939,11 +958,15 @@ angular
                 startDate = new Date(tempDate.toLocaleDateString()),
                 endDate = new Date(tempDate.toLocaleDateString());
 
+            $scope.monthArray = generateMonthArray(tempDate.getFullYear(), tempDate.getMonth());
+
             setStartDate(generateMetaDateObject(startDate, startDate.getMonth()));
 
             endDate.setDate(endDate.getDate() - range.value);
 
             setEndDate(generateMetaDateObject(endDate, endDate.getMonth()));
+
+
 
         };
 
