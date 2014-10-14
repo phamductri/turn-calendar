@@ -19,7 +19,13 @@
     angular
             .module('demo', ['turn/calendar'])
             .controller('mainCtrl', function ($scope) {
+                $scope.currentDate = function () {
+                    return new Date().toLocaleDateString();
+                };
 
+                $scope.maxMonthAllowed = function () {
+                    return new Date().getMonth();
+                }
 
             });
 
@@ -27,7 +33,8 @@
 
 <turn-calendar use-monday="true" starting-month="11" starting-year="2013"
                forward-months="2" backward-months="2" min-select-date="'9/13/2013'"
-               weekly-select-range="30" monthly-select-range="60"
+               max-select-date="currentDate()" weekly-select-range="30" monthly-select-range="60"
+               max-forward-month="maxMonthAllowed()"
                prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]">
 
 </turn-calendar>

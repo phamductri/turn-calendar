@@ -67,6 +67,31 @@
  * language, if not specify will display the day in English abbreviation. The
  * array should begin with Sunday, ended with Saturday.
  *
+ * @param {number} maxForwardMonth - Setting the max month which the NEXT button
+ * allowed to work. January starts as 0. This setting will override the setting
+ * in forwardMonths. For example, you set the base month as August 2013, with
+ * forwardMonths is 3, maxForwardMonth is 9, your calendar will miss the month
+ * November 2013, because it exceeds the maxForwardMonth.
+ *
+ * @param {number} maxForwardYear - Setting the max year which the NEXT button
+ * allowed to work. January starts as 0. This setting will override the setting
+ * in forwardMonths. For example, you set the base month to be Nov 2013, with
+ * forwardMonths is 3, maxForwardYyear is 2014, your calendar will miss the month
+ * January and February 2014, since this setting override forwardMonths.
+ *
+ * @param {number} minBackwardMonth - Setting the min month which the PREVIOUS
+ * button allowed to work. January start as 0. This setting will override the
+ * setting in backwardMonths. For example, you set the base month to be March 2014,
+ * with backwardMonths to be 3. You also set minBackwardMonths to be 1. The
+ * calendar will not display January 2014, and Dec 2013, since minBackwardMonths
+ * override backwardMonths. Attempt to press PREVIOUS button won't work either.
+ *
+ * @param {number} minBackwardYear - Set the min year which the PREVIOUS button
+ * allowed to work. January start as 0. The setting override the setting in
+ * backwardMonths. Let's say you set the base month to be February 2013, with
+ * backwardMonths is 4. minBackwardYear is 2013. You will not see the Dec 2013
+ * and Nov 2013 in your calendar. This setting override backwardMonths.
+ *
  * @example
  *
  * <turn-calendar use-monday="true" starting-month="11" starting-year="2013"
@@ -75,7 +100,8 @@
  *                prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"
  *                month-name="['Tháng Một', 'Tháng Hai', 'Tháng Ba', 'Tháng Bốn', 'Tháng Năm', 'Tháng Sáu',
  *                'Tháng Bảy', 'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai']"
- *                day-name="['Chủ nhật','Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']">
+ *                day-name="['Chủ nhật','Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']"
+ *                max-forward-month="10">
  * <turn-calendar>
  *
  * The above code snippet will display 7 months instance, starting from Sep 2013
@@ -84,7 +110,8 @@
  * the current selected date, monthly select mode if cursor is 60 days beyond the
  * current selected date. It will display 3 prior buttons: 20, 45, 90, with 25 is
  * pre-selected from the CURRENT date. Anything before 09/13/2013 is not available
- * for selection. It display the month name and day name in Vietnamese.
+ * for selection. It display the month name and day name in Vietnamese. Any month
+ * above Nov of the year is now allowed.
  *
  * @author Tri Pham <tri.pham@turn.com>
  */
@@ -242,6 +269,14 @@ angular
                     }
                 }
 
+                if ($scope.maxForwardYear && year > $scope.maxForwardYear) {
+                    return;
+                }
+
+                if ($scope.maxForwardMonth && newMonth > $scope.maxForwardMonth) {
+                    return;
+                }
+
                 monthArray.push(generateDayArray(year, newMonth));
                 $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
 
@@ -280,6 +315,14 @@ angular
                     year = year - 1;
                     yearReset = true;
                     newMonthCount++;
+                }
+
+                if ($scope.minBackwardYear && year < $scope.minBackwardYear) {
+                    return;
+                }
+
+                if ($scope.minBackwardMonth && newMonth > $scope.minBackwardMonth) {
+                    return;
                 }
 
                 monthArray.unshift(generateDayArray(year, newMonth));
@@ -549,7 +592,7 @@ angular
          */
         $scope.mouseEnter = function (day) {
 
-            if (!day.date) {
+            if (!day.date || day.isUnavailable) {
                 day.isHover = false;
                 return;
             }
@@ -841,19 +884,39 @@ angular
                 month = middleDateOfMonth.date.getMonth(),
                 newMonth = month + 1;
 
+            if ($scope.maxForwardYear && year > $scope.maxForwardYear) {
+                return;
+            }
+
+            if ($scope.maxForwardMonth && newMonth > $scope.maxForwardMonth) {
+                return;
+            }
+
             // Bigger than 11 means moving to next year
             if (newMonth > 11) {
                 newMonth = newMonth % 12;
                 year = year + 1;
             }
 
-            var newMonthArray = generateDayArray(year, newMonth);
+            var newMonthArray = generateDayArray(year, newMonth),
+                allowedArraySize = 1;
 
-            $scope.monthArray.shift();
+            if ($scope.forwardMonths) {
+                allowedArraySize += $scope.forwardMonths;
+            }
+
+            if ($scope.backwardMonths) {
+                allowedArraySize += $scope.backwardMonths;
+            }
+
+            if (allowedArraySize === $scope.monthArray.length) {
+                $scope.monthArray.shift();
+                $scope.monthNames.shift();
+            }
+
             $scope.monthArray.push(newMonthArray);
-
-            $scope.monthNames.shift();
             $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
+
             discolorSelectedDateRange();
 
             // Remember to color current selected start and end dates
@@ -876,18 +939,37 @@ angular
                 month = middleDateOfMonth.date.getMonth(),
                 newMonth = month - 1;
 
+            if ($scope.minBackwardYear && year < $scope.minBackwardYear) {
+                return;
+            }
+
+            if ($scope.minBackwardMonth && newMonth > $scope.minBackwardMonth) {
+                return;
+            }
+
             // Lower than 0 means moving backward to previous year
             if (newMonth < 0) {
                 newMonth = 11;
                 year = year - 1;
             }
 
-            var newMonthArray = generateDayArray(year, newMonth);
+            var newMonthArray = generateDayArray(year, newMonth),
+                allowedArraySize = 1;
 
-            $scope.monthArray.pop();
+            if ($scope.forwardMonths) {
+                allowedArraySize += $scope.forwardMonths;
+            }
+
+            if ($scope.backwardMonths) {
+                allowedArraySize += $scope.backwardMonths;
+            }
+
+            if (allowedArraySize === $scope.monthArray.length) {
+                $scope.monthArray.pop();
+                $scope.monthNames.pop();
+            }
+
             $scope.monthArray.unshift(newMonthArray);
-
-            $scope.monthNames.pop();
             $scope.monthNames.unshift(MONTH_NAME[newMonth] + ' ' + year);
 
             discolorSelectedDateRange();
@@ -992,7 +1074,11 @@ angular
                 maxSelectDate: '=',
                 priorRangePresets: '&',
                 monthName: '&',
-                dayName: '&'
+                dayName: '&',
+                maxForwardMonth: '=',
+                maxForwardYear: '=',
+                minBackwardMonth: '=',
+                minBackwardYear: '='
             },
             controller: 'CalendarController',
             templateUrl: 'turnCalendar.html'
