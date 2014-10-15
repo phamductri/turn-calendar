@@ -336,7 +336,7 @@ angular
          * by the config from user. By default the year and month will be set
          * according to config values. If there is an input year and an input
          * month from internal calls the year and month setting from config will
-         * be overriden
+         * be overridden
          *
          * @param {number} inputYear - Input year as base year
          * @param {number} inputMonth - Input month as base month
@@ -543,8 +543,9 @@ angular
 
                 if (monthFound) {
                     setMonthValue(month, isHover, hoverValue, selectMode);
-                    return true;
                 }
+
+                return monthFound;
 
             });
 
@@ -573,13 +574,12 @@ angular
 
                     if (weekFound) {
                         setWeekValue(week, isHover, hoverValue, selectMode);
-                        return true;
                     }
+
+                    return weekFound;
                 });
 
-                if (weekFound) {
-                    return true;
-                }
+                return weekFound;
 
             });
         };
@@ -794,6 +794,9 @@ angular
                 $scope.selectedEndDate = day;
             }
 
+            $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
+            $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+
             colorSelectedDateRange();
 
         };
@@ -801,6 +804,7 @@ angular
         var setStartDate = function (day) {
 
             $scope.selectedStartDate = day;
+            $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
             day.selectMode = 'daily';
 
         };
@@ -909,6 +913,11 @@ angular
                 allowedArraySize += $scope.backwardMonths;
             }
 
+            /**
+             * This check if the current monthArray is equal to the maximum length
+             * allowed by backwardMonths and forwardMonths setting. If it reaches
+             * maximum then remove the last month.
+             */
             if (allowedArraySize === $scope.monthArray.length) {
                 $scope.monthArray.shift();
                 $scope.monthNames.shift();
@@ -964,6 +973,11 @@ angular
                 allowedArraySize += $scope.backwardMonths;
             }
 
+            /**
+             * This check if the current monthArray is equal to the maximum length
+             * allowed by backwardMonths and forwardMonths setting. If it reaches
+             * maximum then remove the first month.
+             */
             if (allowedArraySize === $scope.monthArray.length) {
                 $scope.monthArray.pop();
                 $scope.monthNames.pop();
@@ -1056,6 +1070,100 @@ angular
             setDefaultRange();
         }
 
+        $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
+        $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+
+        /**
+         * Change start date when ng-change detects the user changing the start
+         * date
+         *
+         * @param {object} day - Meta date object
+         */
+        var setStartDateString = function (day) {
+
+            if (day.isUnavailable) {
+                return;
+            }
+
+            discolorSelectedDateRange();
+            console.log($scope.monthArray[0][2][6]);
+
+            var middleDateFirstMonth = $scope.monthArray[0][2][6],
+                firstDateFirstMonth = new Date(middleDateFirstMonth.date.getFullYear(), middleDateFirstMonth.date.getMonth(), 1);
+
+            if (day.date < firstDateFirstMonth) {
+                $scope.monthArray = generateMonthArray(day.date.getFullYear(), day.date.getMonth());
+            }
+
+            setStartDate(day);
+
+            if ($scope.selectedEndDate && $scope.selectedEndDate.date > day.date) {
+                colorSelectedDateRange();
+            }
+        };
+
+        /**
+         * Invoke by ng-change when user input start date string
+         */
+        $scope.changeStartDate = function () {
+
+            if (!$scope.startDateString) {
+                return;
+            }
+
+            var milliSeconds = Date.parse($scope.startDateString);
+
+            if (isNaN(milliSeconds)) {
+                return;
+            }
+
+            var newDate = new Date($scope.startDateString);
+
+            setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
+        };
+
+        /**
+         * Change the end date, provoke by ng-change
+         *
+         * @param {object} day - The meta end date object
+         */
+        var setEndDateString = function (day) {
+
+            if (day.isUnavailable) {
+                return;
+            }
+
+            if ($scope.selectedStartDate && $scope.selectedStartDate.date > day.date) {
+                return;
+            }
+
+            $scope.selectedEndDate = day;
+
+
+            discolorSelectedDateRange();
+            colorSelectedDateRange();
+
+        };
+
+        /**
+         * Invoke by ng-change when user invoke changes to end date string
+         */
+        $scope.changeEndDate = function () {
+
+            if (!$scope.endDateString) {
+                return;
+            }
+
+            var milliSeconds = Date.parse($scope.endDateString);
+
+            if (isNaN(milliSeconds)) {
+                return;
+            }
+
+            var newDate = new Date($scope.endDateString);
+
+            setEndDateString(generateMetaDateObject(newDate, newDate.getMonth()));
+        };
 
     }])
     .directive('turnCalendar', function () {

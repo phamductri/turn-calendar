@@ -5,8 +5,8 @@
     <div class="calendar-div" ng-show="calendarEnabled">
         <div class="calendar-input">
         <span>
-            From <input size="10" type="text" value="{{selectedStartDate.date.toLocaleDateString()}}">
-            to <input size="10" type="text" value="{{selectedEndDate.date.toLocaleDateString()}}">
+            From <input size="10" type="text" ng-model="startDateString" ng-change="changeStartDate()">
+            to <input size="10" type="text" ng-model="endDateString" ng-change="changeEndDate()">
         </span>
             <span ng-show="priorButtons.length">Prior : </span>
             <button ng-repeat="range in priorButtons" ng-click="selectRange(range)">{{range.value}}</button>
