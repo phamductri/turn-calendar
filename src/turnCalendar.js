@@ -243,10 +243,10 @@ angular
             return new Date(year, month, 1);
         };
 
-        var isExceedMaxMonth = function (month) {
+        var isExceedMaxMonth = function (month, year) {
             return $scope.maxForwardMonth &&
                 convertToDateObject($scope.maxForwardMonth) &&
-                month > convertToDateObject($scope.maxForwardMonth).getMonth();
+                new Date(year, month, 1) > convertToDateObject($scope.maxForwardMonth);
         };
 
 
@@ -279,7 +279,7 @@ angular
                     }
                 }
 
-                if (isExceedMaxMonth(newMonth)) {
+                if (isExceedMaxMonth(newMonth, year)) {
                     return;
                 }
 
@@ -290,10 +290,10 @@ angular
 
         };
 
-        var isBelowMinMonth = function (month) {
+        var isBelowMinMonth = function (month, year) {
             return $scope.minBackwardMonth &&
                    convertToDateObject($scope.minBackwardMonth) &&
-                   month < convertToDateObject($scope.minBackwardMonth).getMonth();
+                   new Date(year, month, 1) < convertToDateObject($scope.minBackwardMonth);
         };
 
         /**
@@ -329,7 +329,7 @@ angular
                     newMonthCount++;
                 }
 
-                if (isBelowMinMonth(newMonth)) {
+                if (isBelowMinMonth(newMonth, year)) {
                     return;
                 }
 
@@ -897,7 +897,7 @@ angular
                 month = middleDateOfMonth.date.getMonth(),
                 newMonth = month + 1;
 
-            if (isExceedMaxMonth(newMonth)) {
+            if (isExceedMaxMonth(newMonth, year)) {
                 return;
             }
 
@@ -953,7 +953,7 @@ angular
                 month = middleDateOfMonth.date.getMonth(),
                 newMonth = month - 1;
 
-            if (isBelowMinMonth(newMonth)) {
+            if (isBelowMinMonth(newMonth, year)) {
                 return;
             }
 
