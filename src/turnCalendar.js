@@ -817,7 +817,7 @@ angular
          */
         $scope.setDayClick = function (day) {
 
-            if (day.isUnavailable) {
+            if (day.isUnavailable || !day.date) {
                 return;
             }
 
@@ -1013,23 +1013,24 @@ angular
                 }
             }
 
-            if (defaultRange) {
-
-                var endDate = new Date(),
-                    startDate = new Date();
-
-                endDate = generateMetaDateObject(endDate, endDate.getMonth());
-
-                startDate.setDate(startDate.getDate() - defaultRange.value);
-
-                startDate = generateMetaDateObject(startDate, startDate.getMonth());
-
-                setStartDate(startDate);
-                setEndDate(endDate);
-
-                $scope.currentSelectedEndDate = endDate;
-                $scope.currentSelectedStartDate = startDate;
+            if (!defaultRange) {
+                return;
             }
+
+            var endDate = new Date(),
+                startDate = new Date();
+
+            endDate = generateMetaDateObject(endDate, endDate.getMonth());
+
+            startDate.setDate(startDate.getDate() - defaultRange.value);
+
+            startDate = generateMetaDateObject(startDate, startDate.getMonth());
+
+            setStartDate(startDate);
+            setEndDate(endDate);
+
+            $scope.currentSelectedEndDate = endDate;
+            $scope.currentSelectedStartDate = startDate;
         };
 
         $scope.selectedStartDate = null;
@@ -1056,13 +1057,32 @@ angular
 
             $scope.monthArray = generateMonthArray(tempDate.getFullYear(), tempDate.getMonth());
 
-            setStartDate(generateMetaDateObject(startDate, startDate.getMonth()));
+            startDate.setDate(startDate.getDate() - range.value);
+            var startDay = generateMetaDateObject(startDate, startDate.getMonth());
 
-            endDate.setDate(endDate.getDate() - range.value);
+            /**
+             * If endDate is unavailable, going forward 1 day till seeing one
+             * that is available
+             */
+            while (startDay.isUnavailable) {
+                startDate.setDate(startDate.getDate() + 1);
+                startDay = generateMetaDateObject(startDate, startDate.getMonth());
+            }
 
-            setEndDate(generateMetaDateObject(endDate, endDate.getMonth()));
+            setStartDate(startDay);
 
+            var endDay = generateMetaDateObject(endDate, endDate.getMonth());
 
+            /**
+             * If startDate is unavailable, going backward 1 day till seeing one
+             * that is available
+             */
+            while (endDay.isUnavailable) {
+                endDate.setDate(endDate.getDate() - 1);
+                endDay = generateMetaDateObject(endDate, endDate.getMonth());
+            }
+
+            setEndDate(endDay);
 
         };
 
