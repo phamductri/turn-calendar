@@ -24,7 +24,8 @@
                 };
 
                 $scope.maxMonthAllowed = function () {
-                    return new Date().getMonth();
+                    var currentDate = new Date();
+                    return currentDate.getMonth() + '/' + currentDate.getFullYear();
                 }
 
             });
@@ -34,7 +35,7 @@
 <turn-calendar use-monday="true" starting-month="11" starting-year="2013"
                forward-months="2" backward-months="2" min-select-date="'9/13/2013'"
                max-select-date="currentDate()" weekly-select-range="30" monthly-select-range="60"
-               max-forward-month="maxMonthAllowed()"
+               max-forward-month="maxMonthAllowed()" min-backward-month="'08/2013'"
                prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]">
 
 </turn-calendar>

@@ -8,26 +8,26 @@
  *
  * Allow the following options :
  *
- * @param {number} startingMonth - The starting month of the calendar, if not
+ * @param {number} startingMonth - The STARTING month of the calendar, if not
  * specify will use the current month. January is count as 0, February is 1,
  * and so on.
  *
- * @param {number} startingYear - The starting year of the calendar, if not
+ * @param {number} startingYear - The STARTING year of the calendar, if not
  * specify will use the current year.
  *
  * @param {number} backwardMonths - The number of calendar instances of previous
- * months count from the current instance, notice the s. For example, if the
- * current month is September, and you want to display July and August in your
+ * months count from the STARTING month instance, notice the s. For example, if
+ * the STARTING month is September, and you want to display July and August in your
  * calendar pop up, set backwardMonths=2. Maximum allowed value is 6. Minimum
  * allowed is 1. If you don't set anything or setting values not in allowed
- * range, there won't be any backward months to display.
+ * range, there won't be any backward months to display (i.e default value is 0).
  *
  * @param {number} forwardMonths - The number of calendar instances of next
- * months count from the current instance, notice the s at the end. For example:
- * current month is September, and you want to display October and November, set
+ * months count from the STARTING instance, notice the s at the end. For example:
+ * STARTING month is September, and you want to display October and November, set
  * forwardMonths=2. Maximum allowed value is 6. Minimum allowed is 1. If you
  * don't set anything or setting values not in allowed range, there won't be
- * any forward months to display.
+ * any forward months to display (i.e default value is 0).
  *
  * @param {boolean} useMonday - The week start on Monday instead of Sunday like
  * regular calendar. If not specify or set to true the calendar will use Sunday
@@ -67,30 +67,19 @@
  * language, if not specify will display the day in English abbreviation. The
  * array should begin with Sunday, ended with Saturday.
  *
- * @param {number} maxForwardMonth - Setting the max month which the NEXT button
- * allowed to work. January starts as 0. This setting will override the setting
- * in forwardMonths. For example, you set the base month as August 2013, with
- * forwardMonths is 3, maxForwardMonth is 9, your calendar will miss the month
- * November 2013, because it exceeds the maxForwardMonth.
+ * @param {string} maxForwardMonth - Setting the max month which the NEXT button
+ * allowed to work. Format is MM/YYYY. January starts as 0. This setting will
+ * override the setting in forwardMonths. For example, you set the starting month
+ * as August 2013, with forwardMonths is 3, maxForwardMonth is 10/2013, your
+ * calendar will miss the month November 2013, because it exceeds the maxForwardMonth.
  *
- * @param {number} maxForwardYear - Setting the max year which the NEXT button
- * allowed to work. January starts as 0. This setting will override the setting
- * in forwardMonths. For example, you set the base month to be Nov 2013, with
- * forwardMonths is 3, maxForwardYyear is 2014, your calendar will miss the month
- * January and February 2014, since this setting override forwardMonths.
- *
- * @param {number} minBackwardMonth - Setting the min month which the PREVIOUS
- * button allowed to work. January start as 0. This setting will override the
- * setting in backwardMonths. For example, you set the base month to be March 2014,
- * with backwardMonths to be 3. You also set minBackwardMonths to be 1. The
- * calendar will not display January 2014, and Dec 2013, since minBackwardMonths
- * override backwardMonths. Attempt to press PREVIOUS button won't work either.
- *
- * @param {number} minBackwardYear - Set the min year which the PREVIOUS button
- * allowed to work. January start as 0. The setting override the setting in
- * backwardMonths. Let's say you set the base month to be February 2013, with
- * backwardMonths is 4. minBackwardYear is 2013. You will not see the Dec 2013
- * and Nov 2013 in your calendar. This setting override backwardMonths.
+ * @param {string} minBackwardMonth - Setting the min month which the PREVIOUS
+ * button allowed to work. Format is MM/YYYY . January start as 0. This setting
+ * will override the setting in backwardMonths. For example, you set the base
+ * month to be March 2014, with backwardMonths to be 3. You also set minBackwardMonths
+ * to be 1/2014. The calendar will not display January 2014, and Dec 2013, since
+ * minBackwardMonths override backwardMonths. Attempt to press PREVIOUS button
+ * won't work either.
  *
  * @example
  *
@@ -101,7 +90,7 @@
  *                month-name="['Tháng Một', 'Tháng Hai', 'Tháng Ba', 'Tháng Bốn', 'Tháng Năm', 'Tháng Sáu',
  *                'Tháng Bảy', 'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai']"
  *                day-name="['Chủ nhật','Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']"
- *                max-forward-month="10">
+ *                max-forward-month="'10/2013'">
  * <turn-calendar>
  *
  * The above code snippet will display 7 months instance, starting from Sep 2013
@@ -240,6 +229,27 @@ angular
             return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
         };
 
+
+        var convertToDateObject = function (monthValue) {
+
+            var splitArray = monthValue.split('/');
+
+            if (!splitArray.length) {
+                return null;
+            }
+
+            var month = splitArray[0], year = splitArray[1];
+
+            return new Date(year, month, 1);
+        };
+
+        var isExceedMaxMonth = function (month) {
+            return $scope.maxForwardMonth &&
+                convertToDateObject($scope.maxForwardMonth) &&
+                month > convertToDateObject($scope.maxForwardMonth).getMonth();
+        };
+
+
         /**
          * Add the number of forward months into base month
          *
@@ -269,11 +279,7 @@ angular
                     }
                 }
 
-                if ($scope.maxForwardYear && year > $scope.maxForwardYear) {
-                    return;
-                }
-
-                if ($scope.maxForwardMonth && newMonth > $scope.maxForwardMonth) {
+                if (isExceedMaxMonth(newMonth)) {
                     return;
                 }
 
@@ -282,6 +288,12 @@ angular
 
             }
 
+        };
+
+        var isBelowMinMonth = function (month) {
+            return $scope.minBackwardMonth &&
+                   convertToDateObject($scope.minBackwardMonth) &&
+                   month < convertToDateObject($scope.minBackwardMonth).getMonth();
         };
 
         /**
@@ -317,11 +329,7 @@ angular
                     newMonthCount++;
                 }
 
-                if ($scope.minBackwardYear && year < $scope.minBackwardYear) {
-                    return;
-                }
-
-                if ($scope.minBackwardMonth && newMonth > $scope.minBackwardMonth) {
+                if (isBelowMinMonth(newMonth)) {
                     return;
                 }
 
@@ -875,6 +883,7 @@ angular
             $scope.calendarEnabled = false;
         };
 
+
         /**
          * Function that add a new month into the month array, remove the last
          * month at the same time
@@ -888,11 +897,7 @@ angular
                 month = middleDateOfMonth.date.getMonth(),
                 newMonth = month + 1;
 
-            if ($scope.maxForwardYear && year > $scope.maxForwardYear) {
-                return;
-            }
-
-            if ($scope.maxForwardMonth && newMonth > $scope.maxForwardMonth) {
+            if (isExceedMaxMonth(newMonth)) {
                 return;
             }
 
@@ -948,11 +953,7 @@ angular
                 month = middleDateOfMonth.date.getMonth(),
                 newMonth = month - 1;
 
-            if ($scope.minBackwardYear && year < $scope.minBackwardYear) {
-                return;
-            }
-
-            if ($scope.minBackwardMonth && newMonth > $scope.minBackwardMonth) {
+            if (isBelowMinMonth(newMonth)) {
                 return;
             }
 
@@ -1093,6 +1094,8 @@ angular
         $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
         $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
 
+
+
         /**
          * Change start date when ng-change detects the user changing the start
          * date
@@ -1204,9 +1207,9 @@ angular
                 monthName: '&',
                 dayName: '&',
                 maxForwardMonth: '=',
-                maxForwardYear: '=',
                 minBackwardMonth: '=',
-                minBackwardYear: '='
+                startDate: '=',
+                endDate: '='
             },
             controller: 'CalendarController',
             templateUrl: 'turnCalendar.html'
