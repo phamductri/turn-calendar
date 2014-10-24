@@ -42,11 +42,11 @@
  * MM-DD-YYYY or MM/DD/YYYY format.
  *
  * @param {number} weeklySelectRange - A number in which if the hovered/selected
- * SECOND date is beyond the FIRST selected date, the mouse pointer will change
+ * CURRENT date is beyond the LAST selected date, the mouse pointer will change
  * to WEEKLY hover/selected mode.
  *
  * @param {number} monthlySelectRange - A number in which if the hovered/selected
- * SECOND date is beyond the FIRST selected date, the mouse pointer will change
+ * CURRENT date is beyond the LAST selected date, the mouse pointer will change
  * to MONTHLY hover/selected mode.
  *
  * @param {array} priorRangePresets - An array of object that specify the range
@@ -96,18 +96,17 @@
  * The above code snippet will display 7 months instance, starting from Sep 2013
  * to March 2014, with Monday as the starting day of the week, the base month is
  * Dec 2013, it will change to weekly select mode if the cursor is 30 days beyond
- * the current selected date, monthly select mode if cursor is 60 days beyond the
- * current selected date. It will display 3 prior buttons: 20, 45, 90, with 25 is
- * pre-selected from the CURRENT date. Anything before 09/13/2013 is not available
- * for selection. It display the month name and day name in Vietnamese. Any month
- * above Nov of the year is now allowed.
+ * the last selected date, monthly select mode if cursor is 60 days beyond the last
+ * selected date. It will display 3 prior buttons: 20, 45, 90, with 25 is pre-selected
+ * from the CURRENT date. Anything before 09/13/2013 is not available for selection.
+ * It display the month name and day name in Vietnamese. Any month above Nov of the
+ * year is now allowed.
  *
  * @author Tri Pham <tri.pham@turn.com>
  */
 angular
     .module('turn/calendar', ['calendarTemplates'])
     .controller('CalendarController', ['$scope', function ($scope) {
-
 
         /**
          * Default month name to display on calendar
@@ -472,38 +471,39 @@ angular
          * day is falling within
          * @param {number} compareRange - An optional second range, to determine
          * if the day is sandwiched between two range or not
+         * @param {object} baseDay - The base day which we compare against
          * @param {object} day - The day in question
          * @returns {boolean} True if exceeds or is between the two range, false
          * if not
          */
-        var isDateWithinSelectedRange = function (selectRange, compareRange, day) {
+        var isDateWithinSelectedRange = function (selectRange, compareRange, baseDay, day) {
 
-            if (!selectRange) {
+            if (!selectRange || !day || day.isUnavailable || !lastSelectedDate) {
                 return false;
             }
 
-            var tempDateForward = new Date($scope.selectedStartDate.date.toLocaleDateString()),
-                tempDateBackward = new Date($scope.selectedStartDate.date.toLocaleDateString());
+            var selectDateForward = new Date(baseDay.date.toLocaleDateString()),
+                selectDateBackward = new Date(baseDay.date.toLocaleDateString());
 
-            tempDateForward.setDate(tempDateForward.getDate() + selectRange);
-            tempDateBackward.setDate(tempDateBackward.getDate() - selectRange);
+            selectDateForward.setDate(selectDateForward.getDate() + selectRange);
+            selectDateBackward.setDate(selectDateBackward.getDate() - selectRange);
 
             if (compareRange) {
 
-                var compareRangeForward = new Date($scope.selectedStartDate.date.toLocaleDateString()),
-                    compareRangeBackward = new Date($scope.selectedStartDate.date.toLocaleDateString());
+                var compareRangeForward = new Date(lastSelectedDate.date.toLocaleDateString()),
+                    compareRangeBackward = new Date(lastSelectedDate.date.toLocaleDateString());
 
                 compareRangeForward.setDate(compareRangeForward.getDate() + compareRange);
                 compareRangeBackward.setDate(compareRangeBackward.getDate() - compareRange);
 
                 if (compareRange > selectRange) {
-                    return !day.isUnavailable &&
-                        ((day.date > tempDateForward && day.date < compareRangeForward) ||
-                            (day.date > compareRangeBackward && day.date < tempDateBackward));
+                    return (day.date > selectDateForward && day.date < compareRangeForward) ||
+                        (day.date > compareRangeBackward && day.date < selectDateBackward);
                 }
+
             }
 
-            return !day.isUnavailable && (day.date > tempDateForward || day.date < tempDateBackward);
+            return day.date > selectDateForward || day.date < selectDateBackward;
         };
 
         var setWeekValue = function (week, isHover, hoverValue, selectMode) {
@@ -545,7 +545,7 @@ angular
 
                 var monthFound = month.some(function (week) {
                     return week.some(function (day) {
-                        return day.date && day.date.getTime() === selectedDay.date.getTime();
+                        return day && day.date && day.date.toLocaleDateString() === selectedDay.date.toLocaleDateString();
                     })
                 });
 
@@ -577,7 +577,7 @@ angular
                 month.some(function (week) {
 
                     weekFound = week.some(function (day) {
-                        return day.date && day.date.getTime() === selectedDay.date.getTime();
+                        return day && day.date && day.date.toLocaleDateString() === selectedDay.date.toLocaleDateString();
                     });
 
                     if (weekFound) {
@@ -605,22 +605,17 @@ angular
                 return;
             }
 
-            if ($scope.selectedStartDate && $scope.selectedEndDate) {
-                day.isHover = true;
-                return;
-            }
-
             if (!$scope.selectedStartDate) {
                 day.isHover = true;
                 return;
             }
 
-            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, day)) {
+            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, lastSelectedDate, day)) {
                 paletteTheWeek(day, true, true, '');
                 return;
             }
 
-            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, day)) {
+            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, lastSelectedDate, day)) {
                 paletteTheMonth(day, true, true, '');
                 return;
             }
@@ -643,12 +638,12 @@ angular
                 return;
             }
 
-            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, day)) {
+            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, lastSelectedDate, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
 
-            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, day)) {
+            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, lastSelectedDate, day)) {
                 paletteTheMonth(day, true, false, '');
                 return;
             }
@@ -690,8 +685,8 @@ angular
 
         var isDaily = function () {
             return (!$scope.weeklySelectRange && !$scope.monthlySelectRange) ||
-                   (!isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedEndDate) &&
-                    !isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedEndDate));
+                   (!isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate) &&
+                    !isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate));
         };
 
         /**
@@ -722,11 +717,11 @@ angular
                                 day.selectMode = 'daily';
                             }
 
-                            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedEndDate)) {
+                            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
                                 day.selectMode = 'weekly';
                             }
 
-                            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, $scope.selectedEndDate)) {
+                            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
                                 day.selectMode = 'monthly';
                             }
 
@@ -737,13 +732,15 @@ angular
             });
 
             // Color the entire end week, not just the selected end date
-            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedEndDate)) {
+            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+
                 paletteTheWeek($scope.selectedStartDate, false, false, 'weekly');
                 paletteTheWeek($scope.selectedEndDate, false, false, 'weekly');
             }
 
             // Color the entire month, not just the selected end date
-            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, $scope.selectedEndDate)) {
+            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+
                 paletteTheMonth($scope.selectedStartDate, false, false, 'monthly');
                 paletteTheMonth($scope.selectedEndDate, false, false, 'monthly');
             }
@@ -763,22 +760,6 @@ angular
                     });
                 });
             });
-        };
-
-
-        /**
-         * Clear the calendar of hover and selected days, reset the start date
-         * to the newly selected date
-         *
-         * @param {object} day - The new start date
-         */
-        var resetCalendar = function (day) {
-
-            $scope.selectedEndDate = null;
-            discolorSelectedDateRange();
-            $scope.selectedStartDate = day;
-            day.selectMode = 'daily';
-
         };
 
         var isBothSelected = function () {
@@ -817,6 +798,40 @@ angular
 
         };
 
+        var lastSelectedDate = null;
+
+        var swapDate = function () {
+
+            if ($scope.selectedEndDate.date < $scope.selectedStartDate.date) {
+                var tempDay = $scope.selectedStartDate;
+                $scope.selectedStartDate = $scope.selectedEndDate;
+                $scope.selectedEndDate = tempDay;
+            }
+        };
+
+        var resetDayClick = function (day) {
+
+            if (!lastSelectedDate) {
+                lastSelectedDate = $scope.selectedEndDate;
+            }
+
+            if ($scope.selectedStartDate.date == lastSelectedDate.date) {
+                $scope.selectedEndDate = day;
+            } else if ($scope.selectedEndDate.date == lastSelectedDate.date) {
+                $scope.selectedStartDate = day;
+            }
+
+            swapDate();
+            $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
+            $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+
+            discolorSelectedDateRange();
+
+            colorSelectedDateRange();
+
+            lastSelectedDate = day;
+        };
+
         /**
          * Function to execute to determine whether to set start date, end date,
          * or reset the calendar
@@ -839,7 +854,7 @@ angular
 
             } else if (isBothSelected()) {
 
-                resetCalendar(day);
+                resetDayClick(day);
 
             }
 
@@ -994,45 +1009,6 @@ angular
             }
         };
 
-        /**
-         * Function to set the default selection if the user specify a default
-         * prior button
-         */
-        var setDefaultRange = function () {
-
-            var defaultRange = null;
-
-            $scope.priorButtons = $scope.priorRangePresets();
-
-            for (var i = 0; i < $scope.priorButtons.length; i++) {
-
-                var priorRange = $scope.priorButtons[i];
-
-                if (priorRange.isDefault) {
-                    defaultRange = priorRange;
-                    break;
-                }
-            }
-
-            if (!defaultRange) {
-                return;
-            }
-
-            var endDate = new Date(),
-                startDate = new Date();
-
-            endDate = generateMetaDateObject(endDate, endDate.getMonth());
-
-            startDate.setDate(startDate.getDate() - defaultRange.value);
-
-            startDate = generateMetaDateObject(startDate, startDate.getMonth());
-
-            setStartDate(startDate);
-            setEndDate(endDate);
-
-            $scope.currentSelectedEndDate = endDate;
-            $scope.currentSelectedStartDate = startDate;
-        };
 
         $scope.selectedStartDate = null;
         $scope.selectedEndDate = null;
@@ -1052,11 +1028,10 @@ angular
 
             discolorSelectedDateRange();
 
-            var tempDate = new Date(),
-                startDate = new Date(tempDate.toLocaleDateString()),
-                endDate = new Date(tempDate.toLocaleDateString());
+            var startDate = new Date(),
+                endDate = new Date();
 
-            $scope.monthArray = generateMonthArray(tempDate.getFullYear(), tempDate.getMonth());
+            $scope.monthArray = generateMonthArray(endDate.getFullYear(), endDate.getMonth());
 
             startDate.setDate(startDate.getDate() - range.value);
             var startDay = generateMetaDateObject(startDate, startDate.getMonth());
@@ -1083,9 +1058,43 @@ angular
                 endDay = generateMetaDateObject(endDate, endDate.getMonth());
             }
 
+            lastSelectedDate = $scope.selectedStartDate;
+
             setEndDate(endDay);
 
+
         };
+
+        /**
+         * Function to set the default selection if the user specify a default
+         * prior button
+         */
+        var setDefaultRange = function () {
+
+            var defaultRange = null;
+
+            $scope.priorButtons = $scope.priorRangePresets();
+
+            for (var i = 0; i < $scope.priorButtons.length; i++) {
+
+                var priorRange = $scope.priorButtons[i];
+
+                if (priorRange.isDefault) {
+                    defaultRange = priorRange;
+                    break;
+                }
+            }
+
+            if (!defaultRange) {
+                return;
+            }
+
+            $scope.selectRange(defaultRange);
+
+            $scope.currentSelectedEndDate = $scope.selectedEndDate;
+            $scope.currentSelectedStartDate = $scope.selectedStartDate;
+        };
+
 
         if ($scope.priorRangePresets()) {
             setDefaultRange();
@@ -1109,7 +1118,7 @@ angular
             }
 
             discolorSelectedDateRange();
-            console.log($scope.monthArray[0][2][6]);
+
 
             var middleDateFirstMonth = $scope.monthArray[0][2][6],
                 firstDateFirstMonth = new Date(middleDateFirstMonth.date.getFullYear(), middleDateFirstMonth.date.getMonth(), 1);
