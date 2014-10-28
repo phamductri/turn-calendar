@@ -8,12 +8,12 @@
  *
  * Allow the following options :
  *
- * @param {number} startingMonth - The STARTING month of the calendar, if not
- * specify will use the current month. January is count as 0, February is 1,
- * and so on.
+ * @param {number} startingMonth - Optional. The STARTING month of the calendar,
+ * if not specify will use the current month. January is count as 0, February is
+ * 1, and so on.
  *
- * @param {number} startingYear - The STARTING year of the calendar, if not
- * specify will use the current year.
+ * @param {number} startingYear - Optional. The STARTING year of the calendar,
+ * if not specify will use the current year.
  *
  * @param {number} backwardMonths - The number of calendar instances of previous
  * months count from the STARTING month instance, notice the s. For example, if
@@ -106,7 +106,7 @@
  */
 angular
     .module('turn/calendar', ['calendarTemplates'])
-    .controller('CalendarController', ['$scope', function ($scope) {
+    .controller('CalendarController', ['$scope' , '$attrs', '$parse', function ($scope, $attrs, $parse) {
 
         /**
          * Default month name to display on calendar
@@ -168,7 +168,7 @@ angular
          */
         $scope.dayNames = [];
 
-        if ($scope.dayName()) {
+        if ($scope.dayName) {
             DAY_NAME = $scope.dayName();
         }
 
@@ -184,6 +184,24 @@ angular
         if ($scope.monthName()) {
             MONTH_NAME = $scope.monthName();
         }
+
+        if ($attrs.calendarOptions) {
+
+            console.log($scope);
+            console.log($attrs.calendarOptions);
+            angular.forEach($scope.$parent.$eval($attrs.calendarOptions), function (value, option) {
+
+                if (!$scope[option] ) {
+                    console.log(option);
+                    $scope[option] = value;
+                }
+
+            });
+
+
+        }
+
+
 
         /**
          * Determine the starting month for base month, if not specify from input
@@ -1100,10 +1118,13 @@ angular
             setDefaultRange();
         }
 
-        $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
-        $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+        if ($scope.selectedStartDate) {
+            $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
+        }
 
-
+        if ($scope.selectedEndDate) {
+            $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+        }
 
         /**
          * Change start date when ng-change detects the user changing the start
@@ -1129,9 +1150,40 @@ angular
 
             setStartDate(day);
 
+            $scope.endDate = day.date.toLocaleDateString();
+
             if ($scope.selectedEndDate && $scope.selectedEndDate.date > day.date) {
                 colorSelectedDateRange();
             }
+        };
+
+        var validateDateInput = function (date) {
+
+            if (!date) {
+                return false;
+            }
+
+            if (typeof date !== 'number' && typeof date !== 'string') {
+                return false;
+            }
+
+            if (typeof date === 'string') {
+                var milliSeconds = Date.parse(date);
+
+                if (isNaN(milliSeconds)) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            var dateObj = new Date(date);
+
+            if (!dateObj) {
+                return false;
+            }
+
+            return true;
         };
 
         /**
@@ -1139,13 +1191,7 @@ angular
          */
         $scope.changeStartDate = function () {
 
-            if (!$scope.startDateString) {
-                return;
-            }
-
-            var milliSeconds = Date.parse($scope.startDateString);
-
-            if (isNaN(milliSeconds)) {
+            if (!validateDateInput($scope.startDateString)) {
                 return;
             }
 
@@ -1153,6 +1199,8 @@ angular
 
             setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
         };
+
+
 
         /**
          * Change the end date, provoke by ng-change
@@ -1170,6 +1218,7 @@ angular
             }
 
             $scope.selectedEndDate = day;
+            $scope.endDate = day.date.toLocaleDateString();
 
 
             discolorSelectedDateRange();
@@ -1182,13 +1231,7 @@ angular
          */
         $scope.changeEndDate = function () {
 
-            if (!$scope.endDateString) {
-                return;
-            }
-
-            var milliSeconds = Date.parse($scope.endDateString);
-
-            if (isNaN(milliSeconds)) {
+            if (!validateDateInput($scope.endDateString)) {
                 return;
             }
 
@@ -1196,6 +1239,41 @@ angular
 
             setEndDateString(generateMetaDateObject(newDate, newDate.getMonth()));
         };
+
+        $scope.$watch('startDate', function (newVal) {
+
+            if (!validateDateInput(newVal)) {
+                return;
+            }
+
+            var newStartDate = new Date(newVal);
+            $scope.selectedStartDate = generateMetaDateObject(newStartDate, newStartDate.getMonth());
+            $scope.startDateString = $scope.selectedStartDate.toLocaleDateString();
+
+            if ($scope.selectedEndDate) {
+                discolorSelectedDateRange();
+                colorSelectedDateRange();
+            }
+
+        });
+
+        $scope.$watch('endDate', function (newVal) {
+
+            if (!validateDateInput(newVal)) {
+                return;
+            }
+
+            var newEndDate = new Date(newVal);
+
+            $scope.selectedEndDate = generateMetaDateObject(newEndDate, newEndDate.getMonth());
+            $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+
+            if ($scope.selectedStartDate) {
+                discolorSelectedDateRange();
+                colorSelectedDateRange();
+            }
+
+        });
 
     }])
     .directive('turnCalendar', function () {

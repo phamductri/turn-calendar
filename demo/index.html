@@ -28,17 +28,45 @@
                     return currentDate.getMonth() + '/' + currentDate.getFullYear();
                 };
 
+                $scope.endDate = new Date().getTime();
+
+                $scope.setNewEndDate = function () {
+                    var currentVal = new Date($scope.endDate);
+                    currentVal.setDate(currentVal.getDate() + 1);
+                    $scope.endDate = currentVal.getTime();
+
+                };
+
+                $scope.calendarOptions = {
+                    useMonday: true,
+                    backwardMonths: 2,
+                    forwardMonths: 2,
+                    minSelectDate: '9/13/2013',
+                    weeklySelectRange: 60,
+                    monthlySelectRange: 90,
+                    minBackwardMonth : '08/2013',
+                    endDate : $scope.endDate
+                };
+
             });
 
 </script>
+<div>
+    <button ng-click="setNewEndDate()">Increase start date</button>
 
-<turn-calendar use-monday="true" backward-months="2" min-select-date="'9/13/2013'"
-               max-select-date="currentDate()" weekly-select-range="30"
-               monthly-select-range="60"
-               max-forward-month="maxMonthAllowed()" min-backward-month="'08/2013'"
+</div>
+
+
+<!--turn-calendar use-monday="true" backward-months="2" forward-months="2"
+               min-select-date="'9/13/2013'"
+               weekly-select-range="60"
+               monthly-select-range="90"
+               min-backward-month="'08/2013'"
                prior-range-presets="[{value: 7}, {value: 30, isDefault: true}, {value : 45}]"
-               start-date="">
+               end-date="endDate"-->
 
 </turn-calendar>
+
+<turn-calendar calendar-options="calendarOptions"></turn-calendar>
 </body>
 </html>
