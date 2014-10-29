@@ -81,6 +81,17 @@
  * minBackwardMonths override backwardMonths. Attempt to press PREVIOUS button
  * won't work either.
  *
+ * @param {string/number} startDate - Set the start date to be selected on the
+ * calendar. Accept dateString or Unix timestamp. Set this as a directive attribute
+ * if you want to be able to set this value in real time.
+ *
+ * @param {string|number} endDate - Set the end date to be selected on the calendar.
+ * Accept dateString or Unix timestamp. Set this value as directive attribute if
+ * you want to be able to set this value in real time.
+ *
+ * All of the above options can be set through a config object. Pass in the config
+ * object through attribute calendarConfig.
+ *
  * @example
  *
  * <turn-calendar use-monday="true" starting-month="11" starting-year="2013"
@@ -106,21 +117,65 @@
  */
 angular
     .module('turn/calendar', ['calendarTemplates'])
-    .controller('CalendarController', ['$scope' , '$attrs', '$parse', function ($scope, $attrs, $parse) {
+    .constant('turnCalendarDefaults', {
 
         /**
          * Default month name to display on calendar
          *
          * @type {array}
          */
-        var MONTH_NAME = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        monthName : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 
         /**
          * Default day name to display on calendar
          *
          * @type {array}
          */
-        var DAY_NAME = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+        dayName: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+        startingMonth: new Date().getMonth(),
+        startingYear: new Date().getFullYear()
+    })
+    .controller('CalendarController', ['$scope' , '$attrs', 'turnCalendarDefaults', function ($scope, $attrs, turnCalendarDefaults) {
+
+        var self = this, calendarOptions, MONTH_NAME;
+
+        if ($attrs.calendarOptions) {
+            calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
+        }
+
+        /**
+         * Helper function to pick the value from either attribute or from config
+         * object.
+         *
+         * @param {string} property The property to be read from attribute setting or
+         * from a config object, if set in both attribute and config, the attribute
+         * value will be use
+         * @returns {*} The value
+         */
+        var pickValue = function (property) {
+
+            if (angular.isDefined($attrs[property])) {
+                return $scope.$parent.$eval($attrs[property]);
+            }
+
+            if (angular.isDefined(calendarOptions) && calendarOptions[property]) {
+                return calendarOptions[property];
+            }
+
+            if (turnCalendarDefaults[property]) {
+                return turnCalendarDefaults[property];
+            }
+
+            return null;
+
+        };
+
+        // Configuration attributes
+        angular.forEach(['startingMonth', 'startingYear', 'backwardMonths', 'forwardMonths', 'useMonday', 'minSelectDate',
+            'maxSelectDate', 'weeklySelectRange', 'monthlySelectRange', 'priorRangePresets', 'monthName', 'dayName',
+             'maxForwardMonth', 'minForwardMonth', 'startDate', 'endDate'], function(key) {
+            self[key] = pickValue(key);
+        });
 
         /**
          * Constraint on maximum months allowed to display, either as forward
@@ -168,79 +223,18 @@ angular
          */
         $scope.dayNames = [];
 
-        if ($scope.dayName) {
-            DAY_NAME = $scope.dayName();
-        }
+        var sunday = self.dayName.shift();
+        $scope.dayNames = $scope.dayNames.concat(self.dayName);
 
-        var sunday = DAY_NAME.shift();
-        $scope.dayNames = $scope.dayNames.concat(DAY_NAME);
-
-        if ($scope.useMonday) {
+        if (self.useMonday) {
             $scope.dayNames.push(sunday);
         } else {
             $scope.dayNames.unshift(sunday);
         }
 
-        if ($scope.monthName()) {
-            MONTH_NAME = $scope.monthName();
+        if (self.monthName) {
+            MONTH_NAME = self.monthName;
         }
-
-        if ($attrs.calendarOptions) {
-
-            console.log($scope);
-            console.log($attrs.calendarOptions);
-            angular.forEach($scope.$parent.$eval($attrs.calendarOptions), function (value, option) {
-
-                if (!$scope[option] ) {
-                    console.log(option);
-                    $scope[option] = value;
-                }
-
-            });
-
-
-        }
-
-
-
-        /**
-         * Determine the starting month for base month, if not specify from input
-         * it will use the current month
-         *
-         * @returns {number} - Starting month of the base month of calendar
-         */
-        var setBaseMonth = function () {
-
-            var month, currentDate = new Date();
-
-            if ($scope.startingMonth && $scope.startingMonth >= 0) {
-                month = $scope.startingMonth;
-            } else {
-                month = currentDate.getMonth();
-            }
-
-            return month;
-        };
-
-        /**
-         * Determine the starting year of base month, if not specify will use
-         * the current year
-         *
-         * @returns {number} - The starting year of base month of calendar
-         */
-        var setBaseYear = function () {
-
-            var year, currentDate = new Date();
-
-            if ($scope.startingYear) {
-                year = $scope.startingYear;
-            } else {
-                year = currentDate.getFullYear();
-            }
-
-            return year;
-        };
-
 
         var isMonthValid = function (month) {
             return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
@@ -261,9 +255,9 @@ angular
         };
 
         var isExceedMaxMonth = function (month, year) {
-            return $scope.maxForwardMonth &&
-                convertToDateObject($scope.maxForwardMonth) &&
-                new Date(year, month, 1) > convertToDateObject($scope.maxForwardMonth);
+            return self.maxForwardMonth &&
+                convertToDateObject(self.maxForwardMonth) &&
+                new Date(year, month, 1) > convertToDateObject(self.maxForwardMonth);
         };
 
 
@@ -276,13 +270,13 @@ angular
          */
         var setForwardMonths = function (monthArray, month, year) {
 
-            if (!isMonthValid($scope.forwardMonths)) {
+            if (!isMonthValid(self.forwardMonths)) {
                 return;
             }
 
             var yearReset = false;
 
-            for (var i = 1; i <= $scope.forwardMonths; i++) {
+            for (var i = 1; i <= self.forwardMonths; i++) {
 
                 var newMonth = month + i;
 
@@ -308,9 +302,9 @@ angular
         };
 
         var isBelowMinMonth = function (month, year) {
-            return $scope.minBackwardMonth &&
-                   convertToDateObject($scope.minBackwardMonth) &&
-                   new Date(year, month, 1) < convertToDateObject($scope.minBackwardMonth);
+            return self.minBackwardMonth &&
+                   convertToDateObject(self.minBackwardMonth) &&
+                   new Date(year, month, 1) < convertToDateObject(self.minBackwardMonth);
         };
 
         /**
@@ -322,13 +316,13 @@ angular
          */
         var setBackwardMonths = function (monthArray, month, year) {
 
-            if (!isMonthValid($scope.backwardMonths)) {
+            if (!isMonthValid(self.backwardMonths)) {
                 return;
             }
 
             var yearReset = false, newMonthCount = 0;
 
-            for (var i = 1; i <= $scope.backwardMonths; i++) {
+            for (var i = 1; i <= self.backwardMonths; i++) {
 
                 var newMonth = month - i;
 
@@ -368,8 +362,8 @@ angular
          * @returns {array} The array that contains
          */
         var generateMonthArray = function (inputYear, inputMonth) {
-            var year = setBaseYear(),
-                month = setBaseMonth();
+            var year = self.startingYear,
+                month = self.startingMonth;
 
             if (inputYear) {
                 year = inputYear;
@@ -410,7 +404,7 @@ angular
                 dayOfWeek = firstDayOfMonth.getDay(),
                 firstDate;
 
-            if ($scope.useMonday) {
+            if (self.useMonday) {
 
                 /**
                  * Edge case, if the first day on month is a Sunday, and the config
@@ -476,8 +470,8 @@ angular
          * @returns {boolean} - True if compatible, false if not
          */
         var isUnavailable = function (date) {
-            return date <= new Date($scope.minSelectDate) ||
-                   date >= new Date($scope.maxSelectDate);
+            return (self.minSelectDate && date <= new Date(self.minSelectDate)) ||
+                   (self.maxSelectDate && date >= new Date(self.maxSelectDate));
         };
 
 
@@ -628,12 +622,12 @@ angular
                 return;
             }
 
-            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, lastSelectedDate, day)) {
+            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
                 paletteTheWeek(day, true, true, '');
                 return;
             }
 
-            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, lastSelectedDate, day)) {
+            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
                 paletteTheMonth(day, true, true, '');
                 return;
             }
@@ -656,12 +650,12 @@ angular
                 return;
             }
 
-            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, lastSelectedDate, day)) {
+            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
 
-            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, lastSelectedDate, day)) {
+            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
                 paletteTheMonth(day, true, false, '');
                 return;
             }
@@ -702,9 +696,9 @@ angular
         };
 
         var isDaily = function () {
-            return (!$scope.weeklySelectRange && !$scope.monthlySelectRange) ||
-                   (!isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate) &&
-                    !isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate));
+            return (!self.weeklySelectRange && !self.monthlySelectRange) ||
+                   (!isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate) &&
+                    !isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate));
         };
 
         /**
@@ -735,11 +729,11 @@ angular
                                 day.selectMode = 'daily';
                             }
 
-                            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+                            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
                                 day.selectMode = 'weekly';
                             }
 
-                            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+                            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
                                 day.selectMode = 'monthly';
                             }
 
@@ -750,14 +744,14 @@ angular
             });
 
             // Color the entire end week, not just the selected end date
-            if (isDateWithinSelectedRange($scope.weeklySelectRange, $scope.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
 
                 paletteTheWeek($scope.selectedStartDate, false, false, 'weekly');
                 paletteTheWeek($scope.selectedEndDate, false, false, 'weekly');
             }
 
             // Color the entire month, not just the selected end date
-            if (isDateWithinSelectedRange($scope.monthlySelectRange, $scope.weeklySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
 
                 paletteTheMonth($scope.selectedStartDate, false, false, 'monthly');
                 paletteTheMonth($scope.selectedEndDate, false, false, 'monthly');
@@ -943,12 +937,12 @@ angular
             var newMonthArray = generateDayArray(year, newMonth),
                 allowedArraySize = 1;
 
-            if ($scope.forwardMonths) {
-                allowedArraySize += $scope.forwardMonths;
+            if (self.forwardMonths) {
+                allowedArraySize += self.forwardMonths;
             }
 
-            if ($scope.backwardMonths) {
-                allowedArraySize += $scope.backwardMonths;
+            if (self.backwardMonths) {
+                allowedArraySize += self.backwardMonths;
             }
 
             /**
@@ -999,12 +993,12 @@ angular
             var newMonthArray = generateDayArray(year, newMonth),
                 allowedArraySize = 1;
 
-            if ($scope.forwardMonths) {
-                allowedArraySize += $scope.forwardMonths;
+            if (self.forwardMonths) {
+                allowedArraySize += self.forwardMonths;
             }
 
-            if ($scope.backwardMonths) {
-                allowedArraySize += $scope.backwardMonths;
+            if (self.backwardMonths) {
+                allowedArraySize += self.backwardMonths;
             }
 
             /**
@@ -1091,7 +1085,7 @@ angular
 
             var defaultRange = null;
 
-            $scope.priorButtons = $scope.priorRangePresets();
+            $scope.priorButtons = self.priorRangePresets;
 
             for (var i = 0; i < $scope.priorButtons.length; i++) {
 
@@ -1114,7 +1108,7 @@ angular
         };
 
 
-        if ($scope.priorRangePresets()) {
+        if (self.priorRangePresets) {
             setDefaultRange();
         }
 

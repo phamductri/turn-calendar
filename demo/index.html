@@ -40,12 +40,12 @@
                 $scope.calendarOptions = {
                     useMonday: true,
                     backwardMonths: 2,
-                    forwardMonths: 2,
                     minSelectDate: '9/13/2013',
                     weeklySelectRange: 60,
                     monthlySelectRange: 90,
-                    minBackwardMonth : '08/2013',
-                    endDate : $scope.endDate
+                    minBackwardMonth: '08/2013',
+                    priorRangePresets: [{value: 7}, {value: 30, isDefault: true}, {value : 45}],
+                    maxForwardMonth: $scope.maxMonthAllowed()
                 };
 
             });
@@ -57,13 +57,13 @@
 </div>
 
 
-<!--turn-calendar use-monday="true" backward-months="2" forward-months="2"
+<turn-calendar use-monday="true" backward-months="2" forward-months="2"
                min-select-date="'9/13/2013'"
                weekly-select-range="60"
                monthly-select-range="90"
                min-backward-month="'08/2013'"
                prior-range-presets="[{value: 7}, {value: 30, isDefault: true}, {value : 45}]"
-               end-date="endDate"-->
+               end-date="endDate">
 
 </turn-calendar>
 
