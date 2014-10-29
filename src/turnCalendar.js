@@ -90,7 +90,9 @@
  * you want to be able to set this value in real time.
  *
  * All of the above options can be set through a config object. Pass in the config
- * object through attribute calendarConfig.
+ * object through attribute calendarConfig. If you set the same config setting in
+ * attribute and in config object, the value set in attribute will used over the
+ * value in config object.
  *
  * @example
  *
@@ -1151,33 +1153,19 @@ angular
             }
         };
 
+        /**
+         * Helper function to validate date input, be it a string or a number
+         *
+         * @param {string|number} date Date input
+         * @returns {boolean} True if valid, false if not
+         */
         var validateDateInput = function (date) {
-
-            if (!date) {
-                return false;
-            }
-
-            if (typeof date !== 'number' && typeof date !== 'string') {
-                return false;
-            }
-
-            if (typeof date === 'string') {
-                var milliSeconds = Date.parse(date);
-
-                if (isNaN(milliSeconds)) {
-                    return false;
-                }
-
-                return true;
-            }
 
             var dateObj = new Date(date);
 
-            if (!dateObj) {
+            if ( Object.prototype.toString.call(dateObj) !== "[object Date]" )
                 return false;
-            }
-
-            return true;
+            return !isNaN(dateObj.getTime());
         };
 
         /**
@@ -1193,9 +1181,7 @@ angular
 
             setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
         };
-
-
-
+        
         /**
          * Change the end date, provoke by ng-change
          *
