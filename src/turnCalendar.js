@@ -29,9 +29,9 @@
  * don't set anything or setting values not in allowed range, there won't be
  * any forward months to display (i.e default value is 0).
  *
- * @param {boolean} useMonday - The week start on Monday instead of Sunday like
- * regular calendar. If not specify or set to true the calendar will use Sunday
- * as the first day of week.
+ * @param {number} startDayOfWeek - Allow the ability to set any day of the week
+ * as the first day of week. Use 0 for Sunday, 1 for Monday, so on. Default is
+ * 0.
  *
  * @param {string} minSelectDate - The minimum date which any dates which are
  * earlier than that date will not be able to be selected, accept a string in
@@ -96,14 +96,14 @@
  *
  * @example
  *
- * <turn-calendar use-monday="true" starting-month="11" starting-year="2013"
+ * <turn-calendar start-day-of-week="1" starting-month="11" starting-year="2013"
  *                forward-months="3" backward-months="3" min-select-date="'09/13/2013'"
  *                weekly-select-range="30" monthly-select-range="60"
  *                prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"
  *                month-name="['Tháng Một', 'Tháng Hai', 'Tháng Ba', 'Tháng Bốn', 'Tháng Năm', 'Tháng Sáu',
  *                'Tháng Bảy', 'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai']"
  *                day-name="['Chủ nhật','Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']"
- *                max-forward-month="'10/2013'">
+ *                max-forward-month="'10/2014'">
  * <turn-calendar>
  *
  * The above code snippet will display 7 months instance, starting from Sep 2013
@@ -113,7 +113,7 @@
  * selected date. It will display 3 prior buttons: 20, 45, 90, with 25 is pre-selected
  * from the CURRENT date. Anything before 09/13/2013 is not available for selection.
  * It display the month name and day name in Vietnamese. Any month above Nov of the
- * year is now allowed.
+ * year 2014 is not allowed.
  *
  * @author Tri Pham <tri.pham@turn.com>
  */
@@ -135,7 +135,8 @@ angular
          */
         dayName: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
         startingMonth: new Date().getMonth(),
-        startingYear: new Date().getFullYear()
+        startingYear: new Date().getFullYear(),
+        startDayOfWeek: 0
     })
     .controller('CalendarController', ['$scope' , '$attrs', 'turnCalendarDefaults', function ($scope, $attrs, turnCalendarDefaults) {
 
@@ -173,7 +174,7 @@ angular
         };
 
         // Configuration attributes
-        angular.forEach(['startingMonth', 'startingYear', 'backwardMonths', 'forwardMonths', 'useMonday', 'minSelectDate',
+        angular.forEach(['startingMonth', 'startingYear', 'backwardMonths', 'forwardMonths', 'startDayOfWeek', 'minSelectDate',
             'maxSelectDate', 'weeklySelectRange', 'monthlySelectRange', 'priorRangePresets', 'monthName', 'dayName',
              'maxForwardMonth', 'minForwardMonth', 'startDate', 'endDate'], function(key) {
             self[key] = pickValue(key);
@@ -225,14 +226,8 @@ angular
          */
         $scope.dayNames = [];
 
-        var sunday = self.dayName.shift();
-        $scope.dayNames = $scope.dayNames.concat(self.dayName);
-
-        if (self.useMonday) {
-            $scope.dayNames.push(sunday);
-        } else {
-            $scope.dayNames.unshift(sunday);
-        }
+        var dayRemained = self.dayName.splice(self.startDayOfWeek);
+        $scope.dayNames = dayRemained.concat(self.dayName);
 
         if (self.monthName) {
             MONTH_NAME = self.monthName;
@@ -240,6 +235,23 @@ angular
 
         var isMonthValid = function (month) {
             return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
+        };
+
+        /**
+         * A helper function to determine how many day we should go back from the
+         * first day of the month so that it fits the start day of week set by
+         * user
+         *
+         * @param {number} startDayOfWeek Start day of week chosen by user
+         * @param {number} firstDayOfMonth The day index of the week of the first
+         * day of month
+         * @returns {number} A number to indicate how many days we should go
+         * backward from the first day of the month to fit in the week that has
+         * an arbitrary start day
+         */
+        var generateFirstDateIndex = function (startDayOfWeek, firstDayOfMonth) {
+
+            return 0 - (DAY_IN_WEEK - 1 - startDayOfWeek - (0 - firstDayOfMonth));
         };
 
 
@@ -406,22 +418,7 @@ angular
                 dayOfWeek = firstDayOfMonth.getDay(),
                 firstDate;
 
-            if (self.useMonday) {
-
-                /**
-                 * Edge case, if the first day on month is a Sunday, and the config
-                 * is to use Monday as first day of week, then going backward 6 days
-                 * previous to use as first day in 42 days view
-                 */
-                if (dayOfWeek === 0) {
-                    firstDate = new Date(firstDayOfMonth.setDate(-5));
-                } else {
-                    firstDate = new Date(firstDayOfMonth.setDate(2 - dayOfWeek));
-                }
-
-            } else {
-                firstDate = new Date(firstDayOfMonth.setDate(1 - dayOfWeek))
-            }
+            firstDate = new Date(firstDayOfMonth.setDate(generateFirstDateIndex(self.startDayOfWeek, dayOfWeek)));
 
             return firstDate;
 
@@ -1181,7 +1178,7 @@ angular
 
             setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
         };
-        
+
         /**
          * Change the end date, provoke by ng-change
          *
@@ -1265,7 +1262,7 @@ angular
                 startingYear: '=',
                 backwardMonths: '=',
                 forwardMonths: '=',
-                useMonday: '=',
+                startDayOfWeek: '=',
                 weeklySelectRange: '=',
                 monthlySelectRange: '=',
                 minSelectDate: '=',
