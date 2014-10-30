@@ -119,6 +119,10 @@
  */
 angular
     .module('turn/calendar', ['calendarTemplates'])
+
+    /**
+    * Default values for some of the config option of the calendar
+    */
     .constant('turnCalendarDefaults', {
 
         /**
@@ -138,7 +142,31 @@ angular
         startingYear: new Date().getFullYear(),
         startDayOfWeek: 0
     })
-    .controller('CalendarController', ['$scope' , '$attrs', 'turnCalendarDefaults', function ($scope, $attrs, turnCalendarDefaults) {
+
+    /**
+    * Constraint on maximum months allowed to display, either as forwar or backward
+    *
+    * @type {number}
+    */
+    .constant('MAX_MONTH_ALLOWED', 6)
+
+    /**
+    * Constraint on minimum months allowed to display as extra forward or backward
+    *
+    * @type {number}
+    */
+    .constant('MIN_MONTH_ALLOWED', 1)
+    .service('turnCalendarService', ['MAX_MONTH_ALLOWED', 'MIN_MONTH_ALLOWED', function (MAX_MONTH_ALLOWED, MIN_MONTH_ALLOWED) {
+
+        return {
+
+
+            isMonthValid: function (month) {
+                return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
+            }
+        };
+    }])
+    .controller('CalendarController', ['$scope' , '$attrs', 'turnCalendarDefaults', 'turnCalendarService', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService) {
 
         var self = this, calendarOptions, MONTH_NAME;
 
@@ -179,23 +207,7 @@ angular
              'maxForwardMonth', 'minForwardMonth', 'startDate', 'endDate'], function(key) {
             self[key] = pickValue(key);
         });
-
-        /**
-         * Constraint on maximum months allowed to display, either as forward
-         * or backward
-         *
-         * @type {number}
-         */
-        const MAX_MONTH_ALLOWED = 6;
-
-        /**
-         * Constraint on minimum months allowed to display as extra forward or
-         * backward
-         *
-         * @type {number}
-         */
-        const MIN_MONTH_ALLOWED = 1;
-
+        
         /**
          * Maximum number of day to display on a calendar in month view
          *
@@ -232,10 +244,6 @@ angular
         if (self.monthName) {
             MONTH_NAME = self.monthName;
         }
-
-        var isMonthValid = function (month) {
-            return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
-        };
 
         /**
          * A helper function to determine how many day we should go back from the
@@ -284,7 +292,7 @@ angular
          */
         var setForwardMonths = function (monthArray, month, year) {
 
-            if (!isMonthValid(self.forwardMonths)) {
+            if (!turnCalendarService.isMonthValid(self.forwardMonths)) {
                 return;
             }
 
@@ -330,7 +338,7 @@ angular
          */
         var setBackwardMonths = function (monthArray, month, year) {
 
-            if (!isMonthValid(self.backwardMonths)) {
+            if (!turnCalendarService.isMonthValid(self.backwardMonths)) {
                 return;
             }
 
@@ -694,6 +702,13 @@ angular
             };
         };
 
+        /**
+         * Helper function to determine the current cursor mode, notice that the
+         * current cursor mode depends SOLELY on the current position of the
+         * START date and END date only.
+         *
+         * @returns {boolean} True if daily cursor mode, false if not
+         */
         var isDaily = function () {
             return (!self.weeklySelectRange && !self.monthlySelectRange) ||
                    (!isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate) &&
@@ -811,6 +826,10 @@ angular
 
         var lastSelectedDate = null;
 
+        /**
+         * Util function to swap start date and end date if the end date is less
+         * than start date
+         */
         var swapDate = function () {
 
             if ($scope.selectedEndDate.date < $scope.selectedStartDate.date) {
@@ -1048,7 +1067,7 @@ angular
             var startDay = generateMetaDateObject(startDate, startDate.getMonth());
 
             /**
-             * If endDate is unavailable, going forward 1 day till seeing one
+             * If start date is unavailable, going forward 1 day till seeing one
              * that is available
              */
             while (startDay.isUnavailable) {
@@ -1061,7 +1080,7 @@ angular
             var endDay = generateMetaDateObject(endDate, endDate.getMonth());
 
             /**
-             * If startDate is unavailable, going backward 1 day till seeing one
+             * If end date is unavailable, going backward 1 day till seeing one
              * that is available
              */
             while (endDay.isUnavailable) {
@@ -1217,39 +1236,29 @@ angular
             setEndDateString(generateMetaDateObject(newDate, newDate.getMonth()));
         };
 
-        $scope.$watch('startDate', function (newVal) {
+        angular.forEach(['startDate', 'endDate'], function (attribute) {
 
-            if (!validateDateInput(newVal)) {
-                return;
-            }
+            $scope.$watch(attribute, function (newVal) {
 
-            var newStartDate = new Date(newVal);
-            $scope.selectedStartDate = generateMetaDateObject(newStartDate, newStartDate.getMonth());
-            $scope.startDateString = $scope.selectedStartDate.toLocaleDateString();
+                if (!validateDateInput(newVal)) {
+                    return;
+                }
 
-            if ($scope.selectedEndDate) {
-                discolorSelectedDateRange();
-                colorSelectedDateRange();
-            }
+                var newDate = new Date(newVal);
 
-        });
+                if (attribute === 'startDate') {
+                    $scope.selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
+                    $scope.startDateString = $scope.selectedStartDate.toLocaleDateString();
+                } else {
+                    $scope.selectedEndDate = generateMetaDateObject(newDate, newDate.getMonth());
+                    $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+                }
 
-        $scope.$watch('endDate', function (newVal) {
-
-            if (!validateDateInput(newVal)) {
-                return;
-            }
-
-            var newEndDate = new Date(newVal);
-
-            $scope.selectedEndDate = generateMetaDateObject(newEndDate, newEndDate.getMonth());
-            $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
-
-            if ($scope.selectedStartDate) {
-                discolorSelectedDateRange();
-                colorSelectedDateRange();
-            }
-
+                if ($scope.selectedStartDate && $scope.selectedEndDate) {
+                    discolorSelectedDateRange();
+                    colorSelectedDateRange();
+                }
+            });
         });
 
     }])
