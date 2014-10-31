@@ -31,7 +31,7 @@ module.exports = (grunt) ->
 
     coffee:
       files:
-        'test/test.js': 'test/test.coffee'
+        'test/unit.js': 'test/unit.coffee'
 
     concat:
       main:
@@ -83,7 +83,7 @@ module.exports = (grunt) ->
       unit:
         src: './src/turnCalendar.js'
         options:
-          specs: './test/unit.js'
+          specs: './test/*.js'
           vendor: [
             './bower_components/angular/angular.js'
             './bower_components/angular-mocks/angular-mocks.js'

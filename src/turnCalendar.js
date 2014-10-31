@@ -156,13 +156,72 @@ angular
     * @type {number}
     */
     .constant('MIN_MONTH_ALLOWED', 1)
+
+    /**
+    * A service for calendar component, contains mostly util functions
+    */
     .service('turnCalendarService', ['MAX_MONTH_ALLOWED', 'MIN_MONTH_ALLOWED', function (MAX_MONTH_ALLOWED, MIN_MONTH_ALLOWED) {
 
         return {
 
-
+            /**
+             * Util function to check if the month is with allowed range for month
+             * value input
+             * @param {number} month - The month value input
+             * @returns {boolean} True if within the range, false if not
+             */
             isMonthValid: function (month) {
                 return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
+            },
+
+            /**
+             * Convert input in the form of 'MM/YYYY' into a Date object
+             *
+             * @param {string} monthValue The input month and year
+             * @returns {object} A Date object
+             */
+            convertToDateObject: function (monthValue) {
+
+                var splitArray = monthValue.split('/');
+
+                if (!splitArray.length) {
+                    return null;
+                }
+
+                var month = splitArray[0], year = splitArray[1];
+
+                return new Date(year, month, 1);
+            },
+
+            /**
+             * An utility function to split a big array into small chunks of a fixed
+             * size.
+             *
+             * @param {array} array - The array to be split
+             * @param {number} size - The fix size to be split into
+             * @returns {array} An array of fixed size array
+             */
+            arraySplit: function (array, size) {
+                var arrays = [];
+                while (array.length > 0) {
+                    arrays.push(array.splice(0, size));
+                }
+                return arrays;
+            },
+
+            /**
+             * Helper function to validate date input, be it a string or a number
+             *
+             * @param {string|number} date Date input
+             * @returns {boolean} True if valid, false if not
+             */
+            validateDateInput: function (date) {
+
+                var dateObj = new Date(date);
+
+                if ( Object.prototype.toString.call(dateObj) !== "[object Date]" )
+                    return false;
+                return !isNaN(dateObj.getTime());
             }
         };
     }])
@@ -207,7 +266,7 @@ angular
              'maxForwardMonth', 'minForwardMonth', 'startDate', 'endDate'], function(key) {
             self[key] = pickValue(key);
         });
-        
+
         /**
          * Maximum number of day to display on a calendar in month view
          *
@@ -262,26 +321,11 @@ angular
             return 0 - (DAY_IN_WEEK - 1 - startDayOfWeek - (0 - firstDayOfMonth));
         };
 
-
-        var convertToDateObject = function (monthValue) {
-
-            var splitArray = monthValue.split('/');
-
-            if (!splitArray.length) {
-                return null;
-            }
-
-            var month = splitArray[0], year = splitArray[1];
-
-            return new Date(year, month, 1);
-        };
-
         var isExceedMaxMonth = function (month, year) {
             return self.maxForwardMonth &&
-                convertToDateObject(self.maxForwardMonth) &&
-                new Date(year, month, 1) > convertToDateObject(self.maxForwardMonth);
+                turnCalendarService.convertToDateObject(self.maxForwardMonth) &&
+                new Date(year, month, 1) > turnCalendarService.convertToDateObject(self.maxForwardMonth);
         };
-
 
         /**
          * Add the number of forward months into base month
@@ -325,8 +369,8 @@ angular
 
         var isBelowMinMonth = function (month, year) {
             return self.minBackwardMonth &&
-                   convertToDateObject(self.minBackwardMonth) &&
-                   new Date(year, month, 1) < convertToDateObject(self.minBackwardMonth);
+                   turnCalendarService.convertToDateObject(self.minBackwardMonth) &&
+                   new Date(year, month, 1) < turnCalendarService.convertToDateObject(self.minBackwardMonth);
         };
 
         /**
@@ -433,22 +477,6 @@ angular
         };
 
         /**
-         * An utility function to split a big array into small chunks of a fixed
-         * size.
-         *
-         * @param {array} array - The array to be split
-         * @param {number} size - The fix size to be split into
-         * @returns {array} An array of fixed size array
-         */
-        var arraySplit = function (array, size) {
-            var arrays = [];
-            while (array.length > 0) {
-                arrays.push(array.splice(0, size));
-            }
-            return arrays;
-        };
-
-        /**
          * Function to generate the full 42 day to be shown on the calendar
          *
          * @param {number} year - The year to be shown
@@ -465,7 +493,7 @@ angular
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
-            return arraySplit(dayArray, DAY_IN_WEEK);
+            return turnCalendarService.arraySplit(dayArray, DAY_IN_WEEK);
         };
 
 
@@ -1170,26 +1198,11 @@ angular
         };
 
         /**
-         * Helper function to validate date input, be it a string or a number
-         *
-         * @param {string|number} date Date input
-         * @returns {boolean} True if valid, false if not
-         */
-        var validateDateInput = function (date) {
-
-            var dateObj = new Date(date);
-
-            if ( Object.prototype.toString.call(dateObj) !== "[object Date]" )
-                return false;
-            return !isNaN(dateObj.getTime());
-        };
-
-        /**
          * Invoke by ng-change when user input start date string
          */
         $scope.changeStartDate = function () {
 
-            if (!validateDateInput($scope.startDateString)) {
+            if (!turnCalendarService.validateDateInput($scope.startDateString)) {
                 return;
             }
 
@@ -1227,7 +1240,7 @@ angular
          */
         $scope.changeEndDate = function () {
 
-            if (!validateDateInput($scope.endDateString)) {
+            if (!turnCalendarService.validateDateInput($scope.endDateString)) {
                 return;
             }
 
@@ -1240,7 +1253,7 @@ angular
 
             $scope.$watch(attribute, function (newVal) {
 
-                if (!validateDateInput(newVal)) {
+                if (!turnCalendarService.validateDateInput(newVal)) {
                     return;
                 }
 
