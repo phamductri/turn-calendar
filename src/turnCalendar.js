@@ -15,79 +15,82 @@
  * @param {number} startingYear - Optional. The STARTING year of the calendar,
  * if not specify will use the current year.
  *
- * @param {number} backwardMonths - The number of calendar instances of previous
- * months count from the STARTING month instance, notice the s. For example, if
- * the STARTING month is September, and you want to display July and August in your
- * calendar pop up, set backwardMonths=2. Maximum allowed value is 6. Minimum
- * allowed is 1. If you don't set anything or setting values not in allowed
- * range, there won't be any backward months to display (i.e default value is 0).
+ * @param {number} backwardMonths - Optional. The number of calendar instances
+ * of previous months count from the STARTING month instance, notice the s. For
+ * example, if the STARTING month is September, and you want to display July and
+ * August in your calendar pop up, set backwardMonths=2. Maximum allowed value
+ * is 6. Minimum allowed is 1. If you don't set anything or setting values not
+ * in allowed range, there won't be any backward months to display (i.e default
+ * value is 0).
  *
- * @param {number} forwardMonths - The number of calendar instances of next
- * months count from the STARTING instance, notice the s at the end. For example:
- * STARTING month is September, and you want to display October and November, set
- * forwardMonths=2. Maximum allowed value is 6. Minimum allowed is 1. If you
- * don't set anything or setting values not in allowed range, there won't be
- * any forward months to display (i.e default value is 0).
+ * @param {number} forwardMonths - Optional. The number of calendar instances
+ * of next months count from the STARTING instance, notice the s at the end. For
+ * example: STARTING month is September, and you want to display October and
+ * November, set forwardMonths=2. Maximum allowed value is 6. Minimum allowed
+ * is 1. If you don't set anything or setting values not in allowed range, there
+ * won't be any forward months to display (i.e default value is 0).
  *
- * @param {number} startDayOfWeek - Allow the ability to set any day of the week
- * as the first day of week. Use 0 for Sunday, 1 for Monday, so on. Default is
- * 0.
+ * @param {number} startDayOfWeek - Optional. Allow the ability to set any day
+ * of the week as the first day of week. Use 0 for Sunday, 1 for Monday, so on.
+ * Default is 0.
  *
- * @param {string} minSelectDate - The minimum date which any dates which are
- * earlier than that date will not be able to be selected, accept a string in
- * MM-DD-YYYY or MM/DD/YYYY format.
+ * @param {string} minSelectDate - Optional. The minimum date which any dates
+ * which are earlier than that date will not be able to be selected, accept a
+ * string in MM-DD-YYYY or MM/DD/YYYY format.
  *
- * @param {string} maxSelectDate - The maximum date which any dates which are
- * later than that date will not be able to be selected, accept a string in
- * MM-DD-YYYY or MM/DD/YYYY format.
+ * @param {string} maxSelectDate - Optional. The maximum date which any dates
+ * which are later than that date will not be able to be selected, accept a string
+ * in MM-DD-YYYY or MM/DD/YYYY format.
  *
- * @param {number} weeklySelectRange - A number in which if the hovered/selected
- * CURRENT date is beyond the LAST selected date, the mouse pointer will change
- * to WEEKLY hover/selected mode.
+ * @param {number} weeklySelectRange - Optional. A number in which if the hovered
+ * (or selected) CURRENT date is beyond the LAST selected date, the mouse pointer
+ * will change to WEEKLY hover/selected mode. If this or monthlySelectChange is
+ * not specified, the default mode is daily.
  *
- * @param {number} monthlySelectRange - A number in which if the hovered/selected
- * CURRENT date is beyond the LAST selected date, the mouse pointer will change
- * to MONTHLY hover/selected mode.
+ * @param {number} monthlySelectRange - Optional. A number in which if the hovered
+ * (or selected) CURRENT date is beyond the LAST selected date, the mouse pointer
+ * will change to MONTHLY hover/selected mode. If this or weeklySelectRange is
+ * not specified, the default mode is daily.
  *
- * @param {array} priorRangePresets - An array of object that specify the range
- * buttons to appear for user to select prior range from the CURRENT date. If
- * you want a pre-selected range add a property called isDefault: true. The
- * object MUST have a property called 'value' to display it. Value is a number.
+ * @param {array} priorRangePresets - Optional. An array of object that specify
+ * the range buttons to appear for user to select prior range from the CURRENT
+ * date. If you want a pre-selected range add a property called isDefault: true.
+ * The object MUST have a property called 'value' to display it. Value is a number.
  * The range will conform with minSelectDate, maxSelectDate, weeklySelectDate,
  * monthlySelectDate parameters if these parameters are set. If you currently
  * in a different month view, clicking on any of the prior button will reset
  * your current view back to the CURRENT month.
  *
- * @param {array} monthName - An array of string that will override the default
- * English month name, if you want to display the month in your language, if
- * not specify will display month in English abbreviation.
+ * @param {array} monthName - Optional. An array of string that will override
+ * the default English month name, if you want to display the month in your language,
+ * if not specify will display month in English abbreviation.
  *
- * @param {array} dayName - An array of string that will override the default
- * English day name, set this option if you want to display the day in your
- * language, if not specify will display the day in English abbreviation. The
- * array should begin with Sunday, ended with Saturday.
+ * @param {array} dayName - Optional. An array of string that will override the
+ * default English day name, set this option if you want to display the day in
+ * your language, if not specify will display the day in English abbreviation.
+ * The array should begin with Sunday, ended with Saturday.
  *
- * @param {string} maxForwardMonth - Setting the max month which the NEXT button
- * allowed to work. Format is MM/YYYY. January starts as 0. This setting will
- * override the setting in forwardMonths. For example, you set the starting month
- * as August 2013, with forwardMonths is 3, maxForwardMonth is 10/2013, your
+ * @param {string} maxForwardMonth - Optional. Setting the max month which the
+ * NEXT button allowed to work. Format is MM/YYYY. January starts as 0. This setting
+ * will override the setting in forwardMonths. For example, you set the starting
+ * month as August 2013, with forwardMonths is 3, maxForwardMonth is 10/2013, your
  * calendar will miss the month November 2013, because it exceeds the maxForwardMonth.
  *
- * @param {string} minBackwardMonth - Setting the min month which the PREVIOUS
- * button allowed to work. Format is MM/YYYY . January start as 0. This setting
- * will override the setting in backwardMonths. For example, you set the base
- * month to be March 2014, with backwardMonths to be 3. You also set minBackwardMonths
+ * @param {string} minBackwardMonth - Optional. Setting the min month which the
+ * PREVIOUS button allowed to work. Format is MM/YYYY . January start as 0. This
+ * setting will override the setting in backwardMonths. For example, you set the
+ * base month to be March 2014, with backwardMonths to be 3. You also set minBackwardMonths
  * to be 1/2014. The calendar will not display January 2014, and Dec 2013, since
  * minBackwardMonths override backwardMonths. Attempt to press PREVIOUS button
  * won't work either.
  *
- * @param {string/number} startDate - Set the start date to be selected on the
- * calendar. Accept dateString or Unix timestamp. Set this as a directive attribute
- * if you want to be able to set this value in real time.
+ * @param {string/number} startDate - Optional. Set the start date to be selected
+ * on the calendar. Accept dateString or Unix timestamp. Set this as a directive
+ * attribute if you want to be able to set this value in real time.
  *
- * @param {string|number} endDate - Set the end date to be selected on the calendar.
- * Accept dateString or Unix timestamp. Set this value as directive attribute if
- * you want to be able to set this value in real time.
+ * @param {string|number} endDate - Optional. Set the end date to be selected on
+ * the calendar. Accept dateString or Unix timestamp. Set this value as directive
+ * attribute if you want to be able to set this value in real time.
  *
  * All of the above options can be set through a config object. Pass in the config
  * object through attribute calendarConfig. If you set the same config setting in
