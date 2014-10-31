@@ -121,7 +121,7 @@
  * @author Tri Pham <tri.pham@turn.com>
  */
 angular
-    .module('turn/calendar', ['calendarTemplates'])
+    .module('turnCalendar', ['calendarTemplates'])
 
     /**
     * Default values for some of the config option of the calendar
@@ -300,8 +300,12 @@ angular
          */
         $scope.dayNames = [];
 
-        var dayRemained = self.dayName.splice(self.startDayOfWeek);
-        $scope.dayNames = dayRemained.concat(self.dayName);
+        var tempDayName = self.dayName.slice(0),
+            dayRemained = tempDayName.splice(self.startDayOfWeek);
+        $scope.dayNames = dayRemained.concat(tempDayName);
+        self.dayName = tempDayName;
+
+
 
         if (self.monthName) {
             MONTH_NAME = self.monthName;

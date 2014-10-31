@@ -17,7 +17,7 @@
 <script>
 
     angular
-            .module('demo', ['turn/calendar'])
+            .module('demo', ['turnCalendar'])
             .controller('mainCtrl', function ($scope) {
                 $scope.currentDate = function () {
                     return new Date().toLocaleDateString();
@@ -68,5 +68,6 @@
 </turn-calendar>
 
 <turn-calendar calendar-options="calendarOptions"></turn-calendar>
+<turn-calendar></turn-calendar>
 </body>
 </html>
