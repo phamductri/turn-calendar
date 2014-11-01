@@ -34,13 +34,13 @@
  * of the week as the first day of week. Use 0 for Sunday, 1 for Monday, so on.
  * Default is 0.
  *
- * @param {string} minSelectDate - Optional. The minimum date which any dates
- * which are earlier than that date will not be able to be selected, accept a
- * string in MM-DD-YYYY or MM/DD/YYYY format.
+ * @param {string|number} minSelectDate - Optional. The minimum date which any
+ * dates which are earlier than that date will not be able to be selected, accept
+ * a string in MM-DD-YYYY or MM/DD/YYYY format, or a Unix timestamp.
  *
- * @param {string} maxSelectDate - Optional. The maximum date which any dates
+ * @param {string|number} maxSelectDate - Optional. The maximum date which any dates
  * which are later than that date will not be able to be selected, accept a string
- * in MM-DD-YYYY or MM/DD/YYYY format.
+ * in MM-DD-YYYY or MM/DD/YYYY format, or a Unix timestamp.
  *
  * @param {number} weeklySelectRange - Optional. A number in which if the hovered
  * (or selected) CURRENT date is beyond the LAST selected date, the mouse pointer
@@ -84,7 +84,7 @@
  * minBackwardMonths override backwardMonths. Attempt to press PREVIOUS button
  * won't work either.
  *
- * @param {string/number} startDate - Optional. Set the start date to be selected
+ * @param {string|number} startDate - Optional. Set the start date to be selected
  * on the calendar. Accept dateString or Unix timestamp. Set this as a directive
  * attribute if you want to be able to set this value in real time.
  *
