@@ -124,8 +124,8 @@ angular
     .module('turnCalendar', ['calendarTemplates'])
 
     /**
-    * Default values for some of the config option of the calendar
-    */
+     * Default values for some of the config option of the calendar
+     */
     .constant('turnCalendarDefaults', {
 
         /**
@@ -147,22 +147,22 @@ angular
     })
 
     /**
-    * Constraint on maximum months allowed to display, either as forwar or backward
-    *
-    * @type {number}
-    */
+     * Constraint on maximum months allowed to display, either as forwar or backward
+     *
+     * @type {number}
+     */
     .constant('MAX_MONTH_ALLOWED', 6)
 
     /**
-    * Constraint on minimum months allowed to display as extra forward or backward
-    *
-    * @type {number}
-    */
+     * Constraint on minimum months allowed to display as extra forward or backward
+     *
+     * @type {number}
+     */
     .constant('MIN_MONTH_ALLOWED', 1)
 
     /**
-    * A service for calendar component, contains mostly util functions
-    */
+     * A service for calendar component, contains mostly util functions
+     */
     .service('turnCalendarService', ['MAX_MONTH_ALLOWED', 'MIN_MONTH_ALLOWED', function (MAX_MONTH_ALLOWED, MIN_MONTH_ALLOWED) {
 
         return {
