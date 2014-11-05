@@ -92,8 +92,8 @@
  * the calendar. Accept dateString or Unix timestamp. Set this value as directive
  * attribute if you want to be able to set this value in real time.
  *
- * @param {function} applyCallback - Optional. A callback function to apply when
- * the apply button is pressed.
+ * @param {function} applyCallback - Optional. A callback function to call when
+ * the "Apply" button is pressed.
  *
  * All of the above options can be set through a config object. Pass in the config
  * object through attribute calendarConfig. If you set the same config setting in
