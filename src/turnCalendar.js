@@ -223,6 +223,10 @@ angular
              */
             validateDateInput: function (date) {
 
+                if (!date) {
+                    return false;
+                }
+
                 var dateObj = new Date(date);
 
                 if ( Object.prototype.toString.call(dateObj) !== "[object Date]" )
@@ -627,26 +631,63 @@ angular
          */
         var paletteTheWeek = function (selectedDay, isHover, hoverValue, selectMode) {
 
-            $scope.monthArray.some(function (month) {
+            var weekFound = false;
 
-                var weekFound = false;
+            for (var i = 0; i < $scope.monthArray.length; i++) {
 
-                month.some(function (week) {
+                var month = $scope.monthArray[i];
 
-                    weekFound = week.some(function (day) {
-                        return day && day.date && day.date.toLocaleDateString() === selectedDay.date.toLocaleDateString();
-                    });
+                for (var j = 0; j < month.length; j++) {
 
-                    if (weekFound) {
-                        setWeekValue(week, isHover, hoverValue, selectMode);
+                    var week = month[j];
+
+                    for (var k = 0; k < week.length; k++) {
+
+                        var day = week[k];
+
+                        if (day && day.date && day.date.toLocaleDateString() === selectedDay.date.toLocaleDateString()) {
+                            weekFound = true;
+                        }
+
+                        if (weekFound) {
+                            setWeekValue(week, isHover, hoverValue, selectMode);
+
+                            /**
+                             * Edge case, empty day means this week is the first week
+                             * of the month, it means we have to colorize the last week
+                             * of previous month.
+                             */
+                            if (!week[0].date && i > 0) {
+
+                                var lastMonth = $scope.monthArray[i - 1],
+                                    lastWeekOfLastMonth = lastMonth[lastMonth.length - 1];
+
+                                /**
+                                 * Another edge case, since the month contains 42 days, if the
+                                 * first day of this last week is empty means the whole week is
+                                 * all empty day, pick the week before this one.
+                                 */
+                                if (!lastWeekOfLastMonth[0].date) {
+                                    lastWeekOfLastMonth = lastMonth[lastMonth.length - 2];
+                                }
+
+                                setWeekValue(lastWeekOfLastMonth, isHover, hoverValue, selectMode);
+                            }
+                            break;
+                        }
+
                     }
 
-                    return weekFound;
-                });
+                    if (weekFound) {
+                        break;
+                    }
 
-                return weekFound;
+                }
 
-            });
+                if (weekFound) {
+                    break;
+                }
+            }
         };
 
 
@@ -1288,6 +1329,7 @@ angular
             });
         });
 
+        // Set the end date and start date if they are set by users
         if (turnCalendarService.validateDateInput(self.startDate) &&
             turnCalendarService.validateDateInput(self.endDate)) {
             var startDate = new Date(self.startDate),
