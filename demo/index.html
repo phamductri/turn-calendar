@@ -48,6 +48,11 @@
                     maxForwardMonth: $scope.maxMonthAllowed()
                 };
 
+                $scope.callback = function (arg1 , arg2) {
+                    console.log(arg1);
+                    console.log(arg2);
+                }
+
             });
 
 </script>
@@ -59,8 +64,8 @@
 
 <turn-calendar start-day-of-week="4" backward-months="2" forward-months="2"
                min-select-date="'9/13/2013'"
-               weekly-select-range="60"
-               monthly-select-range="90"
+               weekly-select-range="90"
+               monthly-select-range="180"
                min-backward-month="'08/2013'"
                prior-range-presets="[{value: 7}, {value: 30, isDefault: true}, {value : 45}]"
                end-date="endDate">
@@ -68,6 +73,6 @@
 </turn-calendar>
 
 <turn-calendar calendar-options="calendarOptions"></turn-calendar>
-<turn-calendar></turn-calendar>
+<turn-calendar start-date="'9/1/2014'" end-date="'10/15/2014'" apply-callback="callback(1, 2)"></turn-calendar>
 </body>
 </html>

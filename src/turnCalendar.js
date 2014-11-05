@@ -92,6 +92,9 @@
  * the calendar. Accept dateString or Unix timestamp. Set this value as directive
  * attribute if you want to be able to set this value in real time.
  *
+ * @param {function} applyCallback - Optional. A callback function to apply when
+ * the apply button is pressed.
+ *
  * All of the above options can be set through a config object. Pass in the config
  * object through attribute calendarConfig. If you set the same config setting in
  * attribute and in config object, the value set in attribute will used over the
@@ -941,6 +944,10 @@ angular
             $scope.currentSelectedStartDate = $scope.selectedStartDate;
             $scope.currentSelectedEndDate = $scope.selectedEndDate;
             $scope.calendarEnabled = false;
+
+            if ($scope.applyCallback) {
+                $scope.applyCallback();
+            }
         };
 
         $scope.cancel = function () {
@@ -1268,7 +1275,7 @@ angular
 
                 if (attribute === 'startDate') {
                     $scope.selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
-                    $scope.startDateString = $scope.selectedStartDate.toLocaleDateString();
+                    $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
                 } else {
                     $scope.selectedEndDate = generateMetaDateObject(newDate, newDate.getMonth());
                     $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
@@ -1280,6 +1287,21 @@ angular
                 }
             });
         });
+
+        if (turnCalendarService.validateDateInput(self.startDate) &&
+            turnCalendarService.validateDateInput(self.endDate)) {
+            var startDate = new Date(self.startDate),
+                endDate = new Date(self.endDate);
+            $scope.selectedStartDate = generateMetaDateObject(startDate, startDate.getMonth());
+            $scope.selectedEndDate = generateMetaDateObject(endDate, endDate.getMonth());
+            $scope.currentSelectedStartDate = $scope.selectedStartDate;
+            $scope.currentSelectedEndDate = $scope.selectedEndDate;
+            $scope.startDateString = startDate.toLocaleDateString();
+            $scope.endDateString = endDate.toLocaleDateString();
+
+            discolorSelectedDateRange();
+            colorSelectedDateRange()
+        }
 
     }])
     .directive('turnCalendar', function () {
@@ -1302,7 +1324,8 @@ angular
                 maxForwardMonth: '=',
                 minBackwardMonth: '=',
                 startDate: '=',
-                endDate: '='
+                endDate: '=',
+                applyCallback: '&'
             },
             controller: 'CalendarController',
             templateUrl: 'turnCalendar.html'
