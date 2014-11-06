@@ -2,7 +2,7 @@ describe('turnCalendar service test', function() {
 
     var turnCalendarService;
 
-    beforeEach(angular.mock.module('turnCalendar'));
+    beforeEach(angular.mock.module('turn/calendar'));
 
     beforeEach(inject(function ($injector) {
         turnCalendarService = $injector.get('turnCalendarService');

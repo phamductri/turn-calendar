@@ -17,7 +17,7 @@
 <script>
 
     angular
-            .module('demo', ['turnCalendar'])
+            .module('demo', ['turn/calendar'])
             .controller('mainCtrl', function ($scope) {
                 $scope.currentDate = function () {
                     return new Date().toLocaleDateString();

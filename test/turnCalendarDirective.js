@@ -1,6 +1,6 @@
 describe('turnCalendar directive', function() {
     var $rootScope, $compile, element;
-    beforeEach(module('turnCalendar'));
+    beforeEach(module('turn/calendar'));
     beforeEach(module('turnCalendar.html'));
     beforeEach(inject(function (_$compile_, _$rootScope_) {
         $compile = _$compile_;
@@ -57,19 +57,4 @@ describe('turnCalendar directive', function() {
         });
     });
 
-    describe('calendar i18n support', function() {
-        beforeEach(function () {
-            element = $compile('<turn-calendar starting-month="11" starting-year="2013" ' +
-                               'month-name="[\'Tháng Một\', \'Tháng Hai\', \'Tháng Ba\', \'Tháng Bốn\', \'Tháng Năm\', \'Tháng Sáu\', \'Tháng Bảy\', \'Tháng Tám\', \'Tháng Chín\', \'Tháng Mười\', \'Tháng Mười Một\', \'Tháng Mười Hai\']" ' +
-                               'day-name="[\'Chủ nhật\',\'Thứ 2\', \'Thứ 3\', \'Thứ 4\', \'Thứ 5\', \'Thứ 6\', \'Thứ 7\']"> </turn-calendar>')($rootScope);
-            $rootScope.$digest();
-        });
-
-        it('has month name in Dec 2013 in Vietnamese', function () {
-            expect(element.find('thead').find('tr').eq(0).find('th').text()).toEqual('Tháng Mười Hai 2013');
-        });
-        it('begins the week as Sunday in Vietnamese', function () {
-            expect(element.find('thead').find('tr').eq(1).find('th').eq(0).text()).toEqual('Chủ nhật');
-        });
-    });
 });

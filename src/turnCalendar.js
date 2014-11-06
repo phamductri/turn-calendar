@@ -52,23 +52,16 @@
  * will change to MONTHLY hover/selected mode. If this or weeklySelectRange is
  * not specified, the default mode is daily.
  *
- * @param {array} priorRangePresets - Optional. An array of object that specify
- * the range buttons to appear for user to select prior range from the CURRENT
- * date. If you want a pre-selected range add a property called isDefault: true.
- * The object MUST have a property called 'value' to display it. Value is a number.
- * The range will conform with minSelectDate, maxSelectDate, weeklySelectDate,
- * monthlySelectDate parameters if these parameters are set. If you currently
- * in a different month view, clicking on any of the prior button will reset
- * your current view back to the CURRENT month.
- *
- * @param {array} monthName - Optional. An array of string that will override
- * the default English month name, if you want to display the month in your language,
- * if not specify will display month in English abbreviation.
- *
- * @param {array} dayName - Optional. An array of string that will override the
- * default English day name, set this option if you want to display the day in
- * your language, if not specify will display the day in English abbreviation.
- * The array should begin with Sunday, ended with Saturday.
+ * @param {array<object>} priorRangePresets - Optional. An array of object that
+ * specify the range buttons to appear for user to select prior range from the
+ * CURRENT date. If you want a pre-selected range add a property called isDefault: true.
+ * The object MUST have a property called 'value' to display it. 'value' is a
+ * number. 'value' is a range that will allow the user to select date range from
+ * CURRENT date once clicked. The range will conform with minSelectDate, maxSelectDate,
+ * weeklySelectDate, monthlySelectDate parameters if these parameters are set.
+ * If you currently in a different month view, clicking on any of the prior button
+ * will reset your current view back to the CURRENT month. Example :
+ * [{value: 20, isDefault: true}, {value: 45}, {value : 90}]
  *
  * @param {string} maxForwardMonth - Optional. Setting the max month which the
  * NEXT button allowed to work. Format is MM/YYYY. January starts as 0. This setting
@@ -106,9 +99,6 @@
  *                forward-months="3" backward-months="3" min-select-date="'09/13/2013'"
  *                weekly-select-range="30" monthly-select-range="60"
  *                prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"
- *                month-name="['Tháng Một', 'Tháng Hai', 'Tháng Ba', 'Tháng Bốn', 'Tháng Năm', 'Tháng Sáu',
- *                'Tháng Bảy', 'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai']"
- *                day-name="['Chủ nhật','Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']"
  *                max-forward-month="'10/2014'">
  * <turn-calendar>
  *
@@ -118,13 +108,12 @@
  * the last selected date, monthly select mode if cursor is 60 days beyond the last
  * selected date. It will display 3 prior buttons: 20, 45, 90, with 25 is pre-selected
  * from the CURRENT date. Anything before 09/13/2013 is not available for selection.
- * It display the month name and day name in Vietnamese. Any month above Nov of the
- * year 2014 is not allowed.
+ * Any month above Nov of the year 2014 is not allowed.
  *
  * @author Tri Pham <tri.pham@turn.com>
  */
 angular
-    .module('turnCalendar', ['calendarTemplates'])
+    .module('turn/calendar', ['calendarTemplates'])
 
     /**
      * Default values for some of the config option of the calendar
@@ -271,9 +260,10 @@ angular
         };
 
         // Configuration attributes
-        angular.forEach(['startingMonth', 'startingYear', 'backwardMonths', 'forwardMonths', 'startDayOfWeek', 'minSelectDate',
-            'maxSelectDate', 'weeklySelectRange', 'monthlySelectRange', 'priorRangePresets', 'monthName', 'dayName',
-             'maxForwardMonth', 'minForwardMonth', 'startDate', 'endDate'], function(key) {
+        angular.forEach(['startingMonth', 'startingYear', 'backwardMonths',
+            'forwardMonths', 'startDayOfWeek', 'minSelectDate', 'maxSelectDate',
+            'weeklySelectRange', 'monthlySelectRange', 'priorRangePresets',
+            'maxForwardMonth', 'minForwardMonth', 'startDate', 'endDate'], function(key) {
             self[key] = pickValue(key);
         });
 
@@ -297,7 +287,7 @@ angular
          *
          * @type {array}
          */
-        $scope.monthNames = [];
+        $scope.monthNames = MONTH_NAME = turnCalendarDefaults.monthName;
 
         /**
          * An array which contains the name of day of week, to be displayed
@@ -307,16 +297,10 @@ angular
          */
         $scope.dayNames = [];
 
-        var tempDayName = self.dayName.slice(0),
+        var tempDayName = turnCalendarDefaults.dayName.slice(0),
             dayRemained = tempDayName.splice(self.startDayOfWeek);
         $scope.dayNames = dayRemained.concat(tempDayName);
-        self.dayName = tempDayName;
 
-
-
-        if (self.monthName) {
-            MONTH_NAME = self.monthName;
-        }
 
         /**
          * A helper function to determine how many day we should go back from the
