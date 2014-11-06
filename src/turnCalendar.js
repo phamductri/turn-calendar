@@ -79,11 +79,13 @@
  *
  * @param {string|number} startDate - Optional. Set the start date to be selected
  * on the calendar. Accept dateString or Unix timestamp. Set this as a directive
- * attribute if you want to be able to set this value in real time.
+ * attribute if you want to be able to set this value in real time. This is the
+ * directive to use if you want to read the current selected start date.
  *
  * @param {string|number} endDate - Optional. Set the end date to be selected on
  * the calendar. Accept dateString or Unix timestamp. Set this value as directive
- * attribute if you want to be able to set this value in real time.
+ * attribute if you want to be able to set this value in real time. This is the
+ * directive to use if you want to read the current selected end date.
  *
  * @param {function} applyCallback - Optional. A callback function to call when
  * the "Apply" button is pressed.
