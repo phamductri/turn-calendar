@@ -1,26 +1,28 @@
-.calendar-mouse-over {
+$selected-color: #217f9f;
+
+.turn-calendar-mouse-over {
     background-color: rgba(114, 206, 235, 0.3);
 }
-.calendar-selected-daily {
-    background-color: #217f9f;
+.turn-calendar-selected-daily {
+    background-color: $selected-color;
     color: #ffffff;
 }
 
-.calendar-selected-weekly {
-    background-color: #217f9f;
+.turn-calendar-selected-weekly {
+    background-color: $selected-color;
     color: #ffffff;
 }
 
-.calendar-selected-monthly {
-    background-color: #217f9f;
+.turn-calendar-selected-monthly {
+    background-color: $selected-color;
     color: #ffffff;
 }
 
-.calendar-unavailable {
+.turn-calendar-unavailable {
     color: #c4c3c3;
 }
 
-.calendar-table {
+.turn-calendar-table {
     border-collapse: collapse;
     border-spacing: 0;
     text-align: center;
@@ -29,7 +31,7 @@
     float: left;
 }
 
-.calendar-div {
+.turn-calendar-div {
     border: 1px solid;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10pt;
@@ -37,61 +39,57 @@
     display: inline-block;
 }
 
-.calendar-input {
+.turn-calendar-input {
     border-bottom: 1px solid;
     margin-bottom: 10px;
     padding: 5px;
 }
 
-.calendar-navigation-left {
+.turn-calendar-input-box {
+    width: 100px;
+}
+
+.turn-calendar-navigation {
     display: inline-block;
     height: 150px;
     position: relative;
     float: left;
     width: 30px;
     background-color: rgba(196, 195, 195, .3);
+}
+
+.turn-calendar-navigation-left {
+    @extend .turn-calendar-navigation;
     margin-left: 10px;
     margin-right: 5px;
 }
 
-.calendar-navigation-right {
-    display: inline-block;
-    height: 150px;
-    position: relative;
-    float: left;
-    width: 30px;
-    background-color: rgba(196, 195, 195, .3);
+.turn-calendar-navigation-right {
+    @extend .turn-calendar-navigation;
     margin-left: 5px;
     margin-right: 10px;
 }
 
-.calendar-arrow-right {
-
+.turn-calendar-arrow {
     width: 0;
     height: 0;
     border-top: 15px solid transparent;
     border-bottom: 15px solid transparent;
+    margin: auto;
+    position: relative;
+    top: 40%;
+}
+.turn-calendar-arrow-right {
+    @extend .turn-calendar-arrow;
     border-left: 15px solid grey;
-    margin: auto;
-    position: relative;
-    top: 40%;
-
 }
 
-.calendar-arrow-left {
-
-    width: 0;
-    height: 0;
-    border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent;
+.turn-calendar-arrow-left {
+    @extend .turn-calendar-arrow;
     border-right: 15px solid grey;
-    margin: auto;
-    position: relative;
-    top: 40%;
-
 }
 
-.calendar-submit {
+.turn-calendar-submit {
     clear: both;
     float: right;
     margin: 10px;

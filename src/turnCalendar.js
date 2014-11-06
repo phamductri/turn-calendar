@@ -281,7 +281,15 @@ angular
          *
          * @type {number}
          */
-        const DAY_IN_WEEK = 7;
+        $scope.DAYS_IN_WEEK = 7;
+
+        /**
+         * Number of months in a year
+         *
+         * @type {number}
+         */
+        const MONTHS_IN_YEAR = 12;
+
 
         /**
          * An array which will contains the month name with year to display on
@@ -318,7 +326,7 @@ angular
          */
         var generateFirstDateIndex = function (startDayOfWeek, firstDayOfMonth) {
 
-            return 0 - (DAY_IN_WEEK - 1 - startDayOfWeek - (0 - firstDayOfMonth));
+            return 0 - ($scope.DAYS_IN_WEEK - 1 - startDayOfWeek - (0 - firstDayOfMonth));
         };
 
         var isExceedMaxMonth = function (month, year) {
@@ -348,7 +356,7 @@ angular
 
                 // Bigger than 11 means moving to next year
                 if (newMonth > 11) {
-                    newMonth = newMonth % 12;
+                    newMonth = newMonth % MONTHS_IN_YEAR;
 
                     if (!yearReset) {
                         year = year + 1;
@@ -493,7 +501,7 @@ angular
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
-            return turnCalendarService.arraySplit(dayArray, DAY_IN_WEEK);
+            return turnCalendarService.arraySplit(dayArray, $scope.DAYS_IN_WEEK);
         };
 
 
@@ -1017,7 +1025,7 @@ angular
 
             // Bigger than 11 means moving to next year
             if (newMonth > 11) {
-                newMonth = newMonth % 12;
+                newMonth = newMonth % MONTHS_IN_YEAR;
                 year = year + 1;
             }
 

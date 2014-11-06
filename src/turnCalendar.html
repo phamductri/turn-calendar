@@ -2,11 +2,11 @@
         ng-show="currentSelectedStartDate.date">-</span> {{currentSelectedEndDate.date.toLocaleDateString()}}
 </button>
 <div>
-    <div class="calendar-div" ng-show="calendarEnabled">
-        <div class="calendar-input">
+    <div class="turn-calendar-div" ng-show="calendarEnabled">
+        <div class="turn-calendar-input">
         <span>
-            From <input size="10" type="text" ng-model="startDateString" ng-change="changeStartDate()">
-            to <input size="10" type="text" ng-model="endDateString" ng-change="changeEndDate()">
+            From <input class="turn-calendar-input-box" type="text" ng-model="startDateString" ng-change="changeStartDate()">
+            to <input class="turn-calendar-input-box" type="text" ng-model="endDateString" ng-change="changeEndDate()">
         </span>
             <span ng-show="priorButtons.length">Prior : </span>
             <button ng-repeat="range in priorButtons" ng-click="selectRange(range)">{{range.value}}</button>
@@ -15,14 +15,14 @@
         </div>
 
 
-        <div class="calendarTableContainer">
-            <div class="calendar-navigation-left" ng-click="previousMonth()">
-                <div class="calendar-arrow-left"></div>
+        <div>
+            <div class="turn-calendar-navigation-left" ng-click="previousMonth()">
+                <div class="turn-calendar-arrow-left"></div>
             </div>
-            <table class="calendar-table" ng-repeat="month in monthArray" style="display: inline-block;">
+            <table class="turn-calendar-table" ng-repeat="month in monthArray">
                 <thead>
                 <tr>
-                    <th colspan="7">{{monthNames[$index]}}</th>
+                    <th colspan="{{DAYS_IN_WEEK}}">{{monthNames[$index]}}</th>
                 </tr>
                 <tr>
                     <th ng-repeat="dayName in dayNames">{{dayName}}</th>
@@ -32,11 +32,11 @@
                 <tbody>
                 <tr ng-repeat="days in month">
                     <td ng-repeat="day in days"
-                        ng-class="{'calendar-mouse-over': day.isHover,
-                               'calendar-selected-daily': day.selectMode == 'daily',
-                               'calendar-selected-weekly': day.selectMode == 'weekly',
-                               'calendar-selected-monthly': day.selectMode == 'monthly',
-                               'calendar-unavailable': day.isUnavailable}"
+                        ng-class="{'turn-calendar-mouse-over': day.isHover,
+                               'turn-calendar-selected-daily': day.selectMode == 'daily',
+                               'turn-calendar-selected-weekly': day.selectMode == 'weekly',
+                               'turn-calendar-selected-monthly': day.selectMode == 'monthly',
+                               'turn-calendar-unavailable': day.isUnavailable}"
                         ng-mouseenter="mouseEnter(day)"
                         ng-mouseleave="mouseLeave(day)"
                         ng-click="setDayClick(day)"
@@ -47,12 +47,12 @@
 
                 </tbody>
             </table>
-            <div class="calendar-navigation-right" ng-click="nextMonth()">
-                <div class="calendar-arrow-right"></div>
+            <div class="turn-calendar-navigation-right" ng-click="nextMonth()">
+                <div class="turn-calendar-arrow-right"></div>
             </div>
         </div>
 
-        <div class="calendar-submit">
+        <div class="turn-calendar-submit">
             <button ng-click="cancel()">
                 Cancel
             </button>
