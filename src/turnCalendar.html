@@ -1,0 +1,65 @@
+<button ng-click="enableCalendar()">{{currentSelectedStartDate.date.toLocaleDateString()}} <span
+        ng-show="currentSelectedStartDate.date">-</span> {{currentSelectedEndDate.date.toLocaleDateString()}}
+</button>
+<div>
+    <div class="turn-calendar-div" ng-show="calendarEnabled">
+        <div class="turn-calendar-input">
+        <span>
+            From <input class="turn-calendar-input-box" type="text" ng-model="startDateString" ng-change="changeStartDate()">
+            to <input class="turn-calendar-input-box" type="text" ng-model="endDateString" ng-change="changeEndDate()">
+        </span>
+            <span ng-show="priorButtons.length">Prior : </span>
+            <button ng-repeat="range in priorButtons" ng-click="selectRange(range)">{{range.value}}</button>
+            <span ng-show="priorButtons.length">days</span>
+
+        </div>
+
+
+        <div>
+            <div class="turn-calendar-navigation-left" ng-click="previousMonth()">
+                <div class="turn-calendar-arrow-left"></div>
+            </div>
+            <table class="turn-calendar-table" ng-repeat="month in monthArray">
+                <thead>
+                <tr>
+                    <th colspan="{{DAYS_IN_WEEK}}">{{monthNames[$index]}}</th>
+                </tr>
+                <tr>
+                    <th ng-repeat="dayName in dayNames">{{dayName}}</th>
+                </tr>
+
+                </thead>
+                <tbody>
+                <tr ng-repeat="days in month">
+                    <td ng-repeat="day in days"
+                        ng-class="{'turn-calendar-mouse-over': day.isHover,
+                               'turn-calendar-selected-daily': day.selectMode == 'daily',
+                               'turn-calendar-selected-weekly': day.selectMode == 'weekly',
+                               'turn-calendar-selected-monthly': day.selectMode == 'monthly',
+                               'turn-calendar-unavailable': day.isUnavailable}"
+                        ng-mouseenter="mouseEnter(day)"
+                        ng-mouseleave="mouseLeave(day)"
+                        ng-click="setDayClick(day)"
+                            >{{day.date.getDate()}}
+                    </td>
+
+                </tr>
+
+                </tbody>
+            </table>
+            <div class="turn-calendar-navigation-right" ng-click="nextMonth()">
+                <div class="turn-calendar-arrow-right"></div>
+            </div>
+        </div>
+
+        <div class="turn-calendar-submit">
+            <button ng-click="cancel()">
+                Cancel
+            </button>
+            <button ng-click="applyCalendar()">
+                Apply
+            </button>
+        </div>
+
+    </div>
+</div>

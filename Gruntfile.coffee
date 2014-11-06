@@ -1,5 +1,4 @@
 module.exports = (grunt) ->
-
   [
     'grunt-contrib-clean'
     'grunt-contrib-coffee'
@@ -29,14 +28,15 @@ module.exports = (grunt) ->
         './dist/template.js'
       ]
 
+
     coffee:
       files:
-        'test/test.js': 'test/test.coffee'
+        'test/unit.js': 'test/unit.coffee'
 
     concat:
       main:
-        src: ['./dist/calendar.js', './dist/template.js']
-        dest: './dist/calendar.js'
+        src: ['./dist/turnCalendar.js', './dist/template.js']
+        dest: './dist/turnCalendar.js'
 
     coveralls:
       options:
@@ -55,7 +55,7 @@ module.exports = (grunt) ->
     jasmine:
       coverage:
         src: [
-          './src/calendar.js'
+          './src/turnCalendar.js'
         ]
         options:
           specs: ['./test/unit.js']
@@ -81,9 +81,9 @@ module.exports = (grunt) ->
             './dist/template.js'
           ]
       unit:
-        src: './src/calendar.js'
+        src: './src/turnCalendar.js'
         options:
-          specs: './test/unit.js'
+          specs: './test/*.js'
           vendor: [
             './bower_components/angular/angular.js'
             './bower_components/angular-mocks/angular-mocks.js'
@@ -93,13 +93,13 @@ module.exports = (grunt) ->
 
     ngmin:
       main:
-        src: ['./src/calendar.js']
-        dest: './dist/calendar.js'
+        src: ['./src/turnCalendar.js']
+        dest: './dist/turnCalendar.js'
 
     sass:
       main:
         files:
-          'dist/calendar.css': 'src/calendar.scss'
+          'dist/turnCalendar.css': 'src/turnCalendar.scss'
 
     express:
       all:
@@ -127,6 +127,6 @@ module.exports = (grunt) ->
           interrupt: true
           spawn: false
 
-  grunt.registerTask 'default', build
+  grunt.registerTask 'build', build
   grunt.registerTask 'test', test
   grunt.registerTask 'serve', serve
