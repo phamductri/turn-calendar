@@ -453,8 +453,7 @@ angular
             monthArray.push(baseMonth);
 
             // Reset the month names
-            $scope.monthNames = [];
-            $scope.monthNames.push(MONTH_NAME[month] + ' ' + year);
+            $scope.monthNames = [MONTH_NAME[month] + ' ' + year];
 
             setForwardMonths(monthArray, month, year);
 
@@ -1182,15 +1181,12 @@ angular
 
             $scope.priorButtons = self.priorRangePresets;
 
-            for (var i = 0; i < $scope.priorButtons.length; i++) {
-
-                var priorRange = $scope.priorButtons[i];
-
+            $scope.priorButtons.some(function (priorRange) {
                 if (priorRange.isDefault) {
                     defaultRange = priorRange;
-                    break;
                 }
-            }
+                return priorRange.isDefault;
+            });
 
             if (!defaultRange) {
                 return;
@@ -1343,7 +1339,7 @@ angular
     .directive('turnCalendar', function () {
 
         return {
-            restrict: 'AE',
+            restrict: 'E',
             scope: {
                 startingMonth: '=',
                 startingYear: '=',
