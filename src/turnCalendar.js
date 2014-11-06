@@ -90,10 +90,10 @@
  * @param {function} applyCallback - Optional. A callback function to call when
  * the "Apply" button is pressed.
  *
- * All of the above options can be set through a config object. Pass in the config
- * object through attribute calendarConfig. If you set the same config setting in
- * attribute and in config object, the value set in attribute will used over the
- * value in config object.
+ * All of the above options can be set through an option object. Pass in the option
+ * object through attribute calendarOptions. If you set the same setting in attribute
+ * and in option object, the value set in attribute will used over the value in
+ * option object.
  *
  * @example
  *
@@ -145,19 +145,19 @@ angular
      *
      * @type {number}
      */
-    .constant('MAX_MONTH_ALLOWED', 6)
+    .constant('MAX_MONTHS_ALLOWED', 6)
 
     /**
      * Constraint on minimum months allowed to display as extra forward or backward
      *
      * @type {number}
      */
-    .constant('MIN_MONTH_ALLOWED', 1)
+    .constant('MIN_MONTHS_ALLOWED', 1)
 
     /**
      * A service for calendar component, contains mostly util functions
      */
-    .service('turnCalendarService', ['MAX_MONTH_ALLOWED', 'MIN_MONTH_ALLOWED', function (MAX_MONTH_ALLOWED, MIN_MONTH_ALLOWED) {
+    .service('turnCalendarService', function (MAX_MONTHS_ALLOWED, MIN_MONTHS_ALLOWED) {
 
         return {
 
@@ -168,7 +168,7 @@ angular
              * @returns {boolean} True if within the range, false if not
              */
             isMonthValid: function (month) {
-                return month && month >= MIN_MONTH_ALLOWED && month <= MAX_MONTH_ALLOWED;
+                return month && month >= MIN_MONTHS_ALLOWED && month <= MAX_MONTHS_ALLOWED;
             },
 
             /**
@@ -179,7 +179,7 @@ angular
              */
             convertToDateObject: function (monthValue) {
 
-                var splitArray = monthValue.split('/');
+                const splitArray = monthValue.split('/');
 
                 if (!splitArray.length) {
                     return null;
@@ -225,8 +225,8 @@ angular
                 return !isNaN(dateObj.getTime());
             }
         };
-    }])
-    .controller('CalendarController', ['$scope' , '$attrs', 'turnCalendarDefaults', 'turnCalendarService', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService) {
+    })
+    .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService) {
 
         var self = this, calendarOptions, MONTH_NAME;
 
@@ -1331,7 +1331,7 @@ angular
             colorSelectedDateRange()
         }
 
-    }])
+    })
     .directive('turnCalendar', function () {
 
         return {
@@ -1347,8 +1347,6 @@ angular
                 minSelectDate: '=',
                 maxSelectDate: '=',
                 priorRangePresets: '&',
-                monthName: '&',
-                dayName: '&',
                 maxForwardMonth: '=',
                 minBackwardMonth: '=',
                 startDate: '=',
