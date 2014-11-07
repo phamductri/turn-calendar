@@ -228,7 +228,11 @@ angular
     })
     .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService) {
 
-        var self = this, calendarOptions, MONTH_NAME;
+        /**
+         * Note : selectedStartDate and selectedEndDate are meta date object to track
+         * internal cursor movement.
+         */
+        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate;
 
         if ($attrs.calendarOptions) {
             calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
@@ -696,7 +700,7 @@ angular
                 return;
             }
 
-            if (!$scope.selectedStartDate) {
+            if (!selectedStartDate) {
                 day.isHover = true;
                 return;
             }
@@ -724,7 +728,7 @@ angular
          */
         $scope.mouseLeave = function (day) {
 
-            if (!$scope.selectedStartDate) {
+            if (!selectedStartDate) {
                 day.isHover = false;
                 return;
             }
@@ -783,8 +787,8 @@ angular
          */
         var isDaily = function () {
             return (!self.weeklySelectRange && !self.monthlySelectRange) ||
-                   (!isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate) &&
-                    !isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate));
+                   (!isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate) &&
+                    !isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate));
         };
 
         /**
@@ -794,7 +798,7 @@ angular
          * @returns {boolean} True if between, false if not
          */
         var isBetweenStartAndEndDate = function (date) {
-            return date <= $scope.selectedEndDate.date && date >= $scope.selectedStartDate.date;
+            return date <= selectedEndDate.date && date >= selectedStartDate.date;
         };
 
         /**
@@ -815,11 +819,11 @@ angular
                                 day.selectMode = 'daily';
                             }
 
-                            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+                            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
                                 day.selectMode = 'weekly';
                             }
 
-                            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+                            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, selectedStartDate, selectedEndDate)) {
                                 day.selectMode = 'monthly';
                             }
 
@@ -830,17 +834,17 @@ angular
             });
 
             // Color the entire end week, not just the selected end date
-            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
 
-                paletteTheWeek($scope.selectedStartDate, false, false, 'weekly');
-                paletteTheWeek($scope.selectedEndDate, false, false, 'weekly');
+                paletteTheWeek(selectedStartDate, false, false, 'weekly');
+                paletteTheWeek(selectedEndDate, false, false, 'weekly');
             }
 
             // Color the entire month, not just the selected end date
-            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, $scope.selectedStartDate, $scope.selectedEndDate)) {
+            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, selectedStartDate, selectedEndDate)) {
 
-                paletteTheMonth($scope.selectedStartDate, false, false, 'monthly');
-                paletteTheMonth($scope.selectedEndDate, false, false, 'monthly');
+                paletteTheMonth(selectedStartDate, false, false, 'monthly');
+                paletteTheMonth(selectedEndDate, false, false, 'monthly');
             }
         };
 
@@ -861,28 +865,28 @@ angular
         };
 
         var isBothSelected = function () {
-            return $scope.selectedStartDate && $scope.selectedEndDate;
+            return selectedStartDate && selectedEndDate;
         };
 
         var isNoneSelected = function () {
-            return !$scope.selectedStartDate && !$scope.selectedEndDate;
+            return !selectedStartDate && !selectedEndDate;
         };
 
         var isStartDateSelected = function () {
-            return $scope.selectedStartDate && !$scope.selectedEndDate;
+            return selectedStartDate && !selectedEndDate;
         };
 
         var setEndDate = function (day) {
 
-            if (day.date < $scope.selectedStartDate.date) {
-                $scope.selectedEndDate = $scope.selectedStartDate;
-                $scope.selectedStartDate = day;
-            } else if (day.date > $scope.selectedStartDate.date) {
-                $scope.selectedEndDate = day;
+            if (day.date < selectedStartDate.date) {
+                selectedEndDate = selectedStartDate;
+                selectedStartDate = day;
+            } else if (day.date > selectedStartDate.date) {
+                selectedEndDate = day;
             }
 
-            $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
-            $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
 
             colorSelectedDateRange();
 
@@ -890,8 +894,8 @@ angular
 
         var setStartDate = function (day) {
 
-            $scope.selectedStartDate = day;
-            $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
+            selectedStartDate = day;
+            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
             day.selectMode = 'daily';
 
         };
@@ -904,28 +908,28 @@ angular
          */
         var swapDate = function () {
 
-            if ($scope.selectedEndDate.date < $scope.selectedStartDate.date) {
-                var tempDay = $scope.selectedStartDate;
-                $scope.selectedStartDate = $scope.selectedEndDate;
-                $scope.selectedEndDate = tempDay;
+            if (selectedEndDate.date < selectedStartDate.date) {
+                var tempDay = selectedStartDate;
+                selectedStartDate = selectedEndDate;
+                selectedEndDate = tempDay;
             }
         };
 
         var resetDayClick = function (day) {
 
             if (!lastSelectedDate) {
-                lastSelectedDate = $scope.selectedEndDate;
+                lastSelectedDate = selectedEndDate;
             }
 
-            if ($scope.selectedStartDate.date == lastSelectedDate.date) {
-                $scope.selectedEndDate = day;
-            } else if ($scope.selectedEndDate.date == lastSelectedDate.date) {
-                $scope.selectedStartDate = day;
+            if (selectedStartDate.date.toLocaleString() === lastSelectedDate.date.toLocaleString()) {
+                selectedEndDate = day;
+            } else if (selectedEndDate.date.toLocaleString() === lastSelectedDate.date.toLocaleString()) {
+                selectedStartDate = day;
             }
 
             swapDate();
-            $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
-            $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
 
             discolorSelectedDateRange();
 
@@ -945,6 +949,8 @@ angular
             if (day.isUnavailable || !day.date) {
                 return;
             }
+
+            console.log('let me see what happened');
 
             if (isNoneSelected()) {
 
@@ -975,8 +981,8 @@ angular
         };
 
         $scope.applyCalendar = function () {
-            $scope.currentSelectedStartDate = $scope.selectedStartDate;
-            $scope.currentSelectedEndDate = $scope.selectedEndDate;
+            $scope.currentSelectedStartDate = selectedStartDate;
+            $scope.currentSelectedEndDate = selectedEndDate;
             $scope.calendarEnabled = false;
 
             if ($scope.applyCallback) {
@@ -986,18 +992,37 @@ angular
 
         $scope.cancel = function () {
             discolorSelectedDateRange();
-            $scope.selectedStartDate = $scope.currentSelectedStartDate;
-            $scope.selectedEndDate = $scope.currentSelectedEndDate;
+            selectedStartDate = $scope.currentSelectedStartDate;
+            selectedEndDate = $scope.currentSelectedEndDate;
+            lastSelectedDate = selectedEndDate;
+
+            if (angular.isDefined($attrs.startDate)) {
+                if (isNaN($scope.$parent.$eval($attrs.startDate))) {
+                    $scope.startDate = selectedStartDate.date.toLocaleString();
+                } else {
+                    $scope.startDate = selectedStartDate.date.getTime();
+                }
+
+            }
+
+            if (angular.isDefined($attrs.endDate)) {
+                if (isNaN($scope.$parent.$eval($attrs.endDate))) {
+                    $scope.endDate = selectedEndDate.date.toLocaleString();
+                } else {
+                    $scope.endDate = selectedEndDate.date.getTime();
+                }
+
+            }
 
             /**
              * Edge case, if the current selected start date is empty, then it
              * means the selected end date should be null too
              */
             if (!$scope.currentSelectedStartDate) {
-                $scope.selectedEndDate = null;
+                selectedEndDate = null;
             }
 
-            if ($scope.selectedStartDate && $scope.selectedEndDate) {
+            if (selectedStartDate && selectedEndDate) {
                 colorSelectedDateRange();
             }
 
@@ -1055,7 +1080,7 @@ angular
             discolorSelectedDateRange();
 
             // Remember to color current selected start and end dates
-            if ($scope.selectedStartDate && $scope.selectedEndDate) {
+            if (selectedStartDate && selectedEndDate) {
                 colorSelectedDateRange();
             }
 
@@ -1110,14 +1135,14 @@ angular
 
             discolorSelectedDateRange();
 
-            if ($scope.selectedStartDate && $scope.selectedEndDate) {
+            if (selectedStartDate && selectedEndDate) {
                 colorSelectedDateRange();
             }
         };
 
 
-        $scope.selectedStartDate = null;
-        $scope.selectedEndDate = null;
+        selectedStartDate = null;
+        selectedEndDate = null;
         $scope.currentSelectedStartDate = null;
         var currentDate = new Date();
         $scope.currentSelectedEndDate = generateMetaDateObject(currentDate, currentDate.getMonth());
@@ -1164,7 +1189,7 @@ angular
                 endDay = generateMetaDateObject(endDate, endDate.getMonth());
             }
 
-            lastSelectedDate = $scope.selectedStartDate;
+            lastSelectedDate = selectedStartDate;
 
             setEndDate(endDay);
 
@@ -1194,8 +1219,8 @@ angular
 
             $scope.selectRange(defaultRange);
 
-            $scope.currentSelectedEndDate = $scope.selectedEndDate;
-            $scope.currentSelectedStartDate = $scope.selectedStartDate;
+            $scope.currentSelectedEndDate = selectedEndDate;
+            $scope.currentSelectedStartDate = selectedStartDate;
         };
 
 
@@ -1203,12 +1228,12 @@ angular
             setDefaultRange();
         }
 
-        if ($scope.selectedStartDate) {
-            $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
+        if (selectedStartDate) {
+            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
         }
 
-        if ($scope.selectedEndDate) {
-            $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+        if (selectedEndDate) {
+            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
         }
 
         /**
@@ -1237,7 +1262,7 @@ angular
 
             $scope.endDate = day.date.toLocaleDateString();
 
-            if ($scope.selectedEndDate && $scope.selectedEndDate.date > day.date) {
+            if (selectedEndDate && selectedEndDate.date > day.date) {
                 colorSelectedDateRange();
             }
         };
@@ -1267,11 +1292,11 @@ angular
                 return;
             }
 
-            if ($scope.selectedStartDate && $scope.selectedStartDate.date > day.date) {
+            if (selectedStartDate && selectedStartDate.date > day.date) {
                 return;
             }
 
-            $scope.selectedEndDate = day;
+            selectedEndDate = day;
             $scope.endDate = day.date.toLocaleDateString();
 
 
@@ -1305,14 +1330,14 @@ angular
                 var newDate = new Date(newVal);
 
                 if (attribute === 'startDate') {
-                    $scope.selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
-                    $scope.startDateString = $scope.selectedStartDate.date.toLocaleDateString();
+                    selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
+                    $scope.startDateString = selectedStartDate.date.toLocaleDateString();
                 } else {
-                    $scope.selectedEndDate = generateMetaDateObject(newDate, newDate.getMonth());
-                    $scope.endDateString = $scope.selectedEndDate.date.toLocaleDateString();
+                    selectedEndDate = generateMetaDateObject(newDate, newDate.getMonth());
+                    $scope.endDateString = selectedEndDate.date.toLocaleDateString();
                 }
 
-                if ($scope.selectedStartDate && $scope.selectedEndDate) {
+                if (selectedStartDate && selectedEndDate) {
                     discolorSelectedDateRange();
                     colorSelectedDateRange();
                 }
@@ -1324,10 +1349,10 @@ angular
             turnCalendarService.validateDateInput(self.endDate)) {
             var startDate = new Date(self.startDate),
                 endDate = new Date(self.endDate);
-            $scope.selectedStartDate = generateMetaDateObject(startDate, startDate.getMonth());
-            $scope.selectedEndDate = generateMetaDateObject(endDate, endDate.getMonth());
-            $scope.currentSelectedStartDate = $scope.selectedStartDate;
-            $scope.currentSelectedEndDate = $scope.selectedEndDate;
+            selectedStartDate = generateMetaDateObject(startDate, startDate.getMonth());
+            selectedEndDate = generateMetaDateObject(endDate, endDate.getMonth());
+            $scope.currentSelectedStartDate = selectedStartDate;
+            $scope.currentSelectedEndDate = selectedEndDate;
             $scope.startDateString = startDate.toLocaleDateString();
             $scope.endDateString = endDate.toLocaleDateString();
 
