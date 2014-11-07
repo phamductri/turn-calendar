@@ -670,6 +670,17 @@ angular
 
                                 setWeekValue(lastWeekOfLastMonth, isHover, hoverValue, selectMode);
                             }
+
+                            /**
+                             * Edge case, if the last date of the week is empty, means
+                             * it has to go to the first week of next month
+                             */
+                            if (!week[$scope.DAYS_IN_WEEK - 1].date && (i < $scope.monthArray.length - 1)) {
+                                var nextMonth = $scope.monthArray[i + 1],
+                                    firstWeekOfNextMonth = nextMonth[0];
+                                setWeekValue(firstWeekOfNextMonth, isHover, hoverValue, selectMode);
+                            }
+
                             break;
                         }
 
