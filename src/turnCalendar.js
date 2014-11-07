@@ -980,22 +980,7 @@ angular
             $scope.calendarEnabled = !$scope.calendarEnabled;
         };
 
-        $scope.applyCalendar = function () {
-            $scope.currentSelectedStartDate = selectedStartDate;
-            $scope.currentSelectedEndDate = selectedEndDate;
-            $scope.calendarEnabled = false;
-
-            if ($scope.applyCallback) {
-                $scope.applyCallback();
-            }
-        };
-
-        $scope.cancel = function () {
-            discolorSelectedDateRange();
-            selectedStartDate = $scope.currentSelectedStartDate;
-            selectedEndDate = $scope.currentSelectedEndDate;
-            lastSelectedDate = selectedEndDate;
-
+        var setStartEndDate = function () {
             if (angular.isDefined($attrs.startDate)) {
                 if (isNaN($scope.$parent.$eval($attrs.startDate))) {
                     $scope.startDate = selectedStartDate.date.toLocaleString();
@@ -1013,6 +998,27 @@ angular
                 }
 
             }
+        };
+
+        $scope.applyCalendar = function () {
+            $scope.currentSelectedStartDate = selectedStartDate;
+            $scope.currentSelectedEndDate = selectedEndDate;
+            $scope.calendarEnabled = false;
+
+            setStartEndDate();
+
+            if ($scope.applyCallback) {
+                $scope.applyCallback();
+            }
+        };
+
+        $scope.cancel = function () {
+            discolorSelectedDateRange();
+            selectedStartDate = $scope.currentSelectedStartDate;
+            selectedEndDate = $scope.currentSelectedEndDate;
+            lastSelectedDate = selectedEndDate;
+
+            setStartEndDate();
 
             /**
              * Edge case, if the current selected start date is empty, then it
