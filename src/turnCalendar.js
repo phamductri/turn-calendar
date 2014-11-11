@@ -80,12 +80,18 @@
  * @param {string|number} startDate - Optional. Set the start date to be selected
  * on the calendar. Accept dateString or Unix timestamp. Set this as a directive
  * attribute if you want to be able to set this value in real time. This is the
- * directive to use if you want to read the current selected start date.
+ * directive to use if you want to read the current selected start date. If
+ * minSelectDate is set, and startDate falls into a date that is earlier than
+ * minSelectDate, the startDate will be pumped up until it reaches a day that is
+ * not conflicted with minSelectDate.
  *
  * @param {string|number} endDate - Optional. Set the end date to be selected on
  * the calendar. Accept dateString or Unix timestamp. Set this value as directive
  * attribute if you want to be able to set this value in real time. This is the
- * directive to use if you want to read the current selected end date.
+ * directive to use if you want to read the current selected end date. If maxSelectDate
+ * is set, and this endDate falls into a date that is later than maxSelectDate,
+ * endDate will be going backward till it reaches a date that is not conflicted
+ * with maxSelectDate.
  *
  * @param {function} applyCallback - Optional. A callback function to call when
  * the "Apply" button is pressed.
@@ -94,6 +100,11 @@
  * object through attribute calendarOptions. If you set the same setting in attribute
  * and in option object, the value set in attribute will used over the value in
  * option object.
+ *
+ * Real time update for following options are supported : startDate, endDate,
+ * minSelectDate, maxSelectDate, minBackwardMonth, maxForwardMonth, forwardMonths,
+ * backwardMonths. These options have to set through attributes for real time
+ * tracking to work. Setting through options object will not work.
  *
  * @example
  *
