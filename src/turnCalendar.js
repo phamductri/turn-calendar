@@ -190,6 +190,10 @@ angular
              */
             convertToDateObject: function (monthValue) {
 
+                if (!monthValue) {
+                    return null;
+                }
+
                 const splitArray = monthValue.split('/');
 
                 if (!splitArray.length) {
