@@ -1,7 +1,7 @@
 /**
  * @ngdoc directive
  * @name calendar
- * @restrict AE
+ * @restrict E
  *
  * @description
  * An AngularJS directive that allows a calendar to be display when embedded.
@@ -272,6 +272,45 @@ angular
             'maxForwardMonth', 'minForwardMonth', 'startDate', 'endDate'], function(key) {
             self[key] = pickValue(key);
         });
+
+        angular.forEach(['minSelectDate', 'maxSelectDate'], function(key) {
+            $scope.$watch(key, function (newVal) {
+                if (!turnCalendarService.validateDateInput(newVal)) {
+                    return;
+                }
+                self[key] = newVal;
+                $scope.monthArray = generateMonthArray(null, null);
+                var startDate = resetStartDate(selectedStartDate.date),
+                    endDate = resetEndDate(selectedEndDate.date);
+
+                selectedStartDate = generateMetaDateObject(startDate, startDate.getMonth());
+                selectedEndDate = generateMetaDateObject(endDate, endDate.getMonth());
+
+                discolorSelectedDateRange();
+                colorSelectedDateRange();
+            });
+        });
+
+        angular.forEach(['minForwardMonth', 'maxForwardMonth'], function(key) {
+            $scope.$watch(key, function (newVal) {
+                if (!turnCalendarService.convertToDateObject(newVal)) {
+                    return;
+                }
+                self[key] = newVal;
+            });
+        });
+
+        angular.forEach(['forwardMonths', 'backwardMonths'], function(key) {
+            $scope.$watch(key, function (newVal) {
+                if (!turnCalendarService.isMonthValid(newVal)) {
+                    return;
+                }
+                self[key] = newVal;
+                $scope.monthArray = generateMonthArray(null, null);
+            });
+        });
+
+
 
         /**
          * Maximum number of day to display on a calendar in month view
@@ -1166,6 +1205,55 @@ angular
 
         $scope.priorButtons = null;
 
+
+
+        /**
+         * Util function, if the end date falls into a date that is unavailable,
+         * it will decrease the date till meet a date that's available
+         *
+         * @param {object} endDate The end date object
+         * @returns {object} The end date object that is available
+         */
+        var resetEndDate = function (endDate) {
+
+            var endDay = generateMetaDateObject(endDate, endDate.getMonth());
+
+            /**
+             * If end date is unavailable, going backward 1 day till seeing one
+             * that is available
+             */
+            while (endDay.isUnavailable) {
+                endDate.setDate(endDate.getDate() - 1);
+                endDay = generateMetaDateObject(endDate, endDate.getMonth());
+            }
+
+            return endDate;
+
+        };
+
+        /**
+         * Util function, if the start date falls into a date that is unavailable,
+         * it will increase the date till meet a date that's available
+         *
+         * @param {object} startDate The start date object
+         * @returns {object} The start date object that is available
+         */
+        var resetStartDate = function (startDate) {
+
+            var startDay = generateMetaDateObject(startDate, startDate.getMonth());
+
+            /**
+             * If start date is unavailable, going forward 1 day till seeing one
+             * that is available
+             */
+            while (startDay.isUnavailable) {
+                startDate.setDate(startDate.getDate() + 1);
+                startDay = generateMetaDateObject(startDate, startDate.getMonth());
+            }
+
+            return startDate;
+        };
+
         /**
          * Function to allow the prior buttons to set the end date by using a
          * range from the current date
@@ -1182,29 +1270,14 @@ angular
             $scope.monthArray = generateMonthArray(endDate.getFullYear(), endDate.getMonth());
 
             startDate.setDate(startDate.getDate() - range.value);
-            var startDay = generateMetaDateObject(startDate, startDate.getMonth());
 
-            /**
-             * If start date is unavailable, going forward 1 day till seeing one
-             * that is available
-             */
-            while (startDay.isUnavailable) {
-                startDate.setDate(startDate.getDate() + 1);
-                startDay = generateMetaDateObject(startDate, startDate.getMonth());
-            }
+            startDate = resetStartDate(startDate);
+            var startDay = generateMetaDateObject(startDate, startDate.getMonth());
 
             setStartDate(startDay);
 
+            endDate = resetEndDate(endDate);
             var endDay = generateMetaDateObject(endDate, endDate.getMonth());
-
-            /**
-             * If end date is unavailable, going backward 1 day till seeing one
-             * that is available
-             */
-            while (endDay.isUnavailable) {
-                endDate.setDate(endDate.getDate() - 1);
-                endDay = generateMetaDateObject(endDate, endDate.getMonth());
-            }
 
             lastSelectedDate = selectedStartDate;
 
@@ -1347,9 +1420,11 @@ angular
                 var newDate = new Date(newVal);
 
                 if (attribute === 'startDate') {
+                    newDate = resetStartDate(newDate);
                     selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
                     $scope.startDateString = selectedStartDate.date.toLocaleDateString();
                 } else {
+                    newDate = resetEndDate(newDate);
                     selectedEndDate = generateMetaDateObject(newDate, newDate.getMonth());
                     $scope.endDateString = selectedEndDate.date.toLocaleDateString();
                 }
@@ -1364,8 +1439,9 @@ angular
         // Set the end date and start date if they are set by users
         if (turnCalendarService.validateDateInput(self.startDate) &&
             turnCalendarService.validateDateInput(self.endDate)) {
-            var startDate = new Date(self.startDate),
-                endDate = new Date(self.endDate);
+            var startDate = resetStartDate(new Date(self.startDate)),
+                endDate = resetEndDate(new Date(self.endDate));
+
             selectedStartDate = generateMetaDateObject(startDate, startDate.getMonth());
             selectedEndDate = generateMetaDateObject(endDate, endDate.getMonth());
             $scope.currentSelectedStartDate = selectedStartDate;
