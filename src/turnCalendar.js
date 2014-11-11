@@ -1063,6 +1063,10 @@ angular
                 }
 
             }
+            
+            if(!$scope.$$phase){
+          	  $scope.$apply();
+            }
         };
 
         $scope.applyCalendar = function () {
@@ -1082,8 +1086,6 @@ angular
             selectedStartDate = $scope.currentSelectedStartDate;
             selectedEndDate = $scope.currentSelectedEndDate;
             lastSelectedDate = selectedEndDate;
-
-            setStartEndDate();
 
             /**
              * Edge case, if the current selected start date is empty, then it
@@ -1438,10 +1440,12 @@ angular
                     newDate = resetStartDate(newDate);
                     selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
                     $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+                    $scope.currentSelectedStartDate = selectedStartDate;
                 } else {
                     newDate = resetEndDate(newDate);
                     selectedEndDate = generateMetaDateObject(newDate, newDate.getMonth());
                     $scope.endDateString = selectedEndDate.date.toLocaleDateString();
+                    $scope.currentSelectedEndDate = selectedEndDate;
                 }
 
                 if (selectedStartDate && selectedEndDate) {
