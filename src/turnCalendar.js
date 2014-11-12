@@ -247,7 +247,7 @@ angular
          * Note : selectedStartDate and selectedEndDate are meta date object to track
          * internal cursor movement.
          */
-        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate;
+        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, isInitializedWithPriorRange = false;;
 
         if ($attrs.calendarOptions) {
             calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
@@ -427,7 +427,7 @@ angular
                     }
                 }
 
-                if (isExceedMaxMonth(newMonth, year)) {
+                if (isExceedMaxMonth(newMonth, year) && !isInitializedWithPriorRange) {
                     return;
                 }
 
@@ -477,7 +477,7 @@ angular
                     newMonthCount++;
                 }
 
-                if (isBelowMinMonth(newMonth, year)) {
+                if (isBelowMinMonth(newMonth, year) && !isInitializedWithPriorRange) {
                     return;
                 }
 
@@ -1281,6 +1281,8 @@ angular
          * @param {object} range - A range object to be set
          */
         $scope.selectRange = function (range) {
+        	
+        	isInitializedWithPriorRange = true;
 
             discolorSelectedDateRange();
 
@@ -1302,8 +1304,8 @@ angular
             lastSelectedDate = selectedStartDate;
 
             setEndDate(endDay);
-
-
+            
+            isInitializedWithPriorRange = false;
         };
 
         /**
@@ -1454,6 +1456,7 @@ angular
                 if (selectedStartDate && selectedEndDate) {
                     discolorSelectedDateRange();
                     colorSelectedDateRange();
+                    lastSelectedDate = selectedEndDate;
                 }
             });
         });
