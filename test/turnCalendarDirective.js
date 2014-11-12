@@ -117,4 +117,59 @@ describe('turnCalendar directive', function() {
         });
     });
 
+    describe('calendar weekly select mode', function () {
+        beforeEach(function () {
+            element = $compile('<turn-calendar starting-month="11" starting-year="2014" backward-months="1" forward-months="1" weekly-select-range="30" start-date="\'11/15/2014\'" end-date="\'01/08/2015\'"> </turn-calendar>')($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('is selected on 01/05/2015 and the mode is weekly', function () {
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-selected-weekly')).toBe(true);
+        });
+    });
+
+    describe('calendar monthly select mode', function () {
+        beforeEach(function () {
+            element = $compile('<turn-calendar starting-month="11" starting-year="2014" backward-months="1" forward-months="1" monthly-select-range="30" start-date="\'11/15/2014\'" end-date="\'01/08/2015\'"> </turn-calendar>')($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('is selected on 01/05/2015 and the mode is weekly', function () {
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-selected-monthly')).toBe(true);
+        });
+    });
+
+    describe('calendar weekly and monthly select mode together, and the cursor is between weekly and monthly ', function () {
+        beforeEach(function () {
+            element = $compile('<turn-calendar starting-month="11" starting-year="2014" backward-months="1" forward-months="1" weekly-select-range="30" monthly-select-range="90" start-date="\'11/15/2014\'" end-date="\'01/08/2015\'"> </turn-calendar>')($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('is selected on 01/05/2015 and the mode is weekly, because it is within weekly range but not in monthly range', function () {
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-selected-weekly')).toBe(true);
+        });
+    });
+
+    describe('calendar max forward month ', function () {
+        beforeEach(function () {
+            element = $compile('<turn-calendar starting-month="11" starting-year="2014" backward-months="2" forward-months="2" max-forward-month="\'0/2015\'"> </turn-calendar>')($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('has only 4 month instances, due to restriction by max month forward', function () {
+            expect(element.find('table').length).toBe(4);
+        });
+    });
+
+    describe('calendar min backward month ', function () {
+        beforeEach(function () {
+            element = $compile('<turn-calendar starting-month="11" starting-year="2014" backward-months="2" forward-months="2" min-backward-month="\'11/2014\'"> </turn-calendar>')($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('has only 3 month instances, due to restriction by min backward month ', function () {
+            expect(element.find('table').length).toBe(3);
+        });
+    });
+
 });
