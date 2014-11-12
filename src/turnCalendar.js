@@ -284,7 +284,7 @@ angular
         angular.forEach(['startingMonth', 'startingYear', 'backwardMonths',
             'forwardMonths', 'startDayOfWeek', 'minSelectDate', 'maxSelectDate',
             'weeklySelectRange', 'monthlySelectRange', 'priorRangePresets',
-            'maxForwardMonth', 'minForwardMonth', 'startDate', 'endDate'], function(key) {
+            'maxForwardMonth', 'minBackwardMonth', 'startDate', 'endDate'], function(key) {
             self[key] = pickValue(key);
         });
 
@@ -311,7 +311,7 @@ angular
             });
         });
 
-        angular.forEach(['minForwardMonth', 'maxForwardMonth'], function(key) {
+        angular.forEach(['minBackwardMonth', 'maxForwardMonth'], function(key) {
             $scope.$watch(key, function (newVal) {
                 if (!turnCalendarService.convertToDateObject(newVal)) {
                     return;
@@ -1020,8 +1020,6 @@ angular
                 return;
             }
 
-            console.log('let me see what happened');
-
             if (isNoneSelected()) {
 
                 setStartDate(day);
@@ -1473,6 +1471,7 @@ angular
             $scope.startDateString = startDate.toLocaleDateString();
             $scope.endDateString = endDate.toLocaleDateString();
 
+            lastSelectedDate = selectedEndDate;
             discolorSelectedDateRange();
             colorSelectedDateRange()
         }
