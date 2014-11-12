@@ -295,6 +295,11 @@ angular
                 }
                 self[key] = newVal;
                 $scope.monthArray = generateMonthArray(null, null);
+
+                if (!selectedStartDate || !selectedEndDate) {
+                    return;
+                }
+
                 var startDate = resetStartDate(selectedStartDate.date),
                     endDate = resetEndDate(selectedEndDate.date);
 
