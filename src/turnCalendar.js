@@ -311,7 +311,7 @@ angular
             });
         });
 
-        angular.forEach(['minForwardMonth', 'maxForwardMonth'], function(key) {
+        angular.forEach(['minBackwardMonth', 'maxForwardMonth'], function(key) {
             $scope.$watch(key, function (newVal) {
                 if (!turnCalendarService.convertToDateObject(newVal)) {
                     return;

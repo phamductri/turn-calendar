@@ -134,7 +134,7 @@ describe('turnCalendar directive', function() {
             $rootScope.$digest();
         });
 
-        it('is selected on 01/05/2015 and the mode is weekly', function () {
+        it('is selected on 01/05/2015 and the mode is monthly', function () {
             expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-selected-monthly')).toBe(true);
         });
     });
