@@ -111,12 +111,14 @@ Allow the following options :
 
 Example:
 
+```html
 <turn-calendar start-day-of-week="1" starting-month="11" starting-year="2013"
                  forward-months="3" backward-months="3" min-select-date="'09/13/2013'"
                  weekly-select-range="30" monthly-select-range="60"
                  prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"
                  max-forward-month="'10/2014'">
 <turn-calendar>
+```
 
 The above code snippet will display 7 months instance, starting from Sep 2013
 to March 2014, with Monday as the starting day of the week, the base month is
