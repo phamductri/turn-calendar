@@ -120,6 +120,16 @@ Example:
 <turn-calendar>
 ```
 
+All of the above options can be set through an option object. Pass in the option
+object through attribute calendarOptions. If you set the same setting in attribute
+and in option object, the value set in attribute will used over the value in
+option object.
+
+Real time update for following options are supported : startDate, endDate,
+minSelectDate, maxSelectDate, minBackwardMonth, maxForwardMonth, forwardMonths,
+backwardMonths. These options have to set through attributes for real time
+tracking to work. Setting through options object will not work.
+
 The above code snippet will display 7 months instance, starting from Sep 2013
 to March 2014, with Monday as the starting day of the week, the base month is
 Dec 2013, it will change to weekly select mode if the cursor is 30 days beyond
