@@ -5,6 +5,24 @@ turn calendar
 Turn Angular is a calendar-like component for AngularJS. It behaviors are very similar to Google analytics calendar,
 with a few extra unique options.
 
+### feature comparison
+
+Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap Date picker
+
+| Feature                     | Turn Calendar | Angular Strap Datepicker | Angular Bootstrap Datecicker |
+|-----------------------------|---------------|--------------------------|------------------------------|
+| Date range selection        | Yes           | No                       | No                           |
+| Multiple month instances    | Yes           | No                       | No                           |
+| Min/Max date selection      | Yes           | Yes                      | Yes                          |
+| Restrict month movement     | Yes           | No                       | No                           |
+| CSS                         | Custom        | Bootstrap                | Boostrap                     |
+| Arbitrary start day of week | Yes           | Yes                      | Yes                          |
+| Date format customization   | No            | Yes                      | Yes                          |
+| Weekly/Monthly Mode         | Yes           | No                       | No                           |
+| Customizable starting month | Yes           | No                       | No                           |
+| Prior range preset          | Yes           | No                       | No                           |
+| Settable start/end date     | Yes           | Yes                      | Yes                          |
+
 ### dependencies
 
 - angular (1.0.8)
@@ -73,122 +91,7 @@ grunt test
 
  Allow the following options :
 
- @param {number} startingMonth - Optional. The STARTING month of the calendar,
- if not specify will use the current month. January is count as 0, February is
- 1, and so on.
 
- @param {number} startingYear - Optional. The STARTING year of the calendar,
- if not specify will use the current year.
-
- @param {number} backwardMonths - Optional. The number of calendar instances
- of previous months count from the STARTING month instance, notice the s. For
- example, if the STARTING month is September, and you want to display July and
- August in your calendar pop up, set backwardMonths=2. Maximum allowed value
- is 6. Minimum allowed is 1. If you don't set anything or setting values not
- in allowed range, there won't be any backward months to display (i.e default
- value is 0).
-
- @param {number} forwardMonths - Optional. The number of calendar instances
- of next months count from the STARTING instance, notice the s at the end. For
- example: STARTING month is September, and you want to display October and
- November, set forwardMonths=2. Maximum allowed value is 6. Minimum allowed
- is 1. If you don't set anything or setting values not in allowed range, there
- won't be any forward months to display (i.e default value is 0).
-
- @param {number} startDayOfWeek - Optional. Allow the ability to set any day
- of the week as the first day of week. Use 0 for Sunday, 1 for Monday, so on.
- Default is 0.
-
- @param {string|number} minSelectDate - Optional. The minimum date which any
- dates which are earlier than that date will not be able to be selected, accept
- a string in MM-DD-YYYY or MM/DD/YYYY format, or a Unix timestamp.
-
- @param {string|number} maxSelectDate - Optional. The maximum date which any dates
- which are later than that date will not be able to be selected, accept a string
- in MM-DD-YYYY or MM/DD/YYYY format, or a Unix timestamp.
-
- @param {number} weeklySelectRange - Optional. A number in which if the hovered
- (or selected) CURRENT date is beyond the LAST selected date, the mouse pointer
- will change to WEEKLY hover/selected mode. If this or monthlySelectChange is
- not specified, the default mode is daily.
-
- @param {number} monthlySelectRange - Optional. A number in which if the hovered
- (or selected) CURRENT date is beyond the LAST selected date, the mouse pointer
- will change to MONTHLY hover/selected mode. If this or weeklySelectRange is
- not specified, the default mode is daily.
-
- @param {array<object>} priorRangePresets - Optional. An array of object that
- specify the range buttons to appear for user to select prior range from the
- CURRENT date. If you want a pre-selected range add a property called isDefault: true.
- The object MUST have a property called 'value' to display it. 'value' is a
- number. 'value' is a range that will allow the user to select date range from
- CURRENT date once clicked. The range will conform with minSelectDate, maxSelectDate,
- weeklySelectDate, monthlySelectDate parameters if these parameters are set.
- If you currently in a different month view, clicking on any of the prior button
- will reset your current view back to the CURRENT month. Example :
- [{value: 20, isDefault: true}, {value: 45}, {value : 90}]
-
- @param {string} maxForwardMonth - Optional. Setting the max month which the
- NEXT button allowed to work. Format is MM/YYYY. January starts as 0. This setting
- will override the setting in forwardMonths. For example, you set the starting
- month as August 2013, with forwardMonths is 3, maxForwardMonth is 10/2013, your
- calendar will miss the month November 2013, because it exceeds the maxForwardMonth.
-
- @param {string} minBackwardMonth - Optional. Setting the min month which the
- PREVIOUS button allowed to work. Format is MM/YYYY . January start as 0. This
- setting will override the setting in backwardMonths. For example, you set the
- base month to be March 2014, with backwardMonths to be 3. You also set minBackwardMonths
- to be 1/2014. The calendar will not display January 2014, and Dec 2013, since
- minBackwardMonths override backwardMonths. Attempt to press PREVIOUS button
- won't work either.
-
- @param {string|number} startDate - Optional. Set the start date to be selected
- on the calendar. Accept dateString or Unix timestamp. Set this as a directive
- attribute if you want to be able to set this value in real time. This is the
- directive to use if you want to read the current selected start date. If
- minSelectDate is set, and startDate falls into a date that is earlier than
- minSelectDate, the startDate will be pumped up until it reaches a day that is
- not conflicted with minSelectDate.
-
- @param {string|number} endDate - Optional. Set the end date to be selected on
- the calendar. Accept dateString or Unix timestamp. Set this value as directive
- attribute if you want to be able to set this value in real time. This is the
- directive to use if you want to read the current selected end date. If maxSelectDate
- is set, and this endDate falls into a date that is later than maxSelectDate,
- endDate will be going backward till it reaches a date that is not conflicted
- with maxSelectDate.
-
- @param {function} applyCallback - Optional. A callback function to call when
- the "Apply" button is pressed.
-
- All of the above options can be set through an option object. Pass in the option
- object through attribute calendarOptions. If you set the same setting in attribute
- and in option object, the value set in attribute will used over the value in
- option object.
-
- Real time update for following options are supported : startDate, endDate,
- minSelectDate, maxSelectDate, minBackwardMonth, maxForwardMonth, forwardMonths,
- backwardMonths. These options have to set through attributes for real time
- tracking to work. Setting through options object will not work.
-
- @example
-
- <turn-calendar start-day-of-week="1" starting-month="11" starting-year="2013"
-                forward-months="3" backward-months="3" min-select-date="'09/13/2013'"
-                weekly-select-range="30" monthly-select-range="60"
-                prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"
-                max-forward-month="'10/2014'">
- <turn-calendar>
-
- The above code snippet will display 7 months instance, starting from Sep 2013
- to March 2014, with Monday as the starting day of the week, the base month is
- Dec 2013, it will change to weekly select mode if the cursor is 30 days beyond
- the last selected date, monthly select mode if cursor is 60 days beyond the last
- selected date. It will display 3 prior buttons: 20, 45, 90, with 25 is pre-selected
- from the CURRENT date. Anything before 09/13/2013 is not available for selection.
- Any month above Nov of the year 2014 is not allowed.
-
- @author Tri Pham <tri.pham@turn.com>
 
 ### license
 
