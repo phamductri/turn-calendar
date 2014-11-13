@@ -1,11 +1,11 @@
 turn calendar
 ========
 
-### introduction
+### Introduction
 Turn Angular is a calendar-like component for AngularJS. It behaviors are very similar to Google analytics calendar,
 with a few extra unique options.
 
-### feature comparison
+### Feature comparison
 
 Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap Date picker
 
@@ -23,11 +23,11 @@ Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap
 | Prior range preset          | Yes           | No                       | No                           |
 | Settable start/end date     | Yes           | Yes                      | Yes                          |
 
-### dependencies
+### Dependencies
 
 - angular (1.0.8)
 
-### usage
+### Usage
 
 **html**
 
@@ -66,7 +66,7 @@ angular
 });
 ```
 
-### run the demo
+### Run the demo
 
 ```shell
 bower install
@@ -77,7 +77,7 @@ grunt serve
 
 then pop open index.html in a browser. Address is http://localhost:9000/index.html
 
-### run the tests
+### Run the tests
 
 ```
 bower install
@@ -85,7 +85,7 @@ npm install
 grunt test
 ```
 
-### documentation
+### Documentation
 
 An AngularJS directive that allows a calendar to be display when embedded.
 
@@ -128,6 +128,11 @@ selected date. It will display 3 prior buttons: 20, 45, 90, with 25 is pre-selec
 from the CURRENT date. Anything before 09/13/2013 is not available for selection.
 Any month above Nov of the year 2014 is not allowed.
 
-### license
+### Todo list
+
+- Support i18n
+- Support date formatting
+
+### License
 
 Apache2
