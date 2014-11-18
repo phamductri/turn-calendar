@@ -42,11 +42,11 @@
                                        'turn-calendar-selected-daily': day.selectMode == 'daily',
                                        'turn-calendar-selected-weekly': day.selectMode == 'weekly',
                                        'turn-calendar-selected-monthly': day.selectMode == 'monthly',
-                                       'turn-calendar-unavailable': day.isUnavailable}"
+                                       'turn-calendar-unavailable': day.isUnavailable,
+                                       'turn-calendar-date': day.date.getDate()}"
                             ng-mouseenter="mouseEnter(day)"
                             ng-mouseleave="mouseLeave(day)"
-                            ng-click="setDayClick(day)"
-                            class="turn-calendar-date" >{{day.date.getDate()}}
+                            ng-click="setDayClick(day)">{{day.date.getDate()}}
                         </td>
                     </tr>
                 </tbody>

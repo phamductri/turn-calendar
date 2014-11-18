@@ -241,7 +241,7 @@ angular
             }
         };
     })
-    .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService) {
+    .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService,$document) {
 
         /**
          * Note : selectedStartDate and selectedEndDate are meta date object to track
@@ -1066,10 +1066,6 @@ angular
                 }
 
             }
-            
-            if(!$scope.$$phase){
-          	  $scope.$apply();
-            }
         };
 
         $scope.applyCalendar = function () {
@@ -1479,6 +1475,18 @@ angular
             discolorSelectedDateRange();
             colorSelectedDateRange()
         }
+        
+        /*
+         * This will make sure that click outside of calendar will close the calendar(Will behave same as cancel button click) 
+         */
+        $document.bind('click', function (event) {
+        	if(!angular.element('turn-calendar').find(event.target).length){
+        		$scope.$apply(function(){
+        			$scope.cancel();
+        		});
+        		
+        	}
+	    });
 
     })
     .directive('turnCalendar', function () {
