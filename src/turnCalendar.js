@@ -432,7 +432,7 @@ angular
                 }
 
                 monthArray.push(generateDayArray(year, newMonth));
-                $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
+                $scope.monthNames.push(MONTH_NAME[newMonth]);
 
             }
 
@@ -482,7 +482,7 @@ angular
                 }
 
                 monthArray.unshift(generateDayArray(year, newMonth));
-                $scope.monthNames.unshift(MONTH_NAME[newMonth] + ' ' + year);
+                $scope.monthNames.unshift(MONTH_NAME[newMonth]);
             }
 
         };
@@ -516,7 +516,7 @@ angular
             monthArray.push(baseMonth);
 
             // Reset the month names
-            $scope.monthNames = [MONTH_NAME[month] + ' ' + year];
+            $scope.monthNames = [MONTH_NAME[month]];
 
             setForwardMonths(monthArray, month, year);
 
@@ -1151,7 +1151,7 @@ angular
             }
 
             $scope.monthArray.push(newMonthArray);
-            $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
+            $scope.monthNames.push(MONTH_NAME[newMonth]);
 
             discolorSelectedDateRange();
 
@@ -1207,7 +1207,7 @@ angular
             }
 
             $scope.monthArray.unshift(newMonthArray);
-            $scope.monthNames.unshift(MONTH_NAME[newMonth] + ' ' + year);
+            $scope.monthNames.unshift(MONTH_NAME[newMonth]);
 
             discolorSelectedDateRange();
 
@@ -1280,8 +1280,9 @@ angular
          *
          * @param {object} range - A range object to be set
          */
-        $scope.selectRange = function (range) {
+        $scope.selectRange = function (range, index) {
         	
+        	$scope.clickedIndex = index;        	
         	isInitializedWithPriorRange = true;
 
             discolorSelectedDateRange();
