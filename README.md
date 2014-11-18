@@ -8,6 +8,7 @@ with a few extra unique options.
 ### Why Turn Calendar ?
 
 Use Turn Calendar if you want a native AngularJS directive that:
+
 - Behaves like Google Analytics calendar
 - A calendar that is able to do date range selection
 - Configurable prior range preset buttons
