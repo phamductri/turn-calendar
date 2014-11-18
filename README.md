@@ -152,6 +152,21 @@ Any month above Nov of the year 2014 is not allowed.
 - Support i18n
 - Support date formatting
 
+### Contribute
+
+Contributes from everyone are welcomed. A few ways you can contribute:
+
+- Report a bug
+- Submit patches to fix bugs, add features, or add tests
+- Suggest new features
+- Refactor the code
+- Write or edit the documentation
+- Help with development of new features, or fix bugs
+
+### Author
+
+Tri Pham <tri.pham@turn.com>
+
 ### License
 
 Apache2
