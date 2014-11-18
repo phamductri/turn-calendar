@@ -247,7 +247,7 @@ angular
          * Note : selectedStartDate and selectedEndDate are meta date object to track
          * internal cursor movement.
          */
-        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, isInitializedWithPriorRange = false;;
+        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, isInitializedWithPriorRange = false;
 
         if ($attrs.calendarOptions) {
             calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
@@ -581,11 +581,11 @@ angular
 
 
         /**
-         * Function that determine if the current day is within the selected
-         * range, either weekly select range or monthly select range
+         * Function that determine if the current day exceeds the selected range,
+         * either weekly select range or monthly select range
          *
-         * @param {number} selectRange - The range to determine whether the
-         * day is falling within
+         * @param {number} selectRange - The range to determine whether the day
+         * is exceeding the range
          * @param {number} compareRange - An optional second range, to determine
          * if the day is sandwiched between two range or not
          * @param {object} baseDay - The base day which we compare against
@@ -593,7 +593,7 @@ angular
          * @returns {boolean} True if exceeds or is between the two range, false
          * if not
          */
-        var isDateWithinSelectedRange = function (selectRange, compareRange, baseDay, day) {
+        var isDateExceedSelectedRange = function (selectRange, compareRange, baseDay, day) {
 
             if (!selectRange || !day || day.isUnavailable || !lastSelectedDate) {
                 return false;
@@ -775,12 +775,12 @@ angular
                 return;
             }
 
-            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
+            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
                 paletteTheWeek(day, true, true, '');
                 return;
             }
 
-            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
                 paletteTheMonth(day, true, true, '');
                 return;
             }
@@ -803,12 +803,12 @@ angular
                 return;
             }
 
-            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
+            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
 
-            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
                 paletteTheMonth(day, true, false, '');
                 return;
             }
@@ -857,8 +857,8 @@ angular
          */
         var isDaily = function () {
             return (!self.weeklySelectRange && !self.monthlySelectRange) ||
-                   (!isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate) &&
-                    !isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate));
+                   (!isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate) &&
+                    !isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate));
         };
 
         /**
@@ -889,11 +889,11 @@ angular
                                 day.selectMode = 'daily';
                             }
 
-                            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
+                            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
                                 day.selectMode = 'weekly';
                             }
 
-                            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, selectedStartDate, selectedEndDate)) {
+                            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, selectedStartDate, selectedEndDate)) {
                                 day.selectMode = 'monthly';
                             }
 
@@ -904,14 +904,14 @@ angular
             });
 
             // Color the entire end week, not just the selected end date
-            if (isDateWithinSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
+            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
 
                 paletteTheWeek(selectedStartDate, false, false, 'weekly');
                 paletteTheWeek(selectedEndDate, false, false, 'weekly');
             }
 
             // Color the entire month, not just the selected end date
-            if (isDateWithinSelectedRange(self.monthlySelectRange, self.weeklySelectRange, selectedStartDate, selectedEndDate)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, selectedStartDate, selectedEndDate)) {
 
                 paletteTheMonth(selectedStartDate, false, false, 'monthly');
                 paletteTheMonth(selectedEndDate, false, false, 'monthly');
