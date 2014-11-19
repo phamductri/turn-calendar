@@ -241,7 +241,7 @@ angular
             }
         };
     })
-    .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService,$document) {
+    .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService, $document) {
 
         /**
          * Note : selectedStartDate and selectedEndDate are meta date object to track
@@ -496,7 +496,7 @@ angular
          *
          * @param {number} inputYear - Input year as base year
          * @param {number} inputMonth - Input month as base month
-         * @returns {array} The array that contains
+         * @returns {array} The array that contains all the months to be displayed
          */
         var generateMonthArray = function (inputYear, inputMonth) {
             var year = self.startingYear,
@@ -1477,16 +1477,16 @@ angular
         }
         
         /*
-         * This will make sure that click outside of calendar will close the calendar(Will behave same as cancel button click) 
+         * This will make sure that click outside of calendar will close the calendar
+         * (behave same as cancel button click)
          */
         $document.bind('click', function (event) {
-        	if(!angular.element('turn-calendar').find(event.target).length){
-        		$scope.$apply(function(){
-        			$scope.cancel();
-        		});
-        		
-        	}
-	    });
+            if(!angular.element('turn-calendar').find(event.target).length){
+                $scope.$apply(function(){
+                    $scope.cancel();
+                });
+            }
+        });
 
     })
     .directive('turnCalendar', function () {
