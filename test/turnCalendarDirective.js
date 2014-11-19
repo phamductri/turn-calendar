@@ -18,7 +18,7 @@ describe('turnCalendar directive', function() {
         });
 
         it('starts in Dec 2013', function () {
-            expect(element.find('thead').find('tr').eq(0).find('th').text()).toEqual('Dec 2013');
+            expect(element.find('thead').find('tr').eq(0).find('th').text()).toEqual('Dec');
         });
     });
 
