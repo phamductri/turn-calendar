@@ -35,6 +35,7 @@ Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap
 ### Dependencies
 
 - angular (1.0.8)
+- jQuery (2.1.1)
 
 ### Usage
 
@@ -48,7 +49,7 @@ Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap
 <body>
 
 <div ng-controller="fooCtrl">
-	<turn-calendar calendar-options="calendarOptions"></turn-calendar>
+    <turn-calendar calendar-options="calendarOptions"></turn-calendar>
 </div>
 ...
 <script src="turnCalendar.js"></script>
@@ -60,8 +61,8 @@ Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap
 angular
 .module('foo', ['turn/calendar'])
 .controller('fooCtrl', function ($scope) {
-	
-	$scope.calendarOptions = {
+
+    $scope.calendarOptions = {
                         startDayOfWeek: 1,
                         backwardMonths: 2,
                         minSelectDate: '9/13/2013',

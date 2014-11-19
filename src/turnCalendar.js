@@ -241,7 +241,7 @@ angular
             }
         };
     })
-    .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService) {
+    .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService, $document) {
 
         /**
          * Note : selectedStartDate and selectedEndDate are meta date object to track
@@ -432,7 +432,7 @@ angular
                 }
 
                 monthArray.push(generateDayArray(year, newMonth));
-                $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
+                $scope.monthNames.push(MONTH_NAME[newMonth]);
 
             }
 
@@ -482,7 +482,7 @@ angular
                 }
 
                 monthArray.unshift(generateDayArray(year, newMonth));
-                $scope.monthNames.unshift(MONTH_NAME[newMonth] + ' ' + year);
+                $scope.monthNames.unshift(MONTH_NAME[newMonth]);
             }
 
         };
@@ -496,7 +496,7 @@ angular
          *
          * @param {number} inputYear - Input year as base year
          * @param {number} inputMonth - Input month as base month
-         * @returns {array} The array that contains
+         * @returns {array} The array that contains all the months to be displayed
          */
         var generateMonthArray = function (inputYear, inputMonth) {
             var year = self.startingYear,
@@ -516,7 +516,7 @@ angular
             monthArray.push(baseMonth);
 
             // Reset the month names
-            $scope.monthNames = [MONTH_NAME[month] + ' ' + year];
+            $scope.monthNames = [MONTH_NAME[month]];
 
             setForwardMonths(monthArray, month, year);
 
@@ -1066,10 +1066,6 @@ angular
                 }
 
             }
-            
-            if(!$scope.$$phase){
-          	  $scope.$apply();
-            }
         };
 
         $scope.applyCalendar = function () {
@@ -1151,7 +1147,7 @@ angular
             }
 
             $scope.monthArray.push(newMonthArray);
-            $scope.monthNames.push(MONTH_NAME[newMonth] + ' ' + year);
+            $scope.monthNames.push(MONTH_NAME[newMonth]);
 
             discolorSelectedDateRange();
 
@@ -1207,7 +1203,7 @@ angular
             }
 
             $scope.monthArray.unshift(newMonthArray);
-            $scope.monthNames.unshift(MONTH_NAME[newMonth] + ' ' + year);
+            $scope.monthNames.unshift(MONTH_NAME[newMonth]);
 
             discolorSelectedDateRange();
 
@@ -1280,8 +1276,9 @@ angular
          *
          * @param {object} range - A range object to be set
          */
-        $scope.selectRange = function (range) {
+        $scope.selectRange = function (range, index) {
         	
+        	$scope.clickedIndex = index;        	
         	isInitializedWithPriorRange = true;
 
             discolorSelectedDateRange();
@@ -1478,6 +1475,18 @@ angular
             discolorSelectedDateRange();
             colorSelectedDateRange()
         }
+        
+        /*
+         * This will make sure that click outside of calendar will close the calendar
+         * (behave same as cancel button click)
+         */
+        $document.bind('click', function (event) {
+            if(!angular.element('turn-calendar').find(event.target).length){
+                $scope.$apply(function(){
+                    $scope.cancel();
+                });
+            }
+        });
 
     })
     .directive('turnCalendar', function () {
