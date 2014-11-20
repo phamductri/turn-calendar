@@ -335,7 +335,7 @@ angular
                 }
                 self[key] = newVal;
                 $scope.monthArray = generateMonthArray(null, null);
-                if (isBothSelected) {
+                if (isBothSelected()) {
                     discolorSelectedDateRange();
                     colorSelectedDateRange();
                 }
