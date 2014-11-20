@@ -769,6 +769,10 @@ angular
             }
         };
 
+        var isTwoClickSelectionMode = function () {
+            return !self.selectionMode || (self.selectionMode && self.selectionMode === 'twoClick');
+        };
+
 
         /**
          * Function to determine whether to hover the cell or not
@@ -787,12 +791,28 @@ angular
                 return;
             }
 
-            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
+            if (isBothSelected() && isTwoClickSelectionMode) {
+                day.isHover = true;
+                return;
+            }
+
+            var comparedDate;
+
+            switch (self.selectionMode) {
+
+                case 'lastSelectedDate':
+                    comparedDate = lastSelectedDate;
+                    break;
+                default:
+                    comparedDate = selectedStartDate;
+            }
+
+            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, comparedDate, day)) {
                 paletteTheWeek(day, true, true, '');
                 return;
             }
 
-            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, comparedDate, day)) {
                 paletteTheMonth(day, true, true, '');
                 return;
             }
@@ -815,12 +835,28 @@ angular
                 return;
             }
 
-            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
+            if (isBothSelected() && isTwoClickSelectionMode) {
+                day.isHover = false;
+                return;
+            }
+
+            var comparedDate;
+
+            switch (self.selectionMode) {
+
+                case 'lastSelectedDate':
+                    comparedDate = lastSelectedDate;
+                    break;
+                default:
+                    comparedDate = selectedStartDate;
+            }
+
+            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, comparedDate, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
 
-            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, comparedDate, day)) {
                 paletteTheMonth(day, true, false, '');
                 return;
             }
@@ -1049,7 +1085,6 @@ angular
                     break;
                 default:
                     resetSelectionTwoClickMode(day);
-                    break;
             }
         };
 
@@ -1094,7 +1129,7 @@ angular
         };
 
         var setStartEndDate = function () {
-            if (angular.isDefined($attrs.startDate)) {
+            if (angular.isDefined($attrs.startDate) && selectedStartDate) {
                 if (isNaN($scope.$parent.$eval($attrs.startDate))) {
                     $scope.startDate = selectedStartDate.date.toLocaleString();
                 } else {
@@ -1103,7 +1138,7 @@ angular
 
             }
 
-            if (angular.isDefined($attrs.endDate)) {
+            if (angular.isDefined($attrs.endDate) && selectedEndDate) {
                 if (isNaN($scope.$parent.$eval($attrs.endDate))) {
                     $scope.endDate = selectedEndDate.date.toLocaleString();
                 } else {
