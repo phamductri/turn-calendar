@@ -96,6 +96,12 @@
  * @param {function} applyCallback - Optional. A callback function to call when
  * the "Apply" button is pressed.
  *
+ * @param {string} selectionMode - Optional. The selection behavior of the calendar.
+ * Support two options for now. Default selection mode is 'twoClick', where the
+ * selected start date and end date is cleared out every time the user try a new
+ * selection. The other mode is 'lastSelectedDate', where the cursor will jump
+ * based on the previous selected date.
+ *
  * All of the above options can be set through an option object. Pass in the option
  * object through attribute calendarOptions. If you set the same setting in attribute
  * and in option object, the value set in attribute will used over the value in
@@ -265,7 +271,7 @@ angular
         var pickValue = function (property) {
 
             if (angular.isDefined($attrs[property])) {
-                return $scope.$parent.$eval($attrs[property]);
+                return $scope.$parent.$eval($attrs[property]) || $attrs[property];
             }
 
             if (angular.isDefined(calendarOptions) && calendarOptions[property]) {
@@ -284,12 +290,14 @@ angular
         angular.forEach(['startingMonth', 'startingYear', 'backwardMonths',
             'forwardMonths', 'startDayOfWeek', 'minSelectDate', 'maxSelectDate',
             'weeklySelectRange', 'monthlySelectRange', 'priorRangePresets',
-            'maxForwardMonth', 'minBackwardMonth', 'startDate', 'endDate'], function(key) {
+            'maxForwardMonth', 'minBackwardMonth', 'startDate', 'endDate',
+            'selectionMode'], function(key) {
             self[key] = pickValue(key);
         });
 
         angular.forEach(['minSelectDate', 'maxSelectDate'], function(key) {
             $scope.$watch(key, function (newVal) {
+
                 if (!turnCalendarService.validateDateInput(newVal)) {
                     return;
                 }
@@ -327,6 +335,10 @@ angular
                 }
                 self[key] = newVal;
                 $scope.monthArray = generateMonthArray(null, null);
+                if (isBothSelected()) {
+                    discolorSelectedDateRange();
+                    colorSelectedDateRange();
+                }
             });
         });
 
@@ -757,6 +769,10 @@ angular
             }
         };
 
+        var isTwoClickSelectionMode = function () {
+            return !self.selectionMode || (self.selectionMode && self.selectionMode === 'twoClick');
+        };
+
 
         /**
          * Function to determine whether to hover the cell or not
@@ -775,12 +791,28 @@ angular
                 return;
             }
 
-            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
+            if (isBothSelected() && isTwoClickSelectionMode) {
+                day.isHover = true;
+                return;
+            }
+
+            var comparedDate;
+
+            switch (self.selectionMode) {
+
+                case 'lastSelectedDate':
+                    comparedDate = lastSelectedDate;
+                    break;
+                default:
+                    comparedDate = selectedStartDate;
+            }
+
+            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, comparedDate, day)) {
                 paletteTheWeek(day, true, true, '');
                 return;
             }
 
-            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, comparedDate, day)) {
                 paletteTheMonth(day, true, true, '');
                 return;
             }
@@ -803,12 +835,28 @@ angular
                 return;
             }
 
-            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, lastSelectedDate, day)) {
+            if (isBothSelected() && isTwoClickSelectionMode) {
+                day.isHover = false;
+                return;
+            }
+
+            var comparedDate;
+
+            switch (self.selectionMode) {
+
+                case 'lastSelectedDate':
+                    comparedDate = lastSelectedDate;
+                    break;
+                default:
+                    comparedDate = selectedStartDate;
+            }
+
+            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, comparedDate, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
 
-            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, lastSelectedDate, day)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, comparedDate, day)) {
                 paletteTheMonth(day, true, false, '');
                 return;
             }
@@ -985,8 +1033,13 @@ angular
             }
         };
 
-        var resetDayClick = function (day) {
-
+        /**
+         * Reset the selection of start date, end date based on last selected
+         * start date that has been recorded
+         *
+         * @param {object} day - The day being clicked on
+         */
+        var resetSelectionLastSelectedMode = function (day) {
             if (!lastSelectedDate) {
                 lastSelectedDate = selectedEndDate;
             }
@@ -1006,6 +1059,33 @@ angular
             colorSelectedDateRange();
 
             lastSelectedDate = day;
+        };
+
+        /**
+         * Clear the calendar of hover and selected days, reset the start date
+         * to the newly selected date
+         *
+         * @param {object} day - The new start date
+         */
+        var resetSelectionTwoClickMode = function (day) {
+
+            selectedEndDate = null;
+            discolorSelectedDateRange();
+            selectedStartDate = day;
+            day.selectMode = 'daily';
+
+        };
+
+        var resetDayClick = function (day) {
+
+            // Default is two click mode
+            switch (self.selectionMode) {
+                case 'lastSelectedDate':
+                    resetSelectionLastSelectedMode(day);
+                    break;
+                default:
+                    resetSelectionTwoClickMode(day);
+            }
         };
 
         /**
@@ -1049,7 +1129,7 @@ angular
         };
 
         var setStartEndDate = function () {
-            if (angular.isDefined($attrs.startDate)) {
+            if (angular.isDefined($attrs.startDate) && selectedStartDate) {
                 if (isNaN($scope.$parent.$eval($attrs.startDate))) {
                     $scope.startDate = selectedStartDate.date.toLocaleString();
                 } else {
@@ -1058,7 +1138,7 @@ angular
 
             }
 
-            if (angular.isDefined($attrs.endDate)) {
+            if (angular.isDefined($attrs.endDate) && selectedEndDate) {
                 if (isNaN($scope.$parent.$eval($attrs.endDate))) {
                     $scope.endDate = selectedEndDate.date.toLocaleString();
                 } else {
@@ -1277,9 +1357,9 @@ angular
          * @param {object} range - A range object to be set
          */
         $scope.selectRange = function (range, index) {
-        	
-        	$scope.clickedIndex = index;        	
-        	isInitializedWithPriorRange = true;
+
+            $scope.clickedIndex = index;
+            isInitializedWithPriorRange = true;
 
             discolorSelectedDateRange();
 
@@ -1298,10 +1378,10 @@ angular
             endDate = resetEndDate(endDate);
             var endDay = generateMetaDateObject(endDate, endDate.getMonth());
 
-            lastSelectedDate = selectedStartDate;
+            lastSelectedDate = selectedEndDate;
 
             setEndDate(endDay);
-            
+
             isInitializedWithPriorRange = false;
         };
 
@@ -1508,7 +1588,8 @@ angular
                 minBackwardMonth: '=',
                 startDate: '=',
                 endDate: '=',
-                applyCallback: '&'
+                applyCallback: '&',
+                selectionMode: '='
             },
             controller: 'CalendarController',
             templateUrl: 'turnCalendar.html'
