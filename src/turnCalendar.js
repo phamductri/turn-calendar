@@ -1181,6 +1181,22 @@ angular
             $scope.calendarEnabled = false;
         };
 
+        /**
+         * Function to color just this exact date, the mode will always be daily
+         *
+         * @param {object} date The date object to be colored
+         */
+        var colorDateInMonth = function (date) {
+            $scope.monthArray.forEach(function (month) {
+                month.forEach(function (week) {
+                    week.forEach(function (day) {
+                        if (day && day.date && day.date.toLocaleString() === date.toLocaleString()) {
+                            day.selectMode = 'daily';
+                        }
+                    });
+                });
+            });
+        };
 
         /**
          * Function that add a new month into the month array, remove the last
@@ -1232,8 +1248,12 @@ angular
             discolorSelectedDateRange();
 
             // Remember to color current selected start and end dates
-            if (selectedStartDate && selectedEndDate) {
+            if (isBothSelected()) {
                 colorSelectedDateRange();
+            }
+
+            if (isStartDateSelected()) {
+                colorDateInMonth(selectedStartDate.date);
             }
 
         };
@@ -1289,6 +1309,10 @@ angular
 
             if (selectedStartDate && selectedEndDate) {
                 colorSelectedDateRange();
+            }
+
+            if (isStartDateSelected()) {
+                colorDateInMonth(selectedStartDate.date);
             }
         };
 
