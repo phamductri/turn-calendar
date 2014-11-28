@@ -13,7 +13,7 @@
                 <button class="turn-calendar-prior" ng-repeat="range in priorButtons" ng-click="selectRange(range, $index)" 
                         ng-class="{'turn-calendar-prior-left': $index == 0, 
                                    'turn-calendar-prior-right': $index == priorButtons.length-1, 
-                                   'active': $index == clickedIndex
+                                   'active': $index == selectedPriorButtonIndex
                                   }" turn-calendar-prior">{{range.value}}</button>              
                 <span ng-show="priorButtons.length" class="turn-calendar-day-label">Days</span>
             </div>

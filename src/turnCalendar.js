@@ -587,8 +587,8 @@ angular
          * @returns {boolean} - True if compatible, false if not
          */
         var isUnavailable = function (date) {
-            return (self.minSelectDate && date <= new Date(self.minSelectDate)) ||
-                   (self.maxSelectDate && date >= new Date(self.maxSelectDate));
+            return (self.minSelectDate && date < new Date(self.minSelectDate)) ||
+                   (self.maxSelectDate && date > new Date(self.maxSelectDate));
         };
 
 
@@ -913,7 +913,7 @@ angular
          * @returns {boolean} True if between, false if not
          */
         var isBetweenStartAndEndDate = function (date) {
-            return date <= selectedEndDate.date && date >= selectedStartDate.date;
+            return date.setHours(0, 0, 0, 0) <= selectedEndDate.date.setHours(0, 0, 0, 0) && date.setHours(0, 0, 0, 0) >= selectedStartDate.date.setHours(0, 0, 0, 0);
         };
 
         /**
@@ -1149,6 +1149,22 @@ angular
          */
         $scope.enableCalendar = function () {
             $scope.calendarEnabled = !$scope.calendarEnabled;
+            colorizePriorButtons();
+        };
+        
+        /**
+         * This code will check for day difference of prior button and if any matching range found,
+         * active style will be applied to that button
+         */
+        var colorizePriorButtons = function () {
+        	$scope.selectedPriorButtonIndex = null;
+        	var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
+        	var dayDiff = Math.round((endDate.getTime() - selectedStartDate.date.getTime())/ 864e5);
+        	angular.forEach($scope.priorButtons, function(rangePreset, index){
+        		if((rangePreset.value -1) === dayDiff){
+        			$scope.selectedPriorButtonIndex = index;
+        		}
+        	})
         };
 
         var setStartEndDate = function () {
@@ -1405,17 +1421,17 @@ angular
          */
         $scope.selectRange = function (range, index) {
 
-            $scope.clickedIndex = index;
+            $scope.selectedPriorButtonIndex = index;
             isInitializedWithPriorRange = true;
 
             discolorSelectedDateRange();
 
-            var startDate = new Date(),
-                endDate = new Date();
+            var startDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date(),
+                endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
 
             $scope.monthArray = generateMonthArray(endDate.getFullYear(), endDate.getMonth());
 
-            startDate.setDate(startDate.getDate() - range.value);
+            startDate.setDate(startDate.getDate() - (range.value - 1));
 
             startDate = resetStartDate(startDate);
             var startDay = generateMetaDateObject(startDate, startDate.getMonth());
