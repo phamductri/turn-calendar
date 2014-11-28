@@ -29,6 +29,8 @@
                 };
 
                 $scope.endDate = new Date().getTime();
+                
+                $scope.startDate = ($scope.endDate - (10*864e5));
 
                 $scope.setNewEndDate = function () {
                     var currentVal = new Date($scope.endDate);
@@ -67,7 +69,8 @@
                weekly-select-range="90"
                monthly-select-range="180"
                min-backward-month="'08/2013'"
-               prior-range-presets="[{value: 7}, {value: 30, isDefault: true}, {value : 45}]"
+               prior-range-presets="[{value: 7}, {value: 30}, {value : 90}]"
+               start-date="startDate"
                end-date="endDate">
 
 </turn-calendar>
