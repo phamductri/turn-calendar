@@ -252,8 +252,14 @@ angular
         /**
          * Note : selectedStartDate and selectedEndDate are meta date object to track
          * internal cursor movement.
+         * 
+         * allowMonthGeneration will allow generation of month in some edge cases:
+         * 1) prior range click
+         * 2) dynamically updating maxSelectDate and minSelectDate
+         * In above cases if we don't bypass month generation, less instance of
+         * month will be displayed than expected.
          */
-        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, isInitializedWithPriorRange = false;
+        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, allowMonthGeneration = false;
 
         if ($attrs.calendarOptions) {
             calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
@@ -302,7 +308,10 @@ angular
                     return;
                 }
                 self[key] = newVal;
+
+                allowMonthGeneration = true;
                 $scope.monthArray = generateMonthArray(null, null);
+                allowMonthGeneration = false;
 
                 if (!selectedStartDate || !selectedEndDate) {
                     return;
@@ -439,7 +448,7 @@ angular
                     }
                 }
 
-                if (isExceedMaxMonth(newMonth, year) && !isInitializedWithPriorRange) {
+                if (isExceedMaxMonth(newMonth, year) && !allowMonthGeneration) {
                     return;
                 }
 
@@ -489,7 +498,7 @@ angular
                     newMonthCount++;
                 }
 
-                if (isBelowMinMonth(newMonth, year) && !isInitializedWithPriorRange) {
+                if (isBelowMinMonth(newMonth, year) && !allowMonthGeneration) {
                     return;
                 }
 
@@ -587,8 +596,8 @@ angular
          * @returns {boolean} - True if compatible, false if not
          */
         var isUnavailable = function (date) {
-            return (self.minSelectDate && date <= new Date(self.minSelectDate)) ||
-                   (self.maxSelectDate && date >= new Date(self.maxSelectDate));
+            return (self.minSelectDate && date < new Date(self.minSelectDate)) ||
+                   (self.maxSelectDate && date > new Date(self.maxSelectDate));
         };
 
 
@@ -807,16 +816,15 @@ angular
                     comparedDate = selectedStartDate;
             }
 
-            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, comparedDate, day)) {
+            // Either monthly or weekly selection is possible(not both)
+            if (isDateExceedSelectedRange(self.monthlySelectRange, null, comparedDate, day)) {
+                paletteTheMonth(day, true, true, '');
+                return;
+            } else if (isDateExceedSelectedRange(self.weeklySelectRange, null, comparedDate, day)) {
                 paletteTheWeek(day, true, true, '');
                 return;
             }
-
-            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, comparedDate, day)) {
-                paletteTheMonth(day, true, true, '');
-                return;
-            }
-
+            
             if (!day.isUnavailable) {
                 day.isHover = true;
             }
@@ -851,16 +859,14 @@ angular
                     comparedDate = selectedStartDate;
             }
 
-            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, comparedDate, day)) {
+            // Either monthly or weekly selection is possible(not both)
+            if (isDateExceedSelectedRange(self.monthlySelectRange, null, comparedDate, day)) {
+                paletteTheMonth(day, true, false, '');
+                return;
+            } else if (isDateExceedSelectedRange(self.weeklySelectRange, null, comparedDate, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
-
-            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, comparedDate, day)) {
-                paletteTheMonth(day, true, false, '');
-                return;
-            }
-
             day.isHover = false;
         };
 
@@ -916,7 +922,7 @@ angular
          * @returns {boolean} True if between, false if not
          */
         var isBetweenStartAndEndDate = function (date) {
-            return date <= selectedEndDate.date && date >= selectedStartDate.date;
+            return date.setHours(0, 0, 0, 0) <= selectedEndDate.date.setHours(0, 0, 0, 0) && date.setHours(0, 0, 0, 0) >= selectedStartDate.date.setHours(0, 0, 0, 0);
         };
 
         /**
@@ -951,18 +957,15 @@ angular
                 });
             });
 
-            // Color the entire end week, not just the selected end date
-            if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
-
-                paletteTheWeek(selectedStartDate, false, false, 'weekly');
-                paletteTheWeek(selectedEndDate, false, false, 'weekly');
-            }
-
-            // Color the entire month, not just the selected end date
+            // Selection mode can be either monthly or weekly (both is not possible)
             if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, selectedStartDate, selectedEndDate)) {
-
+                // Color the entire month, not just the selected end date
                 paletteTheMonth(selectedStartDate, false, false, 'monthly');
                 paletteTheMonth(selectedEndDate, false, false, 'monthly');
+            } else if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
+                // Color the entire end week, not just the selected end date
+                paletteTheWeek(selectedStartDate, false, false, 'weekly');
+                paletteTheWeek(selectedEndDate, false, false, 'weekly');
             }
         };
 
@@ -1003,11 +1006,44 @@ angular
                 selectedEndDate = day;
             }
 
+            snapDateToMonthlyWeekly();
             $scope.startDateString = selectedStartDate.date.toLocaleDateString();
             $scope.endDateString = selectedEndDate.date.toLocaleDateString();
 
             colorSelectedDateRange();
 
+        };
+        
+        /**
+         * Snaps selected start/end date in case of monthly and weekly selection mode 
+         */
+        var snapDateToMonthlyWeekly = function(){
+            var updatedStartDate, updatedEndDate, isValueUpdated = false,
+                dayDiff = Math.round((selectedEndDate.date.getTime() - selectedStartDate.date.getTime())/ 864e5);
+
+            if (dayDiff > self.monthlySelectRange) {
+                updatedStartDate = new Date(selectedStartDate.date.getFullYear(), selectedStartDate.date.getMonth(), 1);
+                updatedEndDate = new Date(selectedEndDate.date.getFullYear(), selectedEndDate.date.getMonth()+1, 0);
+                isValueUpdated = true;
+            } else if (dayDiff > self.weeklySelectRange) {
+                updatedStartDate = new Date(selectedStartDate.date.setDate(selectedStartDate.date.getDate() - (7 + selectedStartDate.date.getDay() - self.startDayOfWeek) % 7));
+                updatedEndDate = new Date(((selectedEndDate.date.setDate(selectedEndDate.date.getDate() - (7 + selectedEndDate.date.getDay() - self.startDayOfWeek) % 7)) + 6*864e5));
+                isValueUpdated = true;
+            }
+
+            if (isValueUpdated) {
+
+                if (updatedStartDate && isUnavailable(updatedStartDate)) {
+                    updatedStartDate = new Date(self.minSelectDate);
+                }
+
+                if (updatedEndDate && isUnavailable(updatedEndDate)) {
+                    updatedEndDate = new Date(self.maxSelectDate);
+                }
+
+                selectedStartDate.date = updatedStartDate;
+                selectedEndDate.date = updatedEndDate;
+            }
         };
 
         var setStartDate = function (day) {
@@ -1051,6 +1087,7 @@ angular
             }
 
             swapDate();
+            snapDateToMonthlyWeekly();
             $scope.startDateString = selectedStartDate.date.toLocaleDateString();
             $scope.endDateString = selectedEndDate.date.toLocaleDateString();
 
@@ -1072,7 +1109,7 @@ angular
             selectedEndDate = null;
             discolorSelectedDateRange();
             selectedStartDate = day;
-            day.selectMode = 'daily';
+            colorDateInMonth(day.date);
 
         };
 
@@ -1094,7 +1131,9 @@ angular
          *
          * @param {object} day - A meta date object
          */
-        $scope.setDayClick = function (day) {
+        $scope.setDayClick = function (date) {
+
+            var day = angular.copy(date);
 
             if (day.isUnavailable || !day.date) {
                 return;
@@ -1126,6 +1165,24 @@ angular
          */
         $scope.enableCalendar = function () {
             $scope.calendarEnabled = !$scope.calendarEnabled;
+            colorizePriorButtons();
+        };
+        
+        /**
+         * This code will check for day difference of prior button and if any matching range found,
+         * active style will be applied to that button
+         */
+        var colorizePriorButtons = function () {
+            $scope.selectedPriorButtonIndex = null;
+
+            var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
+            var dayDiff = Math.round((endDate.getTime() - selectedStartDate.date.getTime()) / 864e5);
+
+            angular.forEach($scope.priorButtons, function (rangePreset, index) {
+                if ((rangePreset.value - 1) === dayDiff) {
+                    $scope.selectedPriorButtonIndex = index;
+                }
+            })
         };
 
         var setStartEndDate = function () {
@@ -1382,17 +1439,17 @@ angular
          */
         $scope.selectRange = function (range, index) {
 
-            $scope.clickedIndex = index;
-            isInitializedWithPriorRange = true;
+            $scope.selectedPriorButtonIndex = index;
+            allowMonthGeneration = true;
 
             discolorSelectedDateRange();
 
-            var startDate = new Date(),
-                endDate = new Date();
+            var startDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date(),
+                endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
 
             $scope.monthArray = generateMonthArray(endDate.getFullYear(), endDate.getMonth());
 
-            startDate.setDate(startDate.getDate() - range.value);
+            startDate.setDate(startDate.getDate() - (range.value - 1));
 
             startDate = resetStartDate(startDate);
             var startDay = generateMetaDateObject(startDate, startDate.getMonth());
@@ -1406,7 +1463,7 @@ angular
 
             setEndDate(endDay);
 
-            isInitializedWithPriorRange = false;
+            allowMonthGeneration = false;
         };
 
         /**
