@@ -62,9 +62,13 @@ describe('turnCalendar directive', function() {
             element = $compile('<turn-calendar starting-month="11" starting-year="2014" backward-months="1" forward-months="1" min-select-date="\'11/03/2014\'"> </turn-calendar>')($rootScope);
             $rootScope.$digest();
         });
+        
+        it('has no available date on 11/02/2014', function () {
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(2).find('td').eq(0).hasClass('turn-calendar-unavailable')).toBeTruthy();
+        });
 
-        it('has no available date on 11/03/2014', function () {
-            expect(element.find('table').eq(0).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-unavailable')).toBeTruthy();
+        it('has available date on 11/03/2014', function () {
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-unavailable')).toBe(false);
         });
 
         it('has available date on 11/04/2014', function () {
@@ -77,9 +81,13 @@ describe('turnCalendar directive', function() {
             element = $compile('<turn-calendar starting-month="11" starting-year="2014" backward-months="1" forward-months="1" max-select-date="\'01/06/2015\'"> </turn-calendar>')($rootScope);
             $rootScope.$digest();
         });
+        
+        it('has no available dates on 01/07/2015', function () {
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(3).hasClass('turn-calendar-unavailable')).toBeTruthy();
+        });
 
-        it('has no available dates on 01/06/2015', function () {
-            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(2).hasClass('turn-calendar-unavailable')).toBe(true);
+        it('has available dates on 01/06/2015', function () {
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(2).hasClass('turn-calendar-unavailable')).toBe(false);
         });
 
         it('has available date on 01/05/2014', function () {
@@ -97,8 +105,8 @@ describe('turnCalendar directive', function() {
             expect(element.find('table').eq(0).find('tbody').find('tr').eq(2).find('td').eq(2).hasClass('turn-calendar-selected-daily')).toBe(true);
         });
 
-        it('is not selected on 11/03/2014, and has unavailable status instead', function () {
-            expect(element.find('table').eq(0).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-unavailable')).toBe(true);
+        it('is not selected on 11/02/2014, and has unavailable status instead', function () {
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(2).find('td').eq(0).hasClass('turn-calendar-unavailable')).toBe(true);
         });
     });
 
@@ -112,8 +120,8 @@ describe('turnCalendar directive', function() {
             expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-selected-daily')).toBe(true);
         });
 
-        it('has unavailable date on 01/06/2015', function () {
-            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(2).hasClass('turn-calendar-unavailable')).toBe(true);
+        it('has unavailable date on 01/07/2015', function () {
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(3).hasClass('turn-calendar-unavailable')).toBe(true);
         });
     });
 

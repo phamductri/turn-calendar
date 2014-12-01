@@ -252,8 +252,14 @@ angular
         /**
          * Note : selectedStartDate and selectedEndDate are meta date object to track
          * internal cursor movement.
+         * 
+         * allowMonthGeneration will allow generation of month in some edge cases:
+         * 1)prior range click
+         * 2)dynamically updating maxSelectDate and minSelectDate
+         * In above cases if we don't bypass month generation, less instance of
+         *  month will be displayed than expected.
          */
-        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, isInitializedWithPriorRange = false;
+        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, allowMonthGeneration = false;
 
         if ($attrs.calendarOptions) {
             calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
@@ -302,7 +308,10 @@ angular
                     return;
                 }
                 self[key] = newVal;
+
+                allowMonthGeneration = true;
                 $scope.monthArray = generateMonthArray(null, null);
+                allowMonthGeneration = false;
 
                 if (!selectedStartDate || !selectedEndDate) {
                     return;
@@ -439,7 +448,7 @@ angular
                     }
                 }
 
-                if (isExceedMaxMonth(newMonth, year) && !isInitializedWithPriorRange) {
+                if (isExceedMaxMonth(newMonth, year) && !allowMonthGeneration) {
                     return;
                 }
 
@@ -489,7 +498,7 @@ angular
                     newMonthCount++;
                 }
 
-                if (isBelowMinMonth(newMonth, year) && !isInitializedWithPriorRange) {
+                if (isBelowMinMonth(newMonth, year) && !allowMonthGeneration) {
                     return;
                 }
 
@@ -808,10 +817,10 @@ angular
             }
 
             //either monthly or weekly selection is possible(not both)
-            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, comparedDate, day)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, null, comparedDate, day)) {
                 paletteTheMonth(day, true, true, '');
                 return;
-            } else if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, comparedDate, day)) {
+            } else if (isDateExceedSelectedRange(self.weeklySelectRange, null, comparedDate, day)) {
                 paletteTheWeek(day, true, true, '');
                 return;
             }
@@ -851,10 +860,10 @@ angular
             }
 
             //either montly or weekly selection is possible(not both)
-            if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, comparedDate, day)) {
+            if (isDateExceedSelectedRange(self.monthlySelectRange, null, comparedDate, day)) {
                 paletteTheMonth(day, true, false, '');
                 return;
-            }else if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, comparedDate, day)) {
+            }else if (isDateExceedSelectedRange(self.weeklySelectRange, null, comparedDate, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
@@ -1005,6 +1014,9 @@ angular
 
         };
         
+        /**
+         * Snaps selected start/end date in case of monthly and weekly selection mode 
+         */
         var snapDateToMonthlyWeekly = function(){
         	var updatedStartDate, updatedEndDate, isValueUpdated = false;
         	var dayDiff = Math.round((selectedEndDate.date.getTime() - selectedStartDate.date.getTime())/ 864e5);
@@ -1161,7 +1173,7 @@ angular
         	var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
         	var dayDiff = Math.round((endDate.getTime() - selectedStartDate.date.getTime())/ 864e5);
         	angular.forEach($scope.priorButtons, function(rangePreset, index){
-        		if((rangePreset.value -1) === dayDiff){
+        		if((rangePreset.value - 1) === dayDiff){
         			$scope.selectedPriorButtonIndex = index;
         		}
         	})
@@ -1422,7 +1434,7 @@ angular
         $scope.selectRange = function (range, index) {
 
             $scope.selectedPriorButtonIndex = index;
-            isInitializedWithPriorRange = true;
+            allowMonthGeneration = true;
 
             discolorSelectedDateRange();
 
@@ -1445,7 +1457,7 @@ angular
 
             setEndDate(endDay);
 
-            isInitializedWithPriorRange = false;
+            allowMonthGeneration = false;
         };
 
         /**
