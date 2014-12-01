@@ -254,10 +254,10 @@ angular
          * internal cursor movement.
          * 
          * allowMonthGeneration will allow generation of month in some edge cases:
-         * 1)prior range click
-         * 2)dynamically updating maxSelectDate and minSelectDate
+         * 1) prior range click
+         * 2) dynamically updating maxSelectDate and minSelectDate
          * In above cases if we don't bypass month generation, less instance of
-         *  month will be displayed than expected.
+         * month will be displayed than expected.
          */
         var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, allowMonthGeneration = false;
 
@@ -957,13 +957,13 @@ angular
                 });
             });
 
-            //selection mode can be either monthly or weekly(both is not possible) 
+            // Selection mode can be either monthly or weekly (both is not possible)
             if (isDateExceedSelectedRange(self.monthlySelectRange, self.weeklySelectRange, selectedStartDate, selectedEndDate)) {
-            	// Color the entire month, not just the selected end date
+                // Color the entire month, not just the selected end date
                 paletteTheMonth(selectedStartDate, false, false, 'monthly');
                 paletteTheMonth(selectedEndDate, false, false, 'monthly');
             } else if (isDateExceedSelectedRange(self.weeklySelectRange, self.monthlySelectRange, selectedStartDate, selectedEndDate)) {
-            	// Color the entire end week, not just the selected end date
+                // Color the entire end week, not just the selected end date
                 paletteTheWeek(selectedStartDate, false, false, 'weekly');
                 paletteTheWeek(selectedEndDate, false, false, 'weekly');
             }
@@ -1018,29 +1018,33 @@ angular
          * Snaps selected start/end date in case of monthly and weekly selection mode 
          */
         var snapDateToMonthlyWeekly = function(){
-        	var updatedStartDate, updatedEndDate, isValueUpdated = false;
-        	var dayDiff = Math.round((selectedEndDate.date.getTime() - selectedStartDate.date.getTime())/ 864e5);
-        	if(dayDiff > self.monthlySelectRange){
-        		updatedStartDate = new Date(selectedStartDate.date.getFullYear(), selectedStartDate.date.getMonth(), 1);
-        		updatedEndDate = new Date(selectedEndDate.date.getFullYear(), selectedEndDate.date.getMonth()+1, 0);
-        		isValueUpdated = true;
-        	}else if(dayDiff > self.weeklySelectRange){
-        		updatedStartDate = new Date(selectedStartDate.date.setDate(selectedStartDate.date.getDate() - (7 + selectedStartDate.date.getDay() - self.startDayOfWeek) % 7));
-        		updatedEndDate = new Date(((selectedEndDate.date.setDate(selectedEndDate.date.getDate() - (7 + selectedEndDate.date.getDay() - self.startDayOfWeek) % 7)) + 6*864e5));
-        		isValueUpdated = true;
-        	}
-        	
-        	if(isValueUpdated){
-        		if(updatedStartDate && isUnavailable(updatedStartDate)){
-            		updatedStartDate = new Date(self.minSelectDate);
-        		}
-        		if(updatedEndDate && isUnavailable(updatedEndDate)){
-        			updatedEndDate = new Date(self.maxSelectDate);
-        		}
-        		selectedStartDate.date = updatedStartDate;
-        		selectedEndDate.date = updatedEndDate;
-        	}
-        }
+            var updatedStartDate, updatedEndDate, isValueUpdated = false,
+                dayDiff = Math.round((selectedEndDate.date.getTime() - selectedStartDate.date.getTime())/ 864e5);
+
+            if (dayDiff > self.monthlySelectRange) {
+                updatedStartDate = new Date(selectedStartDate.date.getFullYear(), selectedStartDate.date.getMonth(), 1);
+                updatedEndDate = new Date(selectedEndDate.date.getFullYear(), selectedEndDate.date.getMonth()+1, 0);
+                isValueUpdated = true;
+            } else if (dayDiff > self.weeklySelectRange) {
+                updatedStartDate = new Date(selectedStartDate.date.setDate(selectedStartDate.date.getDate() - (7 + selectedStartDate.date.getDay() - self.startDayOfWeek) % 7));
+                updatedEndDate = new Date(((selectedEndDate.date.setDate(selectedEndDate.date.getDate() - (7 + selectedEndDate.date.getDay() - self.startDayOfWeek) % 7)) + 6*864e5));
+                isValueUpdated = true;
+            }
+
+            if (isValueUpdated) {
+
+                if (updatedStartDate && isUnavailable(updatedStartDate)) {
+                    updatedStartDate = new Date(self.minSelectDate);
+                }
+
+                if (updatedEndDate && isUnavailable(updatedEndDate)) {
+                    updatedEndDate = new Date(self.maxSelectDate);
+                }
+
+                selectedStartDate.date = updatedStartDate;
+                selectedEndDate.date = updatedEndDate;
+            }
+        };
 
         var setStartDate = function (day) {
 
@@ -1128,8 +1132,8 @@ angular
          * @param {object} day - A meta date object
          */
         $scope.setDayClick = function (date) {
-        	
-        	var day = angular.copy(date);
+
+            var day = angular.copy(date);
 
             if (day.isUnavailable || !day.date) {
                 return;
@@ -1168,15 +1172,17 @@ angular
          * This code will check for day difference of prior button and if any matching range found,
          * active style will be applied to that button
          */
-        var colorizePriorButtons = function () {
-        	$scope.selectedPriorButtonIndex = null;
-        	var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
-        	var dayDiff = Math.round((endDate.getTime() - selectedStartDate.date.getTime())/ 864e5);
-        	angular.forEach($scope.priorButtons, function(rangePreset, index){
-        		if((rangePreset.value - 1) === dayDiff){
-        			$scope.selectedPriorButtonIndex = index;
-        		}
-        	})
+      var colorizePriorButtons = function () {
+            $scope.selectedPriorButtonIndex = null;
+
+            var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
+            var dayDiff = Math.round((endDate.getTime() - selectedStartDate.date.getTime())/ 864e5);
+
+            angular.forEach($scope.priorButtons, function (rangePreset, index) {
+                if ((rangePreset.value - 1) === dayDiff) {
+                    $scope.selectedPriorButtonIndex = index;
+                }
+            })
         };
 
         var setStartEndDate = function () {
