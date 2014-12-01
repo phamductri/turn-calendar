@@ -816,7 +816,7 @@ angular
                     comparedDate = selectedStartDate;
             }
 
-            //either monthly or weekly selection is possible(not both)
+            // Either monthly or weekly selection is possible(not both)
             if (isDateExceedSelectedRange(self.monthlySelectRange, null, comparedDate, day)) {
                 paletteTheMonth(day, true, true, '');
                 return;
@@ -859,11 +859,11 @@ angular
                     comparedDate = selectedStartDate;
             }
 
-            //either montly or weekly selection is possible(not both)
+            // Either monthly or weekly selection is possible(not both)
             if (isDateExceedSelectedRange(self.monthlySelectRange, null, comparedDate, day)) {
                 paletteTheMonth(day, true, false, '');
                 return;
-            }else if (isDateExceedSelectedRange(self.weeklySelectRange, null, comparedDate, day)) {
+            } else if (isDateExceedSelectedRange(self.weeklySelectRange, null, comparedDate, day)) {
                 paletteTheWeek(day, true, false, '');
                 return;
             }
@@ -1172,11 +1172,11 @@ angular
          * This code will check for day difference of prior button and if any matching range found,
          * active style will be applied to that button
          */
-      var colorizePriorButtons = function () {
+        var colorizePriorButtons = function () {
             $scope.selectedPriorButtonIndex = null;
 
             var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
-            var dayDiff = Math.round((endDate.getTime() - selectedStartDate.date.getTime())/ 864e5);
+            var dayDiff = Math.round((endDate.getTime() - selectedStartDate.date.getTime()) / 864e5);
 
             angular.forEach($scope.priorButtons, function (rangePreset, index) {
                 if ((rangePreset.value - 1) === dayDiff) {
