@@ -1011,6 +1011,7 @@ angular
             $scope.endDateString = selectedEndDate.date.toLocaleDateString();
 
             colorSelectedDateRange();
+            colorizePriorButtons();
 
         };
         
@@ -1176,7 +1177,7 @@ angular
             $scope.selectedPriorButtonIndex = null;
 
             var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
-            var dayDiff = Math.round((endDate.getTime() - selectedStartDate.date.getTime()) / 864e5);
+            var dayDiff = Math.round((endDate.setHours(0, 0, 0, 0) - selectedStartDate.date.setHours(0, 0, 0, 0)) / 864e5);
 
             angular.forEach($scope.priorButtons, function (rangePreset, index) {
                 if ((rangePreset.value - 1) === dayDiff) {
@@ -1202,15 +1203,19 @@ angular
                     $scope.endDate = selectedEndDate.date.getTime();
                 }
 
+            } else if (selectedStartDate) {
+                selectedEndDate = selectedStartDate;
+                $scope.endDate = selectedEndDate.date.getTime();
             }
         };
 
         $scope.applyCalendar = function () {
-            $scope.currentSelectedStartDate = selectedStartDate;
-            $scope.currentSelectedEndDate = selectedEndDate;
             $scope.calendarEnabled = false;
 
             setStartEndDate();
+            
+            $scope.currentSelectedStartDate = selectedStartDate;
+            $scope.currentSelectedEndDate = selectedEndDate;
 
             if ($scope.applyCallback) {
                 $scope.applyCallback();
@@ -1221,6 +1226,8 @@ angular
             discolorSelectedDateRange();
             selectedStartDate = $scope.currentSelectedStartDate;
             selectedEndDate = $scope.currentSelectedEndDate;
+            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
             lastSelectedDate = selectedEndDate;
 
             /**
