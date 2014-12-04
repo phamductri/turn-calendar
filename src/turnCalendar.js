@@ -260,6 +260,8 @@ angular
          * month will be displayed than expected.
          */
         var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, allowMonthGeneration = false;
+        
+        $scope.isBothDateSelected = true;
 
         if ($attrs.calendarOptions) {
             calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
@@ -1012,6 +1014,7 @@ angular
 
             colorSelectedDateRange();
             colorizePriorButtons();
+            $scope.isBothDateSelected = true;
 
         };
         
@@ -1052,6 +1055,7 @@ angular
             selectedStartDate = day;
             $scope.startDateString = selectedStartDate.date.toLocaleDateString();
             day.selectMode = 'daily';
+            $scope.isBothDateSelected = false;
 
         };
 
@@ -1111,6 +1115,7 @@ angular
             discolorSelectedDateRange();
             selectedStartDate = day;
             colorDateInMonth(day.date);
+            $scope.isBothDateSelected = false;
 
         };
 
@@ -1203,13 +1208,13 @@ angular
                     $scope.endDate = selectedEndDate.date.getTime();
                 }
 
-            } else if (selectedStartDate) {
-                selectedEndDate = selectedStartDate;
-                $scope.endDate = selectedEndDate.date.getTime();
             }
         };
 
         $scope.applyCalendar = function () {
+        	if (!selectedEndDate) {
+                return;
+        	}
             $scope.calendarEnabled = false;
 
             setStartEndDate();
