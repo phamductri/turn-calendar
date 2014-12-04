@@ -263,6 +263,12 @@ $selected-color: #0aa4d2;
   }
 }
 
+.turn-calendar-btn-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;  
+  pointer-events: none;
+}
+
 p.clear {
   margin: 0;
   padding: 0;

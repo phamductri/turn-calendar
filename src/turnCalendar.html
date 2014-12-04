@@ -18,7 +18,7 @@
                 <span ng-show="priorButtons.length" class="turn-calendar-day-label">Days</span>
             </div>
             <div class="turn-calendar-submit">              
-                <button ng-click="applyCalendar()" class="turn-calendar-done-btn">Done</button>
+                <button ng-click="applyCalendar()" class="turn-calendar-done-btn" ng-class="{'turn-calendar-btn-disabled': !isBothDateSelected}">Done</button>
             </div>
             <p class="clear"></p>
         </div>
