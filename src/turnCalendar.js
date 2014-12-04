@@ -411,8 +411,8 @@ angular
          * an arbitrary start day
          */
         var generateFirstDateIndex = function (startDayOfWeek, firstDayOfMonth) {
-
-            return 0 - ($scope.DAYS_IN_WEEK - 1 - startDayOfWeek - (0 - firstDayOfMonth));
+            var firstDayIndex = 0 - ($scope.DAYS_IN_WEEK - 1 - startDayOfWeek - (0 - firstDayOfMonth));
+            return firstDayIndex < -7 ? firstDayIndex + 7 : firstDayIndex;
         };
 
         var isExceedMaxMonth = function (month, year) {
