@@ -1,0 +1,209 @@
+.turn-calendar-enable-btn {
+  background: linear-gradient(to bottom, #f2f2f2 0%, #d4d4d4 100%);
+  border: 1px solid #ababab;
+  border-radius: 3px;
+  box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
+  text-shadow: 0px 0px 5px white, 0px 1px 0.1px white;
+  color: #666;
+  cursor: pointer;
+  line-height: 1.5;
+  margin: 0 10px 0 0;
+  outline: 0;
+  padding: 3px 16px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap; }
+  .turn-calendar-enable-btn:hover {
+    background: linear-gradient(to bottom, white 0%, #e1e1e1 100%);
+    border: 1px solid #ababab;
+    box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
+    text-shadow: 0px 0px 5px white, 0px 1px 0.1px white; }
+  .turn-calendar-enable-btn:active {
+    background: #b9b9b9;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.1);
+    color: #555;
+    outline: 0;
+    text-shadow: 0px 1px 0.1px rgba(255, 255, 255, 0.4); }
+
+.turn-calendar-div {
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #999999;
+  color: #58585b;
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  margin: 5px 0 0 0; }
+  .turn-calendar-div .turn-calendar-navigation, .turn-calendar-div .turn-calendar-navigation-left, .turn-calendar-div .turn-calendar-navigation-right {
+    border-style: solid;
+    cursor: pointer;
+    float: left;
+    height: 0;
+    position: relative;
+    width: 0; }
+  .turn-calendar-div .turn-calendar-navigation-left {
+    border-color: transparent #2ba7d2 transparent transparent;
+    border-width: 5px 7px 5px 0;
+    left: 15px;
+    top: 4px; }
+  .turn-calendar-div .turn-calendar-navigation-right {
+    border-color: transparent transparent transparent #2ba7d2;
+    border-width: 5px 0 5px 7px;
+    right: 15px;
+    top: 4px; }
+  .turn-calendar-div .turn-calendar-arrow {
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    height: 0;
+    margin: auto;
+    position: relative;
+    width: 0; }
+  .turn-calendar-div .turn-calendar-input-container {
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid #b5b7b9;
+    margin-bottom: 8px;
+    padding: 8px 0px 10px 8px; }
+    .turn-calendar-div .turn-calendar-input-container .turn-calendar-submit {
+      float: right;
+      margin-left: 10px; }
+
+.turn-calendar-table-container {
+  margin: 0 -4px 0 -5px; }
+  .turn-calendar-table-container .turn-calendar-table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    float: left;
+    text-align: center;
+    margin: 0 6px 12px 6px; }
+    .turn-calendar-table-container .turn-calendar-table .turn-calendar-day {
+      color: #58585b;
+      font-size: 9px;
+      font-weight: normal;
+      padding-bottom: 3px;
+      text-transform: uppercase; }
+    .turn-calendar-table-container .turn-calendar-table .turn-calendar-date {
+      border: 1px solid #a4a4a4;
+      cursor: pointer;
+      padding: 1px 4px 0 4px; }
+      .turn-calendar-table-container .turn-calendar-table .turn-calendar-date.turn-calendar-unavailable {
+        color: #c4c3c3;
+        cursor: default;
+        font-size: 13px; }
+    .turn-calendar-table-container .turn-calendar-table .turn-calendar-month {
+      color: #2ba7d2;
+      font-size: 14px;
+      padding-bottom: 11px; }
+    .turn-calendar-table-container .turn-calendar-table .turn-calendar-mouse-over {
+      background-color: rgba(0, 173, 239, 0.2); }
+    .turn-calendar-table-container .turn-calendar-table .turn-calendar-selected-daily,
+    .turn-calendar-table-container .turn-calendar-table .turn-calendar-selected-weekly,
+    .turn-calendar-table-container .turn-calendar-table .turn-calendar-selected-monthly {
+      background-color: #0aa4d2;
+      color: #fff; }
+
+.turn-calendar-input {
+  color: #333;
+  float: left; }
+  .turn-calendar-input .turn-calendar-input-box {
+    background-color: #fff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    color: #555;
+    height: 24px;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0px 6px;
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    vertical-align: middle;
+    width: 64px; }
+    .turn-calendar-input .turn-calendar-input-box:focus {
+      border-color: #66afe9;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+      outline: 0; }
+  .turn-calendar-input .turn-calendar-from {
+    margin-right: 3px; }
+  .turn-calendar-input .turn-calendar-to {
+    margin: 0 4px; }
+  .turn-calendar-input .turn-calendar-prior-label {
+    margin: 0 4px 0 22px; }
+  .turn-calendar-input .turn-calendar-day-label {
+    margin-left: 4px; }
+  .turn-calendar-input .turn-calendar-prior {
+    background: linear-gradient(to bottom, #f2f2f2 0%, #d4d4d4 100%);
+    border: 1px solid #ababab;
+    box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
+    color: #666;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.5;
+    margin: 0;
+    padding: 3px 10px;
+    position: relative;
+    text-align: center;
+    text-shadow: 0px 0px 5px white, 0px 1px 0.1px white;
+    vertical-align: middle;
+    white-space: nowrap; }
+    .turn-calendar-input .turn-calendar-prior:hover {
+      background: linear-gradient(to bottom, white 0%, #e1e1e1 100%);
+      z-index: 2; }
+  .turn-calendar-input .turn-calendar-prior + .turn-calendar-prior {
+    margin-left: -1px; }
+  .turn-calendar-input .turn-calendar-prior-left {
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px; }
+  .turn-calendar-input .turn-calendar-prior-right {
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px; }
+  .turn-calendar-input .turn-calendar-prior:focus, .turn-calendar-input .turn-calendar-prior.active {
+    background: #b9b9b9;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.1);
+    color: #555;
+    outline: 0;
+    text-shadow: 0px 1px 0.1px rgba(255, 255, 255, 0.4);
+    z-index: 2; }
+
+.turn-calendar-done-btn {
+  background: linear-gradient(to bottom, #00b3ff 0%, #0096d6 100%);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+  box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2);
+  color: #e0f6ff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 8px 0 0;
+  outline: 0;
+  padding: 3px 16px;
+  text-align: center;
+  text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.3), 0px 0px 5px rgba(0, 0, 0, 0.5);
+  vertical-align: middle;
+  white-space: nowrap; }
+  .turn-calendar-done-btn:hover {
+    background: linear-gradient(to bottom, #2ec0ff 0%, #00a5ec 100%);
+    box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+    text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.3), 0px 0px 5px rgba(0, 0, 0, 0.5); }
+  .turn-calendar-done-btn:active {
+    background: #007bb0;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.1);
+    color: #b8d9e7;
+    outline: 0;
+    text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.4); }
+
+.turn-calendar-btn-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none; }
+
+p.clear {
+  margin: 0;
+  padding: 0; }
+
+.clear {
+  clear: both; }
