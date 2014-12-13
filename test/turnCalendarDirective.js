@@ -64,7 +64,7 @@ describe('turnCalendar directive', function() {
         });
         
         it('has no available date on 11/02/2014', function () {
-            expect(element.find('table').eq(0).find('tbody').find('tr').eq(2).find('td').eq(0).hasClass('turn-calendar-unavailable')).toBeTruthy();
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(1).find('td').eq(0).hasClass('turn-calendar-unavailable')).toBeTruthy();
         });
 
         it('has available date on 11/03/2014', function () {
@@ -83,15 +83,15 @@ describe('turnCalendar directive', function() {
         });
         
         it('has no available dates on 01/07/2015', function () {
-            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(3).hasClass('turn-calendar-unavailable')).toBeTruthy();
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(1).find('td').eq(3).hasClass('turn-calendar-unavailable')).toBeTruthy();
         });
 
         it('has available dates on 01/06/2015', function () {
-            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(2).hasClass('turn-calendar-unavailable')).toBe(false);
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(1).find('td').eq(2).hasClass('turn-calendar-unavailable')).toBe(false);
         });
 
         it('has available date on 01/05/2014', function () {
-            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-unavailable')).toBe(false);
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(1).find('td').eq(1).hasClass('turn-calendar-unavailable')).toBe(false);
         });
     });
 
@@ -106,7 +106,7 @@ describe('turnCalendar directive', function() {
         });
 
         it('is not selected on 11/02/2014, and has unavailable status instead', function () {
-            expect(element.find('table').eq(0).find('tbody').find('tr').eq(2).find('td').eq(0).hasClass('turn-calendar-unavailable')).toBe(true);
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(1).find('td').eq(0).hasClass('turn-calendar-unavailable')).toBe(true);
         });
     });
 
@@ -117,7 +117,7 @@ describe('turnCalendar directive', function() {
         });
 
         it('is selected on 01/05/2015 instead of 01/08/2015 due to maxSelectDate restriction', function () {
-            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-selected-daily')).toBe(true);
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(1).find('td').eq(1).hasClass('turn-calendar-selected-daily')).toBe(true);
         });
 
         it('has unavailable date on 01/07/2015', function () {
@@ -132,7 +132,7 @@ describe('turnCalendar directive', function() {
         });
 
         it('is selected on 01/05/2015 and the mode is weekly', function () {
-            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-selected-weekly')).toBe(true);
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(1).find('td').eq(1).hasClass('turn-calendar-selected-weekly')).toBe(true);
         });
     });
 
@@ -154,7 +154,7 @@ describe('turnCalendar directive', function() {
         });
 
         it('is selected on 01/05/2015 and the mode is weekly, because it is within weekly range but not in monthly range', function () {
-            expect(element.find('table').eq(2).find('tbody').find('tr').eq(2).find('td').eq(1).hasClass('turn-calendar-selected-weekly')).toBe(true);
+            expect(element.find('table').eq(2).find('tbody').find('tr').eq(1).find('td').eq(1).hasClass('turn-calendar-selected-weekly')).toBe(true);
         });
     });
 

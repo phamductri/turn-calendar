@@ -1183,12 +1183,16 @@ angular
 
             var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
             var dayDiff = Math.round((endDate.setHours(0, 0, 0, 0) - selectedStartDate.date.setHours(0, 0, 0, 0)) / 864e5);
+            
+            if (endDate.toLocaleString() !== selectedEndDate.date.toLocaleString()) {
+                return;
+            }
 
             angular.forEach($scope.priorButtons, function (rangePreset, index) {
                 if ((rangePreset.value - 1) === dayDiff) {
                     $scope.selectedPriorButtonIndex = index;
                 }
-            })
+            });
         };
 
         var setStartEndDate = function () {
