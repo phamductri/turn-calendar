@@ -1660,7 +1660,9 @@ angular
         $document.bind('click', function (event) {
             if(!angular.element('turn-calendar').find(event.target).length){
                 $scope.$apply(function(){
-                    $scope.cancel();
+                    if ($scope.currentSelectedStartDate && $scope.currentSelectedEndDate) {
+                        $scope.cancel();
+                    }
                 });
             }
         });
