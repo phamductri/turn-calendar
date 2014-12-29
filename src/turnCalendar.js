@@ -1025,11 +1025,11 @@ angular
             var updatedStartDate, updatedEndDate, isValueUpdated = false,
                 dayDiff = Math.round((selectedEndDate.date.getTime() - selectedStartDate.date.getTime())/ 864e5);
 
-            if (dayDiff > self.monthlySelectRange) {
+            if (self.monthlySelectRange && dayDiff > self.monthlySelectRange) {
                 updatedStartDate = new Date(selectedStartDate.date.getFullYear(), selectedStartDate.date.getMonth(), 1);
                 updatedEndDate = new Date(selectedEndDate.date.getFullYear(), selectedEndDate.date.getMonth()+1, 0);
                 isValueUpdated = true;
-            } else if (dayDiff > self.weeklySelectRange) {
+            } else if (self.weeklySelectRange && dayDiff > self.weeklySelectRange) {
                 updatedStartDate = new Date(selectedStartDate.date.setDate(selectedStartDate.date.getDate() - (7 + selectedStartDate.date.getDay() - self.startDayOfWeek) % 7));
                 updatedEndDate = new Date(((selectedEndDate.date.setDate(selectedEndDate.date.getDate() - (7 + selectedEndDate.date.getDay() - self.startDayOfWeek) % 7)) + 6*864e5));
                 isValueUpdated = true;
