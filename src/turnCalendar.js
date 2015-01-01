@@ -282,11 +282,11 @@ angular
                 return $scope.$parent.$eval($attrs[property]) || $attrs[property];
             }
 
-            if (angular.isDefined(calendarOptions) && calendarOptions[property]) {
+            if (angular.isDefined(calendarOptions) && calendarOptions.hasOwnProperty(property)) {
                 return calendarOptions[property];
             }
 
-            if (turnCalendarDefaults[property]) {
+            if (turnCalendarDefaults.hasOwnProperty(property)) {
                 return turnCalendarDefaults[property];
             }
 
