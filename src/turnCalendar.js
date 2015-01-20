@@ -1216,15 +1216,21 @@ angular
         };
 
         $scope.applyCalendar = function () {
-        	if (!selectedEndDate) {
-                return;
-        	}
+
+            // End date not specified means same start date and end date
+            if (!selectedEndDate) {
+                selectedEndDate = selectedStartDate;
+                lastSelectedDate = selectedStartDate;
+            }
+
             $scope.calendarEnabled = false;
 
             setStartEndDate();
             
             $scope.currentSelectedStartDate = selectedStartDate;
             $scope.currentSelectedEndDate = selectedEndDate;
+            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
 
             if ($scope.applyCallback) {
                 $scope.applyCallback();
