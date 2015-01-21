@@ -230,10 +230,10 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       if (angular.isDefined($attrs[property])) {
         return $scope.$parent.$eval($attrs[property]) || $attrs[property];
       }
-      if (angular.isDefined(calendarOptions) && calendarOptions[property]) {
+      if (angular.isDefined(calendarOptions) && calendarOptions.hasOwnProperty(property)) {
         return calendarOptions[property];
       }
-      if (turnCalendarDefaults[property]) {
+      if (turnCalendarDefaults.hasOwnProperty(property)) {
         return turnCalendarDefaults[property];
       }
       return null;
@@ -815,11 +815,11 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
          */
     var snapDateToMonthlyWeekly = function () {
       var updatedStartDate, updatedEndDate, isValueUpdated = false, dayDiff = Math.round((selectedEndDate.date.getTime() - selectedStartDate.date.getTime()) / 86400000);
-      if (dayDiff > self.monthlySelectRange) {
+      if (self.monthlySelectRange && dayDiff > self.monthlySelectRange) {
         updatedStartDate = new Date(selectedStartDate.date.getFullYear(), selectedStartDate.date.getMonth(), 1);
         updatedEndDate = new Date(selectedEndDate.date.getFullYear(), selectedEndDate.date.getMonth() + 1, 0);
         isValueUpdated = true;
-      } else if (dayDiff > self.weeklySelectRange) {
+      } else if (self.weeklySelectRange && dayDiff > self.weeklySelectRange) {
         updatedStartDate = new Date(selectedStartDate.date.setDate(selectedStartDate.date.getDate() - (7 + selectedStartDate.date.getDay() - self.startDayOfWeek) % 7));
         updatedEndDate = new Date(selectedEndDate.date.setDate(selectedEndDate.date.getDate() - (7 + selectedEndDate.date.getDay() - self.startDayOfWeek) % 7) + 6 * 86400000);
         isValueUpdated = true;
@@ -936,6 +936,9 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       $scope.selectedPriorButtonIndex = null;
       var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
       var dayDiff = Math.round((endDate.setHours(0, 0, 0, 0) - selectedStartDate.date.setHours(0, 0, 0, 0)) / 86400000);
+      if (endDate.toLocaleString() !== selectedEndDate.date.toLocaleString()) {
+        return;
+      }
       angular.forEach($scope.priorButtons, function (rangePreset, index) {
         if (rangePreset.value - 1 === dayDiff) {
           $scope.selectedPriorButtonIndex = index;
@@ -959,13 +962,17 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       }
     };
     $scope.applyCalendar = function () {
+      // End date not specified means same start date and end date
       if (!selectedEndDate) {
-        return;
+        selectedEndDate = selectedStartDate;
+        lastSelectedDate = selectedStartDate;
       }
       $scope.calendarEnabled = false;
       setStartEndDate();
       $scope.currentSelectedStartDate = selectedStartDate;
       $scope.currentSelectedEndDate = selectedEndDate;
+      $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+      $scope.endDateString = selectedEndDate.date.toLocaleDateString();
       if ($scope.applyCallback) {
         $scope.applyCallback();
       }
@@ -1286,7 +1293,9 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
     $document.bind('click', function (event) {
       if (!angular.element('turn-calendar').find(event.target).length) {
         $scope.$apply(function () {
-          $scope.cancel();
+          if ($scope.currentSelectedStartDate && $scope.currentSelectedEndDate) {
+            $scope.cancel();
+          }
         });
       }
     });
@@ -1340,7 +1349,7 @@ angular.module("turnCalendar.html", []).run(["$templateCache", function($templat
     "                <span ng-show=\"priorButtons.length\" class=\"turn-calendar-day-label\">Days</span>\n" +
     "            </div>\n" +
     "            <div class=\"turn-calendar-submit\">              \n" +
-    "                <button ng-click=\"applyCalendar()\" class=\"turn-calendar-done-btn\" ng-class=\"{'turn-calendar-btn-disabled': !isBothDateSelected}\">Done</button>\n" +
+    "                <button ng-click=\"applyCalendar()\" class=\"turn-calendar-done-btn\" >Done</button>\n" +
     "            </div>\n" +
     "            <p class=\"clear\"></p>\n" +
     "        </div>\n" +

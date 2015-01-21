@@ -21,6 +21,7 @@ Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap
 
 | Feature                     | Turn Calendar | Angular Strap Datepicker | Angular Bootstrap Datecicker |
 |-----------------------------|---------------|--------------------------|------------------------------|
+| Single date selection       | Yes           | Yes                      | Yes                          |
 | Date range selection        | Yes           | No                       | No                           |
 | Multiple month instances    | Yes           | No                       | No                           |
 | Min/Max date selection      | Yes           | Yes                      | Yes                          |
@@ -153,19 +154,16 @@ Any month above Nov of the year 2014 is not allowed.
 
 ### Todo list
 
-- Support i18n
+- Support i18n for month name, day abbreviations, or day names
 - Support date formatting
 
 ### Contribute
 
-Contributes from everyone are welcomed. A few ways you can contribute:
+Contributes from everyone are welcomed. A few ways you can contribute immediately:
 
-- Report a bug
-- Submit patches to fix bugs, add features, or add tests
-- Suggest new features
-- Refactor the code
-- Write or edit the documentation
-- Help with development of new features, or fix bugs
+- Write more specs
+- Feature suggestions
+- Code feedback
 
 ### Author
 

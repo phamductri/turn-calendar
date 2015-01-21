@@ -196,11 +196,6 @@
     outline: 0;
     text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.4); }
 
-.turn-calendar-btn-disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-  pointer-events: none; }
-
 p.clear {
   margin: 0;
   padding: 0; }
