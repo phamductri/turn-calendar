@@ -1574,6 +1574,11 @@ angular
 
             setStartDate(day);
 
+            // Special case for single date mode
+            if (!$scope.isNotSingleDateMode) {
+                setSingleDate(day);
+            }
+
             $scope.endDate = day.date.toLocaleDateString();
 
             if (selectedEndDate && selectedEndDate.date > day.date) {

@@ -1225,6 +1225,10 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         $scope.monthArray = generateMonthArray(day.date.getFullYear(), day.date.getMonth());
       }
       setStartDate(day);
+      // Special case for single date mode
+      if (!$scope.isNotSingleDateMode) {
+        setSingleDate(day);
+      }
       $scope.endDate = day.date.toLocaleDateString();
       if (selectedEndDate && selectedEndDate.date > day.date) {
         colorSelectedDateRange();
