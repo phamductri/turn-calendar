@@ -97,10 +97,11 @@
  * the "Apply" button is pressed.
  *
  * @param {string} selectionMode - Optional. The selection behavior of the calendar.
- * Support two options for now. Default selection mode is 'twoClick', where the
- * selected start date and end date is cleared out every time the user try a new
- * selection. The other mode is 'lastSelectedDate', where the cursor will jump
- * based on the previous selected date.
+ * Support three options : 'twoClick', 'lastSelectedDate', and 'singleDate'. Default
+ * selection mode is 'twoClick', where the selected start date and end date is
+ * cleared out every time the user try a new selection. For the mode 'lastSelectedDate',
+ * the cursor will jump based on the previous selected date. For the mode 'singleDate',
+ * you can only select one date at a time.
  *
  * All of the above options can be set through an option object. Pass in the option
  * object through attribute calendarOptions. If you set the same setting in attribute
@@ -249,17 +250,26 @@ angular
     })
     .controller('CalendarController', function ($scope, $attrs, turnCalendarDefaults, turnCalendarService, $document) {
 
-        /**
-         * Note : selectedStartDate and selectedEndDate are meta date object to track
-         * internal cursor movement.
-         * 
-         * allowMonthGeneration will allow generation of month in some edge cases:
-         * 1) prior range click
-         * 2) dynamically updating maxSelectDate and minSelectDate
-         * In above cases if we don't bypass month generation, less instance of
-         * month will be displayed than expected.
-         */
-        var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, allowMonthGeneration = false;
+        var self = this, calendarOptions, MONTH_NAME,
+            // These two variables are used to track start date and end date click
+            selectedStartDate = null, selectedEndDate = null,
+            /**
+             * allowMonthGeneration will allow generation of month in some edge cases:
+             * 1) prior range click
+             * 2) dynamically updating maxSelectDate and minSelectDate
+             * In above cases if we don't bypass month generation, less instance of
+             * month will be displayed than expected.
+             *
+             * @type {boolean}
+             */
+            allowMonthGeneration = false,
+            currentDate = new Date(),
+            // Internal variable to track the last selected cursor click
+            lastSelectedDate = null;
+
+        $scope.currentSelectedStartDate = null;
+
+        $scope.priorButtons = null;
         
         $scope.isBothDateSelected = true;
 
@@ -353,7 +363,7 @@ angular
             });
         });
 
-
+        $scope.isNotSingleDateMode = (self.selectionMode !== 'singleDate');
 
         /**
          * Maximum number of day to display on a calendar in month view
@@ -442,6 +452,7 @@ angular
 
                 // Bigger than 11 means moving to next year
                 if (newMonth > 11) {
+
                     newMonth = newMonth % MONTHS_IN_YEAR;
 
                     if (!yearReset) {
@@ -904,6 +915,8 @@ angular
             };
         };
 
+        $scope.currentSelectedEndDate = generateMetaDateObject(currentDate, currentDate.getMonth());
+
         /**
          * Helper function to determine the current cursor mode, notice that the
          * current cursor mode depends SOLELY on the current position of the
@@ -1059,8 +1072,6 @@ angular
 
         };
 
-        var lastSelectedDate = null;
-
         /**
          * Util function to swap start date and end date if the end date is less
          * than start date
@@ -1119,6 +1130,7 @@ angular
 
         };
 
+
         var resetDayClick = function (day) {
 
             // Default is two click mode
@@ -1145,21 +1157,22 @@ angular
                 return;
             }
 
+            if (!$scope.isNotSingleDateMode) {
+                setSingleDate(day);
+                return;
+            }
+
             if (isNoneSelected()) {
-
                 setStartDate(day);
-
             } else if (isStartDateSelected()) {
-
                 setEndDate(day);
-
             } else if (isBothSelected()) {
-
                 resetDayClick(day);
-
             }
 
         };
+
+
 
         $scope.monthArray = generateMonthArray(null, null);
 
@@ -1276,6 +1289,25 @@ angular
                 });
             });
         };
+
+        var setSingleDate = function (day) {
+
+            if (isBothSelected()) {
+                discolorSelectedDateRange();
+            }
+
+            selectedStartDate = selectedEndDate = day;
+
+            colorDateInMonth(day.date);
+            $scope.isBothDateSelected = true;
+        };
+
+        // Setting default start date for singleDate mode
+        if (!$scope.isNotSingleDateMode) {
+            setSingleDate(generateMetaDateObject(currentDate, currentDate.getMonth()));
+            $scope.currentSelectedStartDate = selectedStartDate;
+            $scope.currentSelectedEndDate = selectedEndDate;
+        }
 
         /**
          * Function that add a new month into the month array, remove the last
@@ -1395,17 +1427,6 @@ angular
             }
         };
 
-
-        selectedStartDate = null;
-        selectedEndDate = null;
-        $scope.currentSelectedStartDate = null;
-        var currentDate = new Date();
-        $scope.currentSelectedEndDate = generateMetaDateObject(currentDate, currentDate.getMonth());
-
-        $scope.priorButtons = null;
-
-
-
         /**
          * Util function, if the end date falls into a date that is unavailable,
          * it will decrease the date till meet a date that's available
@@ -1516,7 +1537,7 @@ angular
         };
 
 
-        if (self.priorRangePresets) {
+        if (self.priorRangePresets && $scope.isNotSingleDateMode) {
             setDefaultRange();
         }
 
