@@ -60,7 +60,8 @@
  * CURRENT date once clicked. The range will conform with minSelectDate, maxSelectDate,
  * weeklySelectDate, monthlySelectDate parameters if these parameters are set.
  * If you currently in a different month view, clicking on any of the prior button
- * will reset your current view back to the CURRENT month. Example :
+ * will reset your current view back to the CURRENT month. If your selection mode
+ * is 'singleDate', this option will NOT come into effect. Example :
  * [{value: 20, isDefault: true}, {value: 45}, {value : 90}]
  *
  * @param {string} maxForwardMonth - Optional. Setting the max month which the
@@ -97,10 +98,11 @@
  * the "Apply" button is pressed.
  *
  * @param {string} selectionMode - Optional. The selection behavior of the calendar.
- * Support two options for now. Default selection mode is 'twoClick', where the
- * selected start date and end date is cleared out every time the user try a new
- * selection. The other mode is 'lastSelectedDate', where the cursor will jump
- * based on the previous selected date.
+ * Support three options : 'twoClick', 'lastSelectedDate', and 'singleDate'. Default
+ * selection mode is 'twoClick', where the selected start date and end date is
+ * cleared out every time the user try a new selection. For the mode 'lastSelectedDate',
+ * the cursor will jump based on the previous selected date. For the mode 'singleDate',
+ * you can only select one date at a time.
  *
  * All of the above options can be set through an option object. Pass in the option
  * object through attribute calendarOptions. If you set the same setting in attribute
@@ -202,17 +204,23 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
   'turnCalendarService',
   '$document',
   function ($scope, $attrs, turnCalendarDefaults, turnCalendarService, $document) {
-    /**
-         * Note : selectedStartDate and selectedEndDate are meta date object to track
-         * internal cursor movement.
-         * 
-         * allowMonthGeneration will allow generation of month in some edge cases:
-         * 1) prior range click
-         * 2) dynamically updating maxSelectDate and minSelectDate
-         * In above cases if we don't bypass month generation, less instance of
-         * month will be displayed than expected.
-         */
-    var self = this, calendarOptions, MONTH_NAME, selectedStartDate, selectedEndDate, allowMonthGeneration = false;
+    var self = this, calendarOptions, MONTH_NAME,
+      // These two variables are used to track start date and end date click
+      selectedStartDate = null, selectedEndDate = null,
+      /**
+             * allowMonthGeneration will allow generation of month in some edge cases:
+             * 1) prior range click
+             * 2) dynamically updating maxSelectDate and minSelectDate
+             * In above cases if we don't bypass month generation, less instance of
+             * month will be displayed than expected.
+             *
+             * @type {boolean}
+             */
+      allowMonthGeneration = false, currentDate = new Date(),
+      // Internal variable to track the last selected cursor click
+      lastSelectedDate = null;
+    $scope.currentSelectedStartDate = null;
+    $scope.priorButtons = null;
     $scope.isBothDateSelected = true;
     if ($attrs.calendarOptions) {
       calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
@@ -307,6 +315,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         }
       });
     });
+    $scope.isNotSingleDateMode = self.selectionMode !== 'singleDate';
     /**
          * Maximum number of day to display on a calendar in month view
          *
@@ -720,6 +729,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         isUnavailable: isUnavailable(date)
       };
     };
+    $scope.currentSelectedEndDate = generateMetaDateObject(currentDate, currentDate.getMonth());
     /**
          * Helper function to determine the current cursor mode, notice that the
          * current cursor mode depends SOLELY on the current position of the
@@ -841,7 +851,6 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       day.selectMode = 'daily';
       $scope.isBothDateSelected = false;
     };
-    var lastSelectedDate = null;
     /**
          * Util function to swap start date and end date if the end date is less
          * than start date
@@ -908,6 +917,10 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
     $scope.setDayClick = function (date) {
       var day = angular.copy(date);
       if (day.isUnavailable || !day.date) {
+        return;
+      }
+      if (!$scope.isNotSingleDateMode) {
+        setSingleDate(day);
         return;
       }
       if (isNoneSelected()) {
@@ -1012,6 +1025,20 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         });
       });
     };
+    var setSingleDate = function (day) {
+      if (isBothSelected()) {
+        discolorSelectedDateRange();
+      }
+      selectedStartDate = selectedEndDate = day;
+      colorDateInMonth(day.date);
+      $scope.isBothDateSelected = true;
+    };
+    // Setting default start date for singleDate mode
+    if (!$scope.isNotSingleDateMode) {
+      setSingleDate(generateMetaDateObject(currentDate, currentDate.getMonth()));
+      $scope.currentSelectedStartDate = selectedStartDate;
+      $scope.currentSelectedEndDate = selectedEndDate;
+    }
     /**
          * Function that add a new month into the month array, remove the last
          * month at the same time
@@ -1093,12 +1120,6 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         colorDateInMonth(selectedStartDate.date);
       }
     };
-    selectedStartDate = null;
-    selectedEndDate = null;
-    $scope.currentSelectedStartDate = null;
-    var currentDate = new Date();
-    $scope.currentSelectedEndDate = generateMetaDateObject(currentDate, currentDate.getMonth());
-    $scope.priorButtons = null;
     /**
          * Util function, if the end date falls into a date that is unavailable,
          * it will decrease the date till meet a date that's available
@@ -1179,7 +1200,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       $scope.currentSelectedEndDate = selectedEndDate;
       $scope.currentSelectedStartDate = selectedStartDate;
     };
-    if (self.priorRangePresets) {
+    if (self.priorRangePresets && $scope.isNotSingleDateMode) {
       setDefaultRange();
     }
     if (selectedStartDate) {
@@ -1330,23 +1351,23 @@ angular.module('calendarTemplates', ['turnCalendar.html']);
 angular.module("turnCalendar.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("turnCalendar.html",
     "<button ng-click=\"enableCalendar()\" class=\"turn-calendar-enable-btn\">{{currentSelectedStartDate.date.toLocaleDateString()}} <span\n" +
-    "        ng-show=\"currentSelectedStartDate.date\">-</span> {{currentSelectedEndDate.date.toLocaleDateString()}}\n" +
+    "        ng-show=\"currentSelectedStartDate.date && isNotSingleDateMode\">- {{currentSelectedEndDate.date.toLocaleDateString()}} </span>\n" +
     "</button>\n" +
     "<div>\n" +
     "    <div class=\"turn-calendar-div\" ng-show=\"calendarEnabled\">\n" +
     "        <div class=\"turn-calendar-input-container\">            \n" +
     "            <div class=\"turn-calendar-input\">\n" +
-    "                <span class=\"turn-calendar-from\">From</span>\n" +
+    "                <span ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-from\">From</span>\n" +
     "                <input class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"startDateString\" ng-change=\"changeStartDate()\" />\n" +
-    "                <span class=\"turn-calendar-to\">To</span>\n" +
-    "                <input class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"endDateString\" ng-change=\"changeEndDate()\" />\n" +
-    "                <span ng-show=\"priorButtons.length\" class=\"turn-calendar-prior-label\">Prior</span>\n" +
-    "                <button class=\"turn-calendar-prior\" ng-repeat=\"range in priorButtons\" ng-click=\"selectRange(range, $index)\" \n" +
+    "                <span ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-to\">To</span>\n" +
+    "                <input ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"endDateString\" ng-change=\"changeEndDate()\" />\n" +
+    "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" class=\"turn-calendar-prior-label\">Prior</span>\n" +
+    "                <button ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-prior\" ng-repeat=\"range in priorButtons\" ng-click=\"selectRange(range, $index)\"\n" +
     "                        ng-class=\"{'turn-calendar-prior-left': $index == 0, \n" +
     "                                   'turn-calendar-prior-right': $index == priorButtons.length-1, \n" +
     "                                   'active': $index == selectedPriorButtonIndex\n" +
     "                                  }\" turn-calendar-prior\">{{range.value}}</button>              \n" +
-    "                <span ng-show=\"priorButtons.length\" class=\"turn-calendar-day-label\">Days</span>\n" +
+    "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" class=\"turn-calendar-day-label\">Days</span>\n" +
     "            </div>\n" +
     "            <div class=\"turn-calendar-submit\">              \n" +
     "                <button ng-click=\"applyCalendar()\" class=\"turn-calendar-done-btn\" >Done</button>\n" +
