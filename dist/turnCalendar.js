@@ -60,7 +60,8 @@
  * CURRENT date once clicked. The range will conform with minSelectDate, maxSelectDate,
  * weeklySelectDate, monthlySelectDate parameters if these parameters are set.
  * If you currently in a different month view, clicking on any of the prior button
- * will reset your current view back to the CURRENT month. Example :
+ * will reset your current view back to the CURRENT month. If your selection mode
+ * is 'singleDate', this option will NOT come into effect. Example :
  * [{value: 20, isDefault: true}, {value: 45}, {value : 90}]
  *
  * @param {string} maxForwardMonth - Optional. Setting the max month which the
