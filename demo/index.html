@@ -1,0 +1,114 @@
+<!doctype html>
+<html ng-app="demo">
+<head>
+
+    <meta charset="utf-8">
+
+    <title>calendar demo</title>
+
+    <link rel="stylesheet" href="../dist/turnCalendar.css">
+
+</head>
+<body ng-controller="mainCtrl">
+
+<script src="../bower_components/jquery/dist/jquery.js"></script>
+<script src="../bower_components/angular/angular.js"></script>
+<script src="../dist/turnCalendar.js"></script>
+<script>
+
+    angular
+            .module('demo', ['turn/calendar'])
+            .controller('mainCtrl', function ($scope) {
+                $scope.currentDate = function () {
+                    return new Date().toLocaleDateString();
+                };
+
+                $scope.maxMonthAllowed = function () {
+                    var currentDate = new Date();
+                    return currentDate.getMonth() + '/' + currentDate.getFullYear();
+                };
+
+                $scope.endDate = new Date().getTime();
+                
+                $scope.startDate = ($scope.endDate - (10*864e5));
+
+                $scope.setNewEndDate = function () {
+                    var currentVal = new Date($scope.endDate);
+                    currentVal.setDate(currentVal.getDate() + 1);
+                    $scope.endDate = currentVal.getTime();
+
+                };
+
+                $scope.calendarOptions = {
+                    startDayOfWeek: 1,
+                    backwardMonths: 2,
+                    minSelectDate: '9/13/2013',
+                    weeklySelectRange: 60,
+                    monthlySelectRange: 90,
+                    minBackwardMonth: '08/2013',
+                    priorRangePresets: [{value: 7}, {value: 30, isDefault: true}, {value : 45}],
+                    maxForwardMonth: $scope.maxMonthAllowed()
+                };
+
+                $scope.callback = function (arg1 , arg2) {
+                    console.log(arg1);
+                    console.log(arg2);
+                }
+
+            });
+
+</script>
+<div>
+    <button ng-click="setNewEndDate()" class="turn-calendar-enable-btn">Increase start date</button>
+
+</div>
+
+
+<turn-calendar start-day-of-week="4" backward-months="2" forward-months="2"
+               min-select-date="'9/13/2013'"
+               weekly-select-range="90"
+               monthly-select-range="180"
+               min-backward-month="'08/2013'"
+               prior-range-presets="[{value: 7}, {value: 30}, {value : 90}]"
+               start-date="startDate"
+               end-date="endDate">
+
+</turn-calendar>
+
+<turn-calendar calendar-options="calendarOptions"></turn-calendar>
+<turn-calendar start-date="'9/1/2014'" end-date="'10/15/2014'" apply-callback="callback(1, 2)"></turn-calendar>
+<turn-calendar starting-month="11" starting-year="2014" backward-months="1" forward-months="1" weekly-select-range="30" start-date="'11/15/2014'" end-date="'01/08/2015'"> </turn-calendar>
+
+<turn-calendar start-day-of-week="4" backward-months="2" forward-months="2"
+               min-select-date="'9/13/2013'"
+               weekly-select-range="90"
+               monthly-select-range="180"
+               min-backward-month="'08/2013'"
+               prior-range-presets="[{value: 7}, {value: 30, isDefault: true}, {value : 45}]"
+               selection-mode="lastSelectedDate">
+
+</turn-calendar>
+
+<turn-calendar start-day-of-week="4"
+               min-select-date="'9/13/2013'"
+               min-backward-month="'08/2013'"
+               prior-range-presets="[{value: 7}, {value: 30, isDefault: true}, {value : 45}]"
+               selection-mode="singleDate">
+
+</turn-calendar>
+
+<turn-calendar min-select-date="'9/13/2013'"
+               min-backward-month="'08/2013'"
+               selection-mode="singleDate">
+
+</turn-calendar>
+
+<turn-calendar min-select-date="'9/13/2013'"
+               backward-months="2" forward-months="2"
+               min-backward-month="'08/2013'"
+               selection-mode="singleDate">
+
+</turn-calendar>
+
+</body>
+</html>
