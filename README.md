@@ -19,7 +19,7 @@ Use Turn Calendar if you want a native AngularJS directive that:
 
 Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap Date picker
 
-| Feature                     | Turn Calendar | Angular Strap Datepicker | Angular Bootstrap Datecicker |
+| Feature                     | Turn Calendar | Angular Strap Datepicker | Angular Bootstrap Datepicker |
 |-----------------------------|---------------|--------------------------|------------------------------|
 | Single date selection       | Yes           | Yes                      | Yes                          |
 | Date range selection        | Yes           | No                       | No                           |
