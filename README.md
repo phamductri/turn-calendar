@@ -5,6 +5,8 @@ turn calendar
 Turn Angular is a calendar-like component for AngularJS. It behaviors are very similar to Google analytics calendar,
 with a few extra unique options.
 
+[Demo](http://phamductri.github.io/turn-calendar/demo/)
+
 ### Why Turn Calendar ?
 
 Use Turn Calendar if you want a native AngularJS directive that:
