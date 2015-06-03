@@ -6,9 +6,9 @@
         <div class="turn-calendar-input-container">            
             <div class="turn-calendar-input">
                 <span ng-show="isNotSingleDateMode" class="turn-calendar-from">From</span>
-                <input class="turn-calendar-input-box" type="text" ng-model="startDateString" ng-change="changeStartDate()" />
+                <input class="turn-calendar-input-box" type="text" ng-model="startDateString" ng-change="changeStartDate()" ng-disabled="isDayClickDisabledMode" />
                 <span ng-show="isNotSingleDateMode" class="turn-calendar-to">To</span>
-                <input ng-show="isNotSingleDateMode" class="turn-calendar-input-box" type="text" ng-model="endDateString" ng-change="changeEndDate()" />
+                <input ng-show="isNotSingleDateMode" class="turn-calendar-input-box" type="text" ng-model="endDateString" ng-change="changeEndDate()" ng-disabled="isDayClickDisabledMode" />
                 <span ng-show="priorButtons.length && isNotSingleDateMode" class="turn-calendar-prior-label">Prior</span>
                 <button ng-show="isNotSingleDateMode" class="turn-calendar-prior" ng-repeat="range in priorButtons" ng-click="selectRange(range, $index)"
                         ng-class="{'turn-calendar-prior-left': $index == 0, 
@@ -23,7 +23,7 @@
             <p class="clear"></p>
         </div>
         <div class="turn-calendar-table-container">
-            <div class="turn-calendar-navigation-left" ng-click="previousMonth()">
+            <div class="turn-calendar-navigation-left" ng-click="previousMonth()" ng-hide="isDayClickDisabledMode">
                 <div class="turn-calendar-arrow-left"></div>
             </div>
             <table class="turn-calendar-table" ng-repeat="month in monthArray">
@@ -43,6 +43,7 @@
                                        'turn-calendar-selected-weekly': day.selectMode == 'weekly',
                                        'turn-calendar-selected-monthly': day.selectMode == 'monthly',
                                        'turn-calendar-unavailable': day.isUnavailable,
+                                       'turn-calendar-unclickable': isDayClickDisabledMode,
                                        'turn-calendar-date': day.date.getDate()}"
                             ng-mouseenter="mouseEnter(day)"
                             ng-mouseleave="mouseLeave(day)"
@@ -51,7 +52,7 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="turn-calendar-navigation-right" ng-click="nextMonth()">
+            <div class="turn-calendar-navigation-right" ng-click="nextMonth()" ng-hide="isDayClickDisabledMode">
                 <div class="turn-calendar-arrow-right"></div>
             </div>
         </div>

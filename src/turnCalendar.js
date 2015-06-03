@@ -796,6 +796,8 @@ angular
             return !self.selectionMode || (self.selectionMode && self.selectionMode === 'twoClick');
         };
 
+        $scope.isDayClickDisabledMode = self.selectionMode && self.selectionMode === 'disableDayClick';
+
 
         /**
          * Function to determine whether to hover the cell or not
@@ -803,6 +805,10 @@ angular
          * @param {object} day - The day in question
          */
         $scope.mouseEnter = function (day) {
+
+            if ($scope.isDayClickDisabledMode) {
+                return;
+            }
 
             if (!day.date || day.isUnavailable) {
                 day.isHover = false;
@@ -851,6 +857,10 @@ angular
          * @param {object} day - The day in question
          */
         $scope.mouseLeave = function (day) {
+
+            if ($scope.isDayClickDisabledMode) {
+                return;
+            }
 
             if (!selectedStartDate) {
                 day.isHover = false;
@@ -1151,6 +1161,10 @@ angular
          * @param {object} day - A meta date object
          */
         $scope.setDayClick = function (date) {
+
+            if ($scope.isDayClickDisabledMode) {
+                return;
+            }
 
             var day = angular.copy(date);
 
