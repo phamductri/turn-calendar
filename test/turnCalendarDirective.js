@@ -180,4 +180,24 @@ describe('turnCalendar directive', function() {
         });
     });
 
+    describe('calendar day click disabled mode ', function () {
+        beforeEach(function () {
+            element = $compile('<turn-calendar selection-mode="disableDayClick"> </turn-calendar>')($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('should have disabled text input for dates ', function () {
+            expect(element.find('input').attr('disabled')).toBe('disabled');
+        });
+
+        it('should not show month navigation buttons ', function () {
+            expect(element.find('div').eq(7).css('display')).toBe('none');
+            expect(element.find('div').eq(9).css('display')).toBe('none');
+        });
+
+        it('has turn-calendar-unclickable class applied to every day in turn-calendar-table ', function () {
+            expect(element.find('table').eq(0).find('td').hasClass('turn-calendar-unclickable')).toBe(true);
+        });
+    });
+
 });

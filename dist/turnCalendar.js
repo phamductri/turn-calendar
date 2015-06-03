@@ -630,12 +630,16 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
     var isTwoClickSelectionMode = function () {
       return !self.selectionMode || self.selectionMode && self.selectionMode === 'twoClick';
     };
+    $scope.isDayClickDisabledMode = self.selectionMode && self.selectionMode === 'disableDayClick';
     /**
          * Function to determine whether to hover the cell or not
          *
          * @param {object} day - The day in question
          */
     $scope.mouseEnter = function (day) {
+      if ($scope.isDayClickDisabledMode) {
+        return;
+      }
       if (!day.date || day.isUnavailable) {
         day.isHover = false;
         return;
@@ -674,6 +678,9 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
          * @param {object} day - The day in question
          */
     $scope.mouseLeave = function (day) {
+      if ($scope.isDayClickDisabledMode) {
+        return;
+      }
       if (!selectedStartDate) {
         day.isHover = false;
         return;
@@ -915,6 +922,9 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
          * @param {object} day - A meta date object
          */
     $scope.setDayClick = function (date) {
+      if ($scope.isDayClickDisabledMode) {
+        return;
+      }
       var day = angular.copy(date);
       if (day.isUnavailable || !day.date) {
         return;
@@ -1362,15 +1372,16 @@ angular.module("turnCalendar.html", []).run(["$templateCache", function($templat
     "        <div class=\"turn-calendar-input-container\">            \n" +
     "            <div class=\"turn-calendar-input\">\n" +
     "                <span ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-from\">From</span>\n" +
-    "                <input class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"startDateString\" ng-change=\"changeStartDate()\" />\n" +
+    "                <input class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"startDateString\" ng-change=\"changeStartDate()\" ng-disabled=\"isDayClickDisabledMode\" />\n" +
     "                <span ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-to\">To</span>\n" +
-    "                <input ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"endDateString\" ng-change=\"changeEndDate()\" />\n" +
+    "                <input ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"endDateString\" ng-change=\"changeEndDate()\" ng-disabled=\"isDayClickDisabledMode\" />\n" +
     "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" class=\"turn-calendar-prior-label\">Prior</span>\n" +
-    "                <button ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-prior\" ng-repeat=\"range in priorButtons\" ng-click=\"selectRange(range, $index)\"\n" +
+    "                <button ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-prior\" ng-repeat=\"range in priorButtons\" \n" +
+    "                        ng-click=\"selectRange(range, $index)\"\n" +
     "                        ng-class=\"{'turn-calendar-prior-left': $index == 0, \n" +
     "                                   'turn-calendar-prior-right': $index == priorButtons.length-1, \n" +
     "                                   'active': $index == selectedPriorButtonIndex\n" +
-    "                                  }\" turn-calendar-prior\">{{range.value}}</button>              \n" +
+    "                                  }\" turn-calendar-prior>{{range.value}}</button>              \n" +
     "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" class=\"turn-calendar-day-label\">Days</span>\n" +
     "            </div>\n" +
     "            <div class=\"turn-calendar-submit\">              \n" +
@@ -1379,36 +1390,39 @@ angular.module("turnCalendar.html", []).run(["$templateCache", function($templat
     "            <p class=\"clear\"></p>\n" +
     "        </div>\n" +
     "        <div class=\"turn-calendar-table-container\">\n" +
-    "            <div class=\"turn-calendar-navigation-left\" ng-click=\"previousMonth()\">\n" +
-    "                <div class=\"turn-calendar-arrow-left\"></div>\n" +
-    "            </div>\n" +
-    "            <table class=\"turn-calendar-table\" ng-repeat=\"month in monthArray\">\n" +
-    "                <thead>\n" +
-    "                    <tr>\n" +
-    "                        <th colspan=\"{{DAYS_IN_WEEK}}\" class=\"turn-calendar-month\">{{monthNames[$index]}}</th>\n" +
-    "                    </tr>\n" +
-    "                    <tr>\n" +
-    "                        <th ng-repeat=\"dayName in dayNames\" class=\"turn-calendar-day\">{{dayName}}</th>\n" +
-    "                    </tr>\n" +
-    "                </thead>\n" +
-    "                <tbody>\n" +
-    "                    <tr ng-repeat=\"days in month\">\n" +
-    "                        <td ng-repeat=\"day in days\"\n" +
-    "                            ng-class=\"{'turn-calendar-mouse-over': day.isHover,\n" +
-    "                                       'turn-calendar-selected-daily': day.selectMode == 'daily',\n" +
-    "                                       'turn-calendar-selected-weekly': day.selectMode == 'weekly',\n" +
-    "                                       'turn-calendar-selected-monthly': day.selectMode == 'monthly',\n" +
-    "                                       'turn-calendar-unavailable': day.isUnavailable,\n" +
-    "                                       'turn-calendar-date': day.date.getDate()}\"\n" +
-    "                            ng-mouseenter=\"mouseEnter(day)\"\n" +
-    "                            ng-mouseleave=\"mouseLeave(day)\"\n" +
-    "                            ng-click=\"setDayClick(day)\">{{day.date.getDate()}}\n" +
-    "                        </td>\n" +
-    "                    </tr>\n" +
-    "                </tbody>\n" +
-    "            </table>\n" +
-    "            <div class=\"turn-calendar-navigation-right\" ng-click=\"nextMonth()\">\n" +
-    "                <div class=\"turn-calendar-arrow-right\"></div>\n" +
+    "            <div class=\"turn-calendar-table-central-aligner\">\n" +
+    "                <div class=\"turn-calendar-navigation-left\" ng-click=\"previousMonth()\" ng-hide=\"isDayClickDisabledMode\">\n" +
+    "                    <div class=\"turn-calendar-arrow-left\"></div>\n" +
+    "                </div>\n" +
+    "                <table class=\"turn-calendar-table\" ng-repeat=\"month in monthArray\">\n" +
+    "                    <thead>\n" +
+    "                        <tr>\n" +
+    "                            <th colspan=\"{{DAYS_IN_WEEK}}\" class=\"turn-calendar-month\">{{monthNames[$index]}}</th>\n" +
+    "                        </tr>\n" +
+    "                        <tr>\n" +
+    "                            <th ng-repeat=\"dayName in dayNames\" class=\"turn-calendar-day\">{{dayName}}</th>\n" +
+    "                        </tr>\n" +
+    "                    </thead>\n" +
+    "                    <tbody>\n" +
+    "                        <tr ng-repeat=\"days in month\">\n" +
+    "                            <td ng-repeat=\"day in days\"\n" +
+    "                                ng-class=\"{'turn-calendar-mouse-over': day.isHover,\n" +
+    "                                           'turn-calendar-selected-daily': day.selectMode == 'daily',\n" +
+    "                                           'turn-calendar-selected-weekly': day.selectMode == 'weekly',\n" +
+    "                                           'turn-calendar-selected-monthly': day.selectMode == 'monthly',\n" +
+    "                                           'turn-calendar-unavailable': day.isUnavailable,\n" +
+    "                                           'turn-calendar-unclickable': isDayClickDisabledMode,\n" +
+    "                                           'turn-calendar-date': day.date.getDate()}\"\n" +
+    "                                ng-mouseenter=\"mouseEnter(day)\"\n" +
+    "                                ng-mouseleave=\"mouseLeave(day)\"\n" +
+    "                                ng-click=\"setDayClick(day)\">{{day.date.getDate()}}\n" +
+    "                            </td>\n" +
+    "                        </tr>\n" +
+    "                    </tbody>\n" +
+    "                </table>\n" +
+    "                <div class=\"turn-calendar-navigation-right\" ng-click=\"nextMonth()\" ng-hide=\"isDayClickDisabledMode\">\n" +
+    "                    <div class=\"turn-calendar-arrow-right\"></div>\n" +
+    "                </div>\n" +
     "            </div>\n" +
     "        </div>\n" +
     "    </div>\n" +
