@@ -10,11 +10,12 @@
                 <span ng-show="isNotSingleDateMode" class="turn-calendar-to">To</span>
                 <input ng-show="isNotSingleDateMode" class="turn-calendar-input-box" type="text" ng-model="endDateString" ng-change="changeEndDate()" ng-disabled="isDayClickDisabledMode" />
                 <span ng-show="priorButtons.length && isNotSingleDateMode" class="turn-calendar-prior-label">Prior</span>
-                <button ng-show="isNotSingleDateMode" class="turn-calendar-prior" ng-repeat="range in priorButtons" ng-click="selectRange(range, $index)"
+                <button ng-show="isNotSingleDateMode" class="turn-calendar-prior" ng-repeat="range in priorButtons" 
+                        ng-click="selectRange(range, $index)"
                         ng-class="{'turn-calendar-prior-left': $index == 0, 
                                    'turn-calendar-prior-right': $index == priorButtons.length-1, 
                                    'active': $index == selectedPriorButtonIndex
-                                  }" turn-calendar-prior">{{range.value}}</button>              
+                                  }" turn-calendar-prior>{{range.value}}</button>              
                 <span ng-show="priorButtons.length && isNotSingleDateMode" class="turn-calendar-day-label">Days</span>
             </div>
             <div class="turn-calendar-submit">              
@@ -23,37 +24,39 @@
             <p class="clear"></p>
         </div>
         <div class="turn-calendar-table-container">
-            <div class="turn-calendar-navigation-left" ng-click="previousMonth()" ng-hide="isDayClickDisabledMode">
-                <div class="turn-calendar-arrow-left"></div>
-            </div>
-            <table class="turn-calendar-table" ng-repeat="month in monthArray">
-                <thead>
-                    <tr>
-                        <th colspan="{{DAYS_IN_WEEK}}" class="turn-calendar-month">{{monthNames[$index]}}</th>
-                    </tr>
-                    <tr>
-                        <th ng-repeat="dayName in dayNames" class="turn-calendar-day">{{dayName}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="days in month">
-                        <td ng-repeat="day in days"
-                            ng-class="{'turn-calendar-mouse-over': day.isHover,
-                                       'turn-calendar-selected-daily': day.selectMode == 'daily',
-                                       'turn-calendar-selected-weekly': day.selectMode == 'weekly',
-                                       'turn-calendar-selected-monthly': day.selectMode == 'monthly',
-                                       'turn-calendar-unavailable': day.isUnavailable,
-                                       'turn-calendar-unclickable': isDayClickDisabledMode,
-                                       'turn-calendar-date': day.date.getDate()}"
-                            ng-mouseenter="mouseEnter(day)"
-                            ng-mouseleave="mouseLeave(day)"
-                            ng-click="setDayClick(day)">{{day.date.getDate()}}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="turn-calendar-navigation-right" ng-click="nextMonth()" ng-hide="isDayClickDisabledMode">
-                <div class="turn-calendar-arrow-right"></div>
+            <div class="turn-calendar-table-central-aligner">
+                <div class="turn-calendar-navigation-left" ng-click="previousMonth()" ng-hide="isDayClickDisabledMode">
+                    <div class="turn-calendar-arrow-left"></div>
+                </div>
+                <table class="turn-calendar-table" ng-repeat="month in monthArray">
+                    <thead>
+                        <tr>
+                            <th colspan="{{DAYS_IN_WEEK}}" class="turn-calendar-month">{{monthNames[$index]}}</th>
+                        </tr>
+                        <tr>
+                            <th ng-repeat="dayName in dayNames" class="turn-calendar-day">{{dayName}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="days in month">
+                            <td ng-repeat="day in days"
+                                ng-class="{'turn-calendar-mouse-over': day.isHover,
+                                           'turn-calendar-selected-daily': day.selectMode == 'daily',
+                                           'turn-calendar-selected-weekly': day.selectMode == 'weekly',
+                                           'turn-calendar-selected-monthly': day.selectMode == 'monthly',
+                                           'turn-calendar-unavailable': day.isUnavailable,
+                                           'turn-calendar-unclickable': isDayClickDisabledMode,
+                                           'turn-calendar-date': day.date.getDate()}"
+                                ng-mouseenter="mouseEnter(day)"
+                                ng-mouseleave="mouseLeave(day)"
+                                ng-click="setDayClick(day)">{{day.date.getDate()}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="turn-calendar-navigation-right" ng-click="nextMonth()" ng-hide="isDayClickDisabledMode">
+                    <div class="turn-calendar-arrow-right"></div>
+                </div>
             </div>
         </div>
     </div>

@@ -38,19 +38,16 @@
   .turn-calendar-div .turn-calendar-navigation, .turn-calendar-div .turn-calendar-navigation-left, .turn-calendar-div .turn-calendar-navigation-right {
     border-style: solid;
     cursor: pointer;
-    float: left;
-    height: 0;
-    position: relative;
-    width: 0; }
+    position: absolute; }
   .turn-calendar-div .turn-calendar-navigation-left {
     border-color: transparent #2ba7d2 transparent transparent;
     border-width: 5px 7px 5px 0;
-    left: 15px;
+    left: 4px;
     top: 4px; }
   .turn-calendar-div .turn-calendar-navigation-right {
     border-color: transparent transparent transparent #2ba7d2;
     border-width: 5px 0 5px 7px;
-    right: 15px;
+    right: 4px;
     top: 4px; }
   .turn-calendar-div .turn-calendar-arrow {
     border-top: 15px solid transparent;
@@ -69,12 +66,17 @@
       margin-left: 10px; }
 
 .turn-calendar-table-container {
-  margin: 0 -4px 0 -5px; }
+  text-align: center;
+  margin: 0 7px; }
+  .turn-calendar-table-container .turn-calendar-table-central-aligner {
+    position: relative;
+    display: inline-block; }
   .turn-calendar-table-container .turn-calendar-table {
     border-collapse: collapse;
     border-spacing: 0;
-    float: left;
+    display: inline-block;
     text-align: center;
+    vertical-align: top;
     margin: 0 6px 12px 6px; }
     .turn-calendar-table-container .turn-calendar-table .turn-calendar-day {
       color: #58585b;
