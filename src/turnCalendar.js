@@ -271,7 +271,7 @@ angular
         $scope.currentSelectedStartDate = null;
 
         $scope.priorButtons = null;
-        
+
         $scope.isBothDateSelected = true;
 
         if ($attrs.calendarOptions) {
@@ -844,7 +844,7 @@ angular
                 paletteTheWeek(day, true, true, '');
                 return;
             }
-            
+
             if (!day.isUnavailable) {
                 day.isHover = true;
             }
@@ -1041,9 +1041,9 @@ angular
             $scope.isBothDateSelected = true;
 
         };
-        
+
         /**
-         * Snaps selected start/end date in case of monthly and weekly selection mode 
+         * Snaps selected start/end date in case of monthly and weekly selection mode
          */
         var snapDateToMonthlyWeekly = function(){
             var updatedStartDate, updatedEndDate, isValueUpdated = false,
@@ -1201,7 +1201,7 @@ angular
             $scope.calendarEnabled = !$scope.calendarEnabled;
             colorizePriorButtons();
         };
-        
+
         /**
          * This code will check for day difference of prior button and if any matching range found,
          * active style will be applied to that button
@@ -1211,7 +1211,7 @@ angular
 
             var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
             var dayDiff = Math.round((endDate.setHours(0, 0, 0, 0) - selectedStartDate.date.setHours(0, 0, 0, 0)) / 864e5);
-            
+
             if (endDate.toLocaleString() !== selectedEndDate.date.toLocaleString()) {
                 return;
             }
@@ -1254,7 +1254,7 @@ angular
             $scope.calendarEnabled = false;
 
             setStartEndDate();
-            
+
             $scope.currentSelectedStartDate = selectedStartDate;
             $scope.currentSelectedEndDate = selectedEndDate;
             $scope.startDateString = selectedStartDate.date.toLocaleDateString();
@@ -1699,7 +1699,7 @@ angular
             discolorSelectedDateRange();
             colorSelectedDateRange()
         }
-        
+
         /*
          * This will make sure that click outside of calendar will close the calendar
          * (behave same as cancel button click)
@@ -1735,7 +1735,8 @@ angular
                 startDate: '=',
                 endDate: '=',
                 applyCallback: '&',
-                selectionMode: '='
+                selectionMode: '=',
+                disabled: '&'
             },
             controller: 'CalendarController',
             templateUrl: 'turnCalendar.html'
