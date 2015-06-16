@@ -104,6 +104,9 @@
  * the cursor will jump based on the previous selected date. For the mode 'singleDate',
  * you can only select one date at a time.
  *
+ * @param {string} disabled - Optional. The boolean variable to dynamically disable
+ * toggle button of turn-calendar. The default is false.
+ *
  * All of the above options can be set through an option object. Pass in the option
  * object through attribute calendarOptions. If you set the same setting in attribute
  * and in option object, the value set in attribute will used over the value in

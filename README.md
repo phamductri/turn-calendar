@@ -54,7 +54,7 @@ Comparison between Turn Calendar and Angular Strap datepicker, Angular Bootstrap
 <body>
 
 <div ng-controller="fooCtrl">
-    <turn-calendar calendar-options="calendarOptions"></turn-calendar>
+	<turn-calendar calendar-options="calendarOptions"></turn-calendar>
 </div>
 ...
 <script src="turnCalendar.js"></script>
@@ -67,16 +67,16 @@ angular
 .module('foo', ['turn/calendar'])
 .controller('fooCtrl', function ($scope) {
 
-    $scope.calendarOptions = {
-                        startDayOfWeek: 1,
-                        backwardMonths: 2,
-                        minSelectDate: '9/13/2013',
-                        weeklySelectRange: 60,
-                        monthlySelectRange: 90,
-                        minBackwardMonth: '08/2013',
-                        priorRangePresets: [{value: 7}, {value: 30, isDefault: true}, {value : 45}],
-                        maxForwardMonth: $scope.maxMonthAllowed()
-                    };
+	$scope.calendarOptions = {
+						startDayOfWeek: 1,
+						backwardMonths: 2,
+						minSelectDate: '9/13/2013',
+						weeklySelectRange: 60,
+						monthlySelectRange: 90,
+						minBackwardMonth: '08/2013',
+						priorRangePresets: [{value: 7}, {value: 30, isDefault: true}, {value : 45}],
+						maxForwardMonth: $scope.maxMonthAllowed()
+					};
 
 });
 ```
@@ -124,15 +124,16 @@ Allow the following options :
 | endDate            | string/number | Optional          | Set the end date to be selected on the calendar. Accept dateString or Unix timestamp. Set this value as directive attribute if you want to be able to set this value in real time. This is the directive to use if you want to read the current selected end date. If maxSelectDate is set, and this endDate falls into a date that is later than maxSelectDate, endDate will be going backward till it reaches a date that is not conflicted with maxSelectDate.                                                                                                                                                                                                                                                                                                                                              |
 | applyCallback      | function      | Optional          | A callback function to call when the "Apply" button is pressed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | selectionMode      | string        | Optional          | The selection behavior of the calendar. Support three options : 'twoClick', 'lastSelectedDate', 'singleDate', and 'disableDayClick'. Default selection mode is 'twoClick', where the selected start date and end date is cleared out every time the user try a new selection. For the mode 'lastSelectedDate', the cursor will jump based on the previous selected date. For the mode 'singleDate', you can only select one date at a time. For the mode 'disableDayClick', you cannot click on the calendar to select dates.                                                                                                                                                                                                                                                                                                                                                                                      |
+| disabled           | boolean       | Optional          | The boolean variable to dynamically disable toggle button of turn-calendar. The default is false                                                                                                                                                                                                                                                                                                                                                                                    |
 
 Example:
 
 ```html
 <turn-calendar start-day-of-week="1" starting-month="11" starting-year="2013"
-                 forward-months="3" backward-months="3" min-select-date="'09/13/2013'"
-                 weekly-select-range="30" monthly-select-range="60"
-                 prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"
-                 max-forward-month="'10/2014'">
+				 forward-months="3" backward-months="3" min-select-date="'09/13/2013'"
+				 weekly-select-range="30" monthly-select-range="60"
+				 prior-range-presets="[{value: 20, isDefault: true}, {value: 45}, {value : 90}]"
+				 max-forward-month="'10/2014'">
 <turn-calendar>
 ```
 
