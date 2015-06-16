@@ -29,7 +29,7 @@
                 };
 
                 $scope.endDate = new Date().getTime();
-                
+
                 $scope.startDate = ($scope.endDate - (10*864e5));
 
                 $scope.setNewEndDate = function () {
@@ -115,6 +115,11 @@
                selection-mode="disableDayClick">
 
 </turn-calendar>
+
+Disabled: <turn-calendar
+  backward-months="1"
+  selection-mode="singleDate"
+  disabled="true"></turn-calendar>
 
 </body>
 </html>

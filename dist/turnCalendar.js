@@ -828,7 +828,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       $scope.isBothDateSelected = true;
     };
     /**
-         * Snaps selected start/end date in case of monthly and weekly selection mode 
+         * Snaps selected start/end date in case of monthly and weekly selection mode
          */
     var snapDateToMonthlyWeekly = function () {
       var updatedStartDate, updatedEndDate, isValueUpdated = false, dayDiff = Math.round((selectedEndDate.date.getTime() - selectedStartDate.date.getTime()) / 86400000);
@@ -1354,7 +1354,8 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       startDate: '=',
       endDate: '=',
       applyCallback: '&',
-      selectionMode: '='
+      selectionMode: '=',
+      disabled: '&'
     },
     controller: 'CalendarController',
     templateUrl: 'turnCalendar.html'
@@ -1364,27 +1365,27 @@ angular.module('calendarTemplates', ['turnCalendar.html']);
 
 angular.module("turnCalendar.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("turnCalendar.html",
-    "<button ng-click=\"enableCalendar()\" class=\"turn-calendar-enable-btn\">{{currentSelectedStartDate.date.toLocaleDateString()}} <span\n" +
+    "<button ng-click=\"enableCalendar()\" class=\"turn-calendar-enable-btn\" ng-disabled=\"disabled()\">{{currentSelectedStartDate.date.toLocaleDateString()}} <span\n" +
     "        ng-show=\"currentSelectedStartDate.date && isNotSingleDateMode\">- {{currentSelectedEndDate.date.toLocaleDateString()}} </span>\n" +
     "</button>\n" +
     "<div>\n" +
     "    <div class=\"turn-calendar-div\" ng-show=\"calendarEnabled\">\n" +
-    "        <div class=\"turn-calendar-input-container\">            \n" +
+    "        <div class=\"turn-calendar-input-container\">\n" +
     "            <div class=\"turn-calendar-input\">\n" +
     "                <span ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-from\">From</span>\n" +
     "                <input class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"startDateString\" ng-change=\"changeStartDate()\" ng-disabled=\"isDayClickDisabledMode\" />\n" +
     "                <span ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-to\">To</span>\n" +
     "                <input ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"endDateString\" ng-change=\"changeEndDate()\" ng-disabled=\"isDayClickDisabledMode\" />\n" +
     "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" class=\"turn-calendar-prior-label\">Prior</span>\n" +
-    "                <button ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-prior\" ng-repeat=\"range in priorButtons\" \n" +
+    "                <button ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-prior\" ng-repeat=\"range in priorButtons\"\n" +
     "                        ng-click=\"selectRange(range, $index)\"\n" +
-    "                        ng-class=\"{'turn-calendar-prior-left': $index == 0, \n" +
-    "                                   'turn-calendar-prior-right': $index == priorButtons.length-1, \n" +
+    "                        ng-class=\"{'turn-calendar-prior-left': $index == 0,\n" +
+    "                                   'turn-calendar-prior-right': $index == priorButtons.length-1,\n" +
     "                                   'active': $index == selectedPriorButtonIndex\n" +
-    "                                  }\" turn-calendar-prior>{{range.value}}</button>              \n" +
+    "                                  }\" turn-calendar-prior>{{range.value}}</button>\n" +
     "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" class=\"turn-calendar-day-label\">Days</span>\n" +
     "            </div>\n" +
-    "            <div class=\"turn-calendar-submit\">              \n" +
+    "            <div class=\"turn-calendar-submit\">\n" +
     "                <button ng-click=\"applyCalendar()\" class=\"turn-calendar-done-btn\" >Done</button>\n" +
     "            </div>\n" +
     "            <p class=\"clear\"></p>\n" +
@@ -1426,5 +1427,6 @@ angular.module("turnCalendar.html", []).run(["$templateCache", function($templat
     "            </div>\n" +
     "        </div>\n" +
     "    </div>\n" +
-    "</div>");
+    "</div>\n" +
+    "");
 }]);
