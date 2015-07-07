@@ -1,6 +1,6 @@
 {
   "name": "calendar",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Generic calendar component for Turn",
   "main": "dist/calendar.js",
   "authors": [
