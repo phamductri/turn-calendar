@@ -104,6 +104,9 @@
  * the cursor will jump based on the previous selected date. For the mode 'singleDate',
  * you can only select one date at a time.
  *
+ * @param {string} disabled - Optional. The boolean variable to dynamically disable
+ * toggle button of turn-calendar. The default is false.
+ *
  * All of the above options can be set through an option object. Pass in the option
  * object through attribute calendarOptions. If you set the same setting in attribute
  * and in option object, the value set in attribute will used over the value in
@@ -1372,12 +1375,15 @@ angular.module("turnCalendar.html", []).run(["$templateCache", function($templat
     "    <div class=\"turn-calendar-div\" ng-show=\"calendarEnabled\">\n" +
     "        <div class=\"turn-calendar-input-container\">\n" +
     "            <div class=\"turn-calendar-input\">\n" +
-    "                <span ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-from\">From</span>\n" +
-    "                <input class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"startDateString\" ng-change=\"changeStartDate()\" ng-disabled=\"isDayClickDisabledMode\" />\n" +
-    "                <span ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-to\">To</span>\n" +
-    "                <input ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"endDateString\" ng-change=\"changeEndDate()\" ng-disabled=\"isDayClickDisabledMode\" />\n" +
-    "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" class=\"turn-calendar-prior-label\">Prior</span>\n" +
-    "                <button ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-prior\" ng-repeat=\"range in priorButtons\"\n" +
+    "                <span ng-show=\"isNotSingleDateMode && !isDayClickDisabledMode\" class=\"turn-calendar-from\">From</span>\n" +
+    "                <input ng-show=\"!isDayClickDisabledMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"startDateString\" ng-change=\"changeStartDate()\" />\n" +
+    "                <span ng-show=\"isNotSingleDateMode && !isDayClickDisabledMode\" class=\"turn-calendar-to\">To</span>\n" +
+    "                <input ng-show=\"isNotSingleDateMode && !isDayClickDisabledMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"endDateString\" ng-change=\"changeEndDate()\" />\n" +
+    "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" \n" +
+    "                        class=\"turn-calendar-prior-label\"\n" +
+    "                        ng-class=\"{'no-left-margin': isDayClickDisabledMode}\">\n" +
+    "                        Prior</span>\n" +
+    "                <button ng-show=\"isNotSingleDateMode\" class=\"turn-calendar-prior\" ng-repeat=\"range in priorButtons\" \n" +
     "                        ng-click=\"selectRange(range, $index)\"\n" +
     "                        ng-class=\"{'turn-calendar-prior-left': $index == 0,\n" +
     "                                   'turn-calendar-prior-right': $index == priorButtons.length-1,\n" +
@@ -1411,7 +1417,7 @@ angular.module("turnCalendar.html", []).run(["$templateCache", function($templat
     "                                           'turn-calendar-selected-daily': day.selectMode == 'daily',\n" +
     "                                           'turn-calendar-selected-weekly': day.selectMode == 'weekly',\n" +
     "                                           'turn-calendar-selected-monthly': day.selectMode == 'monthly',\n" +
-    "                                           'turn-calendar-unavailable': day.isUnavailable,\n" +
+    "                                           'turn-calendar-unavailable': day.isUnavailable || isDayClickDisabledMode,\n" +
     "                                           'turn-calendar-unclickable': isDayClickDisabledMode,\n" +
     "                                           'turn-calendar-date': day.date.getDate()}\"\n" +
     "                                ng-mouseenter=\"mouseEnter(day)\"\n" +

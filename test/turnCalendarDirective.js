@@ -186,17 +186,28 @@ describe('turnCalendar directive', function() {
             $rootScope.$digest();
         });
 
-        it('should have disabled text input for dates ', function () {
-            expect(element.find('input').attr('disabled')).toBe('disabled');
+        it('should not show text input for dates ', function () {
+            expect(element.find('span').eq(1).css('display')).toBe('none'); // 'From'
+            expect(element.find('input').eq(0).css('display')).toBe('none'); // Date
+            expect(element.find('span').eq(2).css('display')).toBe('none'); // 'To'
+            expect(element.find('input').eq(1).css('display')).toBe('none'); // Date
+        });
+
+        it('should set left margin of prior days selection to zero ', function () {
+            expect(element.find('span').eq(3).hasClass('no-left-margin')).toBe(true); // 'Prior'
         });
 
         it('should not show month navigation buttons ', function () {
-            expect(element.find('div').eq(7).css('display')).toBe('none');
-            expect(element.find('div').eq(9).css('display')).toBe('none');
+            expect(element.find('div').eq(7).css('display')).toBe('none'); // Left arrow
+            expect(element.find('div').eq(9).css('display')).toBe('none'); // Right arrow
         });
 
         it('has turn-calendar-unclickable class applied to every day in turn-calendar-table ', function () {
             expect(element.find('table').eq(0).find('td').hasClass('turn-calendar-unclickable')).toBe(true);
+        });
+
+        it('has turn-calendar-unavailable class applied to every day in turn-calendar-table ', function () {
+            expect(element.find('table').eq(0).find('td').hasClass('turn-calendar-unavailable')).toBe(true);
         });
     });
 
