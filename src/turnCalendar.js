@@ -112,7 +112,11 @@
  * @param {string} timezone - Optional. Allow the ability to set the date according
  * to specified timezone. This feature requires timezoneJS to function. If a
  * timezone is specified, setting and reading the date will be based on that
- * timezone, otherwise it will use the system timezone.
+ * timezone, otherwise it will use the system timezone. Note: you have to include
+ * timezoneJS(github.com/mde/timezone-js), with the proper setup in order to use
+ * this feature. If you decide to use timestamp to set the start date and end
+ * date, the result will be converted to the timezone date. The format will
+ * always be MM/dd/yyyy instead of regular locale format.
  *
  * All of the above options can be set through an option object. Pass in the option
  * object through attribute calendarOptions. If you set the same setting in attribute
