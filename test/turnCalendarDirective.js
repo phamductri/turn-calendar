@@ -1,3 +1,9 @@
+/**
+ * Jasmine tests for directive functionalities. To view content of the element,
+ * use this: console.info(element.find('table').eq(0).find('tbody')[0].innerHTML)
+ *
+ * @author Tri Pham <tri.pham@turn.com>
+ */
 describe('turnCalendar directive', function() {
     var $rootScope, $compile, element;
     beforeEach(module('turn/calendar'));
@@ -5,6 +11,7 @@ describe('turnCalendar directive', function() {
     beforeEach(inject(function (_$compile_, _$rootScope_) {
         $compile = _$compile_;
         $rootScope = _$rootScope_;
+
     }));
 
     describe('base case', function ()  {
@@ -208,6 +215,27 @@ describe('turnCalendar directive', function() {
 
         it('has turn-calendar-unavailable class applied to every day in turn-calendar-table ', function () {
             expect(element.find('table').eq(0).find('td').hasClass('turn-calendar-unavailable')).toBe(true);
+        });
+    });
+
+
+    describe('calendar with timezone ', function () {
+        beforeEach(function () {
+
+            jasmine.log('LET ME SEE THE PROBLEM');
+
+            timezoneJS.timezone.zoneFileBasePath = './test/tz';
+            timezoneJS.timezone.init({ async: false });
+
+            element = $compile('<turn-calendar end-date="1437616946000" start-date="1436486400000" starting-month="6" starting-year="2015" timezone="Asia/Ho_Chi_Minh"> </turn-calendar>')($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('has calendar selected between July 23th 2015 and July 10th 2015 because of the Ho Chi Minh City timezone, regardless of where it executes', function () {
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(1).find('td').eq(4).hasClass('turn-calendar-selected-daily')).toBe(false);
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(1).find('td').eq(5).hasClass('turn-calendar-selected-daily')).toBe(true);
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(3).find('td').eq(4).hasClass('turn-calendar-selected-daily')).toBe(true);
+            expect(element.find('table').eq(0).find('tbody').find('tr').eq(3).find('td').eq(5).hasClass('turn-calendar-selected-daily')).toBe(false);
         });
     });
 
