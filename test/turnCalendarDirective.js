@@ -222,8 +222,6 @@ describe('turnCalendar directive', function() {
     describe('calendar with timezone ', function () {
         beforeEach(function () {
 
-            jasmine.log('LET ME SEE THE PROBLEM');
-
             timezoneJS.timezone.zoneFileBasePath = './test/tz';
             timezoneJS.timezone.init({ async: false });
 
