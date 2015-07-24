@@ -915,9 +915,9 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       if (!lastSelectedDate) {
         lastSelectedDate = selectedEndDate;
       }
-      if (selectedStartDate.date.toLocaleString() === lastSelectedDate.date.toLocaleString()) {
+      if (selectedStartDate.date.toDateString() === lastSelectedDate.date.toDateString()) {
         selectedEndDate = day;
-      } else if (selectedEndDate.date.toLocaleString() === lastSelectedDate.date.toLocaleString()) {
+      } else if (selectedEndDate.date.toDateString() === lastSelectedDate.date.toDateString()) {
         selectedStartDate = day;
       }
       swapDate();
@@ -995,7 +995,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       $scope.selectedPriorButtonIndex = null;
       var endDate = self.maxSelectDate ? turnCalendarService.getDate(self.maxSelectDate, self.timezone) : turnCalendarService.getDate(new Date(), self.timezone);
       var dayDiff = Math.round((endDate.setHours(0, 0, 0, 0) - selectedStartDate.date.setHours(0, 0, 0, 0)) / 86400000);
-      if (endDate.toLocaleString() !== selectedEndDate.date.toLocaleString()) {
+      if (endDate.toDateString() !== selectedEndDate.date.toDateString()) {
         return;
       }
       angular.forEach($scope.priorButtons, function (rangePreset, index) {
@@ -1007,14 +1007,14 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
     var setStartEndDate = function () {
       if (angular.isDefined($attrs.startDate) && selectedStartDate) {
         if (isNaN($scope.$parent.$eval($attrs.startDate))) {
-          $scope.startDate = selectedStartDate.date.toLocaleString();
+          $scope.startDate = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
         } else {
           $scope.startDate = selectedStartDate.date.getTime();
         }
       }
       if (angular.isDefined($attrs.endDate) && selectedEndDate) {
         if (isNaN($scope.$parent.$eval($attrs.endDate))) {
-          $scope.endDate = selectedEndDate.date.toLocaleString();
+          $scope.endDate = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
         } else {
           $scope.endDate = selectedEndDate.date.getTime();
         }
@@ -1392,7 +1392,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       applyCallback: '&',
       selectionMode: '=',
       disabled: '&',
-      timezone: '='
+      timezone: '@'
     },
     controller: 'CalendarController',
     templateUrl: 'turnCalendar.html'

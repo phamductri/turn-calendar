@@ -208,7 +208,8 @@ angular
              * Convert input in the form of 'MM/YYYY' into a Date object
              *
              * @param {string} monthValue - The input month and year
-             * @param {string} timezone - The timezone which
+             * @param {string} timezone - The timezone that the monthValue will
+             * be converted to
              * @returns {object} A Date object
              */
             convertToDateObject: function (monthValue, timezone) {
@@ -1189,9 +1190,9 @@ angular
                 lastSelectedDate = selectedEndDate;
             }
 
-            if (selectedStartDate.date.toLocaleString() === lastSelectedDate.date.toLocaleString()) {
+            if (selectedStartDate.date.toDateString() === lastSelectedDate.date.toDateString()) {
                 selectedEndDate = day;
-            } else if (selectedEndDate.date.toLocaleString() === lastSelectedDate.date.toLocaleString()) {
+            } else if (selectedEndDate.date.toDateString() === lastSelectedDate.date.toDateString()) {
                 selectedStartDate = day;
             }
 
@@ -1294,7 +1295,7 @@ angular
             var endDate = self.maxSelectDate ? turnCalendarService.getDate(self.maxSelectDate, self.timezone) : turnCalendarService.getDate(new Date(), self.timezone);
             var dayDiff = Math.round((endDate.setHours(0, 0, 0, 0) - selectedStartDate.date.setHours(0, 0, 0, 0)) / 864e5);
 
-            if (endDate.toLocaleString() !== selectedEndDate.date.toLocaleString()) {
+            if (endDate.toDateString() !== selectedEndDate.date.toDateString()) {
                 return;
             }
 
@@ -1308,7 +1309,7 @@ angular
         var setStartEndDate = function () {
             if (angular.isDefined($attrs.startDate) && selectedStartDate) {
                 if (isNaN($scope.$parent.$eval($attrs.startDate))) {
-                    $scope.startDate = selectedStartDate.date.toLocaleString();
+                    $scope.startDate = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
                 } else {
                     $scope.startDate = selectedStartDate.date.getTime();
                 }
@@ -1317,7 +1318,7 @@ angular
 
             if (angular.isDefined($attrs.endDate) && selectedEndDate) {
                 if (isNaN($scope.$parent.$eval($attrs.endDate))) {
-                    $scope.endDate = selectedEndDate.date.toLocaleString();
+                    $scope.endDate = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
                 } else {
                     $scope.endDate = selectedEndDate.date.getTime();
                 }
@@ -1819,7 +1820,7 @@ angular
                 applyCallback: '&',
                 selectionMode: '=',
                 disabled: '&',
-                timezone: '='
+                timezone: '@'
             },
             controller: 'CalendarController',
             templateUrl: 'turnCalendar.html'
