@@ -1370,6 +1370,27 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         });
       }
     });
+    $scope.$watch('timezone', function (newVal) {
+      if (!newVal) {
+        return;
+      }
+      self.timezone = newVal;
+      var newDate = turnCalendarService.getDate(self.startDate, self.timezone);
+      resetStartDate(newDate);
+      selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
+      $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
+      $scope.currentSelectedStartDate = selectedStartDate;
+      newDate = turnCalendarService.getDate(self.endDate, self.timezone);
+      resetEndDate(newDate);
+      selectedEndDate = generateMetaDateObject(newDate, newDate.getMonth());
+      $scope.endDateString = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
+      $scope.currentSelectedEndDate = selectedEndDate;
+      if (selectedStartDate && selectedEndDate) {
+        discolorSelectedDateRange();
+        colorSelectedDateRange();
+        lastSelectedDate = selectedEndDate;
+      }
+    });
   }
 ]).directive('turnCalendar', function () {
   return {

@@ -1799,6 +1799,10 @@ angular
 
         $scope.$watch('timezone', function (newVal) {
 
+            if (!newVal) {
+                return;
+            }
+
             self.timezone = newVal;
 
             var newDate = turnCalendarService.getDate(self.startDate, self.timezone);
