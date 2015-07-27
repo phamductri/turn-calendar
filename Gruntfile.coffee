@@ -77,7 +77,9 @@ module.exports = (grunt) ->
           type: 'lcovonly'
           vendor: [
             './bower_components/angular/angular.js'
-            './bower_components/angular-mocks/angular-mocks.js'
+            './bower_components/angular-mocks/angular-mocks.js',
+            './bower_components/jquery/dist/jquery.js',
+            './bower_components/timezone-js/src/date.js',
             './dist/template.js'
           ]
       unit:
@@ -86,7 +88,9 @@ module.exports = (grunt) ->
           specs: './test/*.js'
           vendor: [
             './bower_components/angular/angular.js'
-            './bower_components/angular-mocks/angular-mocks.js'
+            './bower_components/angular-mocks/angular-mocks.js',
+            './bower_components/jquery/dist/jquery.js',
+            './bower_components/timezone-js/src/date.js',
             './dist/template.js'
           ]
           keepRunner: true

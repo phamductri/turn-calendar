@@ -98,14 +98,25 @@
  * the "Apply" button is pressed.
  *
  * @param {string} selectionMode - Optional. The selection behavior of the calendar.
- * Support three options : 'twoClick', 'lastSelectedDate', and 'singleDate'. Default
- * selection mode is 'twoClick', where the selected start date and end date is
- * cleared out every time the user try a new selection. For the mode 'lastSelectedDate',
- * the cursor will jump based on the previous selected date. For the mode 'singleDate',
- * you can only select one date at a time.
+ * Support four options : 'twoClick', 'lastSelectedDate', 'singleDate', and
+ * 'disableDayClick'. Default selection mode is 'twoClick', where the selected
+ * start date and end date is cleared out every time the user try a new selection.
+ * For the mode 'lastSelectedDate', the cursor will jump based on the previous
+ * selected date. For the mode 'singleDate', you can only select one date at a
+ * time.  For the mode 'disableDayClick', you cannot click on the calendar to
+ * select dates.
  *
  * @param {string} disabled - Optional. The boolean variable to dynamically disable
  * toggle button of turn-calendar. The default is false.
+ *
+ * @param {string} timezone - Optional. Allow the ability to set the date according
+ * to specified timezone. This feature requires timezoneJS to function. If a
+ * timezone is specified, setting and reading the date will be based on that
+ * timezone, otherwise it will use the system timezone. Note: you have to include
+ * timezoneJS(github.com/mde/timezone-js), with the proper setup in order to use
+ * this feature. If you decide to use timestamp to set the start date and end
+ * date, the result will be converted to the timezone date. The format will
+ * always be MM/dd/yyyy instead of regular locale format.
  *
  * All of the above options can be set through an option object. Pass in the option
  * object through attribute calendarOptions. If you set the same setting in attribute
@@ -196,10 +207,12 @@ angular
             /**
              * Convert input in the form of 'MM/YYYY' into a Date object
              *
-             * @param {string} monthValue The input month and year
+             * @param {string} monthValue - The input month and year
+             * @param {string} timezone - The timezone that the monthValue will
+             * be converted to
              * @returns {object} A Date object
              */
-            convertToDateObject: function (monthValue) {
+            convertToDateObject: function (monthValue, timezone) {
 
                 if (!monthValue) {
                     return null;
@@ -213,7 +226,12 @@ angular
 
                 var month = splitArray[0], year = splitArray[1];
 
-                return new Date(year, month, 1);
+                if (!timezone) {
+                    return new Date(year, month, 1);
+                }
+
+                return new timezoneJS.Date(year, month, 1, timezone).setHours(0,0,0,0);
+
             },
 
             /**
@@ -235,7 +253,7 @@ angular
             /**
              * Helper function to validate date input, be it a string or a number
              *
-             * @param {string|number} date Date input
+             * @param {string|number} date - Date input
              * @returns {boolean} True if valid, false if not
              */
             validateDateInput: function (date) {
@@ -249,6 +267,59 @@ angular
                 if ( Object.prototype.toString.call(dateObj) !== "[object Date]" )
                     return false;
                 return !isNaN(dateObj.getTime());
+            },
+
+
+            /**
+             * An util function that will convert a date input into a Javascript
+             * date object based on timezone. Timezone conversion is based on
+             * timezoneJS. If no timezone input is specified, it will default to
+             * current system settings like regular Javascript Date object.
+             *
+             * @param {string|number} date - Date input, either a string or timestamp
+             * @param {string} timezone - Timezone, using timezoneJS convention (i.e
+             * 'America/New_York');
+             * @returns {object} Javascript date object
+             */
+            getDate: function (date, timezone) {
+                return timezone ? new timezoneJS.Date(new timezoneJS.Date(date, timezone).setHours(0, 0, 0, 0), timezone)
+                    : new Date(new Date(date).setHours(0, 0, 0, 0));
+            },
+
+
+            /**
+             * Util function return the date of the month, either by system
+             * timezone of a specified timezone
+             *
+             * @param {number} year - The year
+             * @param {number} month - The month
+             * @param {number} date - Date of month
+             * @param {string} timezone - Timezone
+             * @returns {object} Date object
+             */
+            getYearMonthDate: function (year, month, date, timezone) {
+                return timezone ? new timezoneJS.Date(new timezoneJS.Date(year, month, date, timezone).setHours(0, 0, 0, 0), timezone) :
+                    new Date(year, month, date);
+            },
+
+            /**
+             * Util function to extract date in MM/dd/yyyy, due to the fact that
+             * timezoneJS does not support printing output in locale date string
+             * format (i.e it does not support toLocaleDateString)
+             *
+             * @param {object} dateObject - Date object, either a Javascript date
+             * object, or a timezoneJS Date object
+             * @param {string} timezone - Timezone string
+             * @returns {string} Date string (will be in MM/dd/yyyy format if timezone
+             * is specified, otherwise will be in locale datestring format)
+             */
+            getDateString: function (dateObject, timezone) {
+
+                if (!dateObject) {
+                    return null;
+                }
+
+                return timezone ? dateObject.toString('MM/dd/yyyy', timezone) : dateObject.toLocaleDateString();
             }
         };
     })
@@ -267,7 +338,7 @@ angular
              * @type {boolean}
              */
             allowMonthGeneration = false,
-            currentDate = new Date(),
+
             // Internal variable to track the last selected cursor click
             lastSelectedDate = null;
 
@@ -276,6 +347,10 @@ angular
         $scope.priorButtons = null;
 
         $scope.isBothDateSelected = true;
+
+        // Expose scope to getDateString service, maintain backward compatibility
+        $scope.timeZone = $scope.$parent.$eval($attrs['timezone']) || $attrs['timezone'];
+        $scope.getDateString = turnCalendarService.getDateString;
 
         if ($attrs.calendarOptions) {
             calendarOptions = $scope.$parent.$eval($attrs.calendarOptions);
@@ -313,9 +388,12 @@ angular
             'forwardMonths', 'startDayOfWeek', 'minSelectDate', 'maxSelectDate',
             'weeklySelectRange', 'monthlySelectRange', 'priorRangePresets',
             'maxForwardMonth', 'minBackwardMonth', 'startDate', 'endDate',
-            'selectionMode'], function(key) {
+            'selectionMode', 'disabled', 'timezone'], function(key) {
             self[key] = pickValue(key);
         });
+
+        var currentDate = self.timezone ? new timezoneJS.Date(new timezoneJS.Date(new Date(), self.timezone).setHours(0, 0, 0, 0), self.timezone)
+            : new Date(new Date().setHours(0, 0, 0, 0));
 
         angular.forEach(['minSelectDate', 'maxSelectDate'], function(key) {
             $scope.$watch(key, function (newVal) {
@@ -346,7 +424,7 @@ angular
 
         angular.forEach(['minBackwardMonth', 'maxForwardMonth'], function(key) {
             $scope.$watch(key, function (newVal) {
-                if (!turnCalendarService.convertToDateObject(newVal)) {
+                if (!turnCalendarService.convertToDateObject(newVal, self.timezone)) {
                     return;
                 }
                 self[key] = newVal;
@@ -431,8 +509,9 @@ angular
 
         var isExceedMaxMonth = function (month, year) {
             return self.maxForwardMonth &&
-                turnCalendarService.convertToDateObject(self.maxForwardMonth) &&
-                new Date(year, month, 1) > turnCalendarService.convertToDateObject(self.maxForwardMonth);
+                turnCalendarService.convertToDateObject(self.maxForwardMonth, self.timezone) &&
+                turnCalendarService.getYearMonthDate(year, month, 1, self.timezone) >
+                    turnCalendarService.convertToDateObject(self.maxForwardMonth, self.timezone);
         };
 
         /**
@@ -478,8 +557,9 @@ angular
 
         var isBelowMinMonth = function (month, year) {
             return self.minBackwardMonth &&
-                   turnCalendarService.convertToDateObject(self.minBackwardMonth) &&
-                   new Date(year, month, 1) < turnCalendarService.convertToDateObject(self.minBackwardMonth);
+                   turnCalendarService.convertToDateObject(self.minBackwardMonth, self.timezone) &&
+                   turnCalendarService.getYearMonthDate(year, month, 1, self.timezone) <
+                       turnCalendarService.convertToDateObject(self.minBackwardMonth, self.timezone);
         };
 
         /**
@@ -574,11 +654,11 @@ angular
          */
         var getFirstDate = function (year, month) {
 
-            var firstDayOfMonth = new Date(year, month, 1),
-                dayOfWeek = firstDayOfMonth.getDay(),
+            var firstDayOfMonth = turnCalendarService.getYearMonthDate(year, month, 1, self.timezone);
+            var dayOfWeek = firstDayOfMonth.getDay(),
                 firstDate;
 
-            firstDate = new Date(firstDayOfMonth.setDate(generateFirstDateIndex(self.startDayOfWeek, dayOfWeek)));
+            firstDate = turnCalendarService.getDate(firstDayOfMonth.setDate(generateFirstDateIndex(self.startDayOfWeek, dayOfWeek)), self.timezone);
 
             return firstDate;
 
@@ -593,11 +673,11 @@ angular
          */
         var generateDayArray = function (year, month) {
 
-            var currentDate = new Date(getFirstDate(year, month)),
+            var currentDate = turnCalendarService.getDate(getFirstDate(year, month), self.timezone),
                 dayArray = [];
 
             for (var i = 0; i < MAX_DAY; i++) {
-                dayArray.push(generateMetaDateObject(new Date(currentDate), month));
+                dayArray.push(generateMetaDateObject(turnCalendarService.getDate(currentDate, self.timezone), month));
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
@@ -613,8 +693,8 @@ angular
          * @returns {boolean} - True if compatible, false if not
          */
         var isUnavailable = function (date) {
-            return (self.minSelectDate && date < new Date(self.minSelectDate)) ||
-                   (self.maxSelectDate && date > new Date(self.maxSelectDate));
+            return (self.minSelectDate && date < turnCalendarService.getDate(self.minSelectDate, self.timezone)) ||
+                   (self.maxSelectDate && date > turnCalendarService.getDate(self.maxSelectDate, self.timezone));
         };
 
 
@@ -637,16 +717,16 @@ angular
                 return false;
             }
 
-            var selectDateForward = new Date(baseDay.date.toLocaleDateString()),
-                selectDateBackward = new Date(baseDay.date.toLocaleDateString());
+            var selectDateForward = turnCalendarService.getDate(baseDay.date.toDateString(), self.timezone),
+                selectDateBackward = turnCalendarService.getDate(baseDay.date.toDateString(), self.timezone);
 
             selectDateForward.setDate(selectDateForward.getDate() + selectRange);
             selectDateBackward.setDate(selectDateBackward.getDate() - selectRange);
 
             if (compareRange) {
 
-                var compareRangeForward = new Date(lastSelectedDate.date.toLocaleDateString()),
-                    compareRangeBackward = new Date(lastSelectedDate.date.toLocaleDateString());
+                var compareRangeForward = turnCalendarService.getDate(lastSelectedDate.date.toDateString(), self.timezone),
+                    compareRangeBackward = turnCalendarService.getDate(lastSelectedDate.date.toDateString(), self.timezone);
 
                 compareRangeForward.setDate(compareRangeForward.getDate() + compareRange);
                 compareRangeBackward.setDate(compareRangeBackward.getDate() - compareRange);
@@ -700,7 +780,7 @@ angular
 
                 var monthFound = month.some(function (week) {
                     return week.some(function (day) {
-                        return day && day.date && day.date.toLocaleDateString() === selectedDay.date.toLocaleDateString();
+                        return day && day.date && day.date.toDateString() === selectedDay.date.toDateString();
                     })
                 });
 
@@ -739,7 +819,7 @@ angular
 
                         var day = week[k];
 
-                        if (day && day.date && day.date.toLocaleDateString() === selectedDay.date.toLocaleDateString()) {
+                        if (day && day.date && day.date.toDateString() === selectedDay.date.toDateString()) {
                             weekFound = true;
                         }
 
@@ -951,7 +1031,7 @@ angular
          * @returns {boolean} True if between, false if not
          */
         var isBetweenStartAndEndDate = function (date) {
-            return date.setHours(0, 0, 0, 0) <= selectedEndDate.date.setHours(0, 0, 0, 0) && date.setHours(0, 0, 0, 0) >= selectedStartDate.date.setHours(0, 0, 0, 0);
+            return date <= selectedEndDate.date && date >= selectedStartDate.date;
         };
 
         /**
@@ -1036,8 +1116,8 @@ angular
             }
 
             snapDateToMonthlyWeekly();
-            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
-            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
+            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
+            $scope.endDateString = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
 
             colorSelectedDateRange();
             colorizePriorButtons();
@@ -1053,23 +1133,23 @@ angular
                 dayDiff = Math.round((selectedEndDate.date.getTime() - selectedStartDate.date.getTime())/ 864e5);
 
             if (self.monthlySelectRange && dayDiff > self.monthlySelectRange) {
-                updatedStartDate = new Date(selectedStartDate.date.getFullYear(), selectedStartDate.date.getMonth(), 1);
-                updatedEndDate = new Date(selectedEndDate.date.getFullYear(), selectedEndDate.date.getMonth()+1, 0);
+                updatedStartDate = turnCalendarService.getYearMonthDate(selectedStartDate.date.getFullYear(), selectedStartDate.date.getMonth(), 1, self.timezone);
+                updatedEndDate = turnCalendarService.getYearMonthDate(selectedEndDate.date.getFullYear(), selectedEndDate.date.getMonth() + 1, 0, self.timezone);
                 isValueUpdated = true;
             } else if (self.weeklySelectRange && dayDiff > self.weeklySelectRange) {
-                updatedStartDate = new Date(selectedStartDate.date.setDate(selectedStartDate.date.getDate() - (7 + selectedStartDate.date.getDay() - self.startDayOfWeek) % 7));
-                updatedEndDate = new Date(((selectedEndDate.date.setDate(selectedEndDate.date.getDate() - (7 + selectedEndDate.date.getDay() - self.startDayOfWeek) % 7)) + 6*864e5));
+                updatedStartDate = turnCalendarService.getDate(selectedStartDate.date.setDate(selectedStartDate.date.getDate() - (7 + selectedStartDate.date.getDay() - self.startDayOfWeek) % 7), self.timezone);
+                updatedEndDate = turnCalendarService.getDate(((selectedEndDate.date.setDate(selectedEndDate.date.getDate() - (7 + selectedEndDate.date.getDay() - self.startDayOfWeek) % 7)) + 6*864e5), self.timezone);
                 isValueUpdated = true;
             }
 
             if (isValueUpdated) {
 
                 if (updatedStartDate && isUnavailable(updatedStartDate)) {
-                    updatedStartDate = new Date(self.minSelectDate);
+                    updatedStartDate = turnCalendarService.getDate(self.minSelectDate, self.timezone);
                 }
 
                 if (updatedEndDate && isUnavailable(updatedEndDate)) {
-                    updatedEndDate = new Date(self.maxSelectDate);
+                    updatedEndDate = turnCalendarService.getDate(self.maxSelectDate, self.timezone);
                 }
 
                 selectedStartDate.date = updatedStartDate;
@@ -1080,7 +1160,7 @@ angular
         var setStartDate = function (day) {
 
             selectedStartDate = day;
-            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date);
             day.selectMode = 'daily';
             $scope.isBothDateSelected = false;
 
@@ -1110,16 +1190,16 @@ angular
                 lastSelectedDate = selectedEndDate;
             }
 
-            if (selectedStartDate.date.toLocaleString() === lastSelectedDate.date.toLocaleString()) {
+            if (selectedStartDate.date.toDateString() === lastSelectedDate.date.toDateString()) {
                 selectedEndDate = day;
-            } else if (selectedEndDate.date.toLocaleString() === lastSelectedDate.date.toLocaleString()) {
+            } else if (selectedEndDate.date.toDateString() === lastSelectedDate.date.toDateString()) {
                 selectedStartDate = day;
             }
 
             swapDate();
             snapDateToMonthlyWeekly();
-            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
-            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
+            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
+            $scope.endDateString = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
 
             discolorSelectedDateRange();
 
@@ -1212,10 +1292,10 @@ angular
         var colorizePriorButtons = function () {
             $scope.selectedPriorButtonIndex = null;
 
-            var endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
+            var endDate = self.maxSelectDate ? turnCalendarService.getDate(self.maxSelectDate, self.timezone) : turnCalendarService.getDate(new Date(), self.timezone);
             var dayDiff = Math.round((endDate.setHours(0, 0, 0, 0) - selectedStartDate.date.setHours(0, 0, 0, 0)) / 864e5);
 
-            if (endDate.toLocaleString() !== selectedEndDate.date.toLocaleString()) {
+            if (endDate.toDateString() !== selectedEndDate.date.toDateString()) {
                 return;
             }
 
@@ -1229,7 +1309,7 @@ angular
         var setStartEndDate = function () {
             if (angular.isDefined($attrs.startDate) && selectedStartDate) {
                 if (isNaN($scope.$parent.$eval($attrs.startDate))) {
-                    $scope.startDate = selectedStartDate.date.toLocaleString();
+                    $scope.startDate = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
                 } else {
                     $scope.startDate = selectedStartDate.date.getTime();
                 }
@@ -1238,7 +1318,7 @@ angular
 
             if (angular.isDefined($attrs.endDate) && selectedEndDate) {
                 if (isNaN($scope.$parent.$eval($attrs.endDate))) {
-                    $scope.endDate = selectedEndDate.date.toLocaleString();
+                    $scope.endDate = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
                 } else {
                     $scope.endDate = selectedEndDate.date.getTime();
                 }
@@ -1260,8 +1340,8 @@ angular
 
             $scope.currentSelectedStartDate = selectedStartDate;
             $scope.currentSelectedEndDate = selectedEndDate;
-            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
-            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
+            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
+            $scope.endDateString = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
 
             if ($scope.applyCallback) {
                 $scope.applyCallback();
@@ -1272,8 +1352,8 @@ angular
             discolorSelectedDateRange();
             selectedStartDate = $scope.currentSelectedStartDate;
             selectedEndDate = $scope.currentSelectedEndDate;
-            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
-            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
+            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
+            $scope.endDateString = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
             lastSelectedDate = selectedEndDate;
 
             /**
@@ -1300,7 +1380,7 @@ angular
             $scope.monthArray.forEach(function (month) {
                 month.forEach(function (week) {
                     week.forEach(function (day) {
-                        if (day && day.date && day.date.toLocaleString() === date.toLocaleString()) {
+                        if (day && day.date && day.date.toDateString() === date.toDateString()) {
                             day.selectMode = 'daily';
                         }
                     });
@@ -1505,8 +1585,8 @@ angular
 
             discolorSelectedDateRange();
 
-            var startDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date(),
-                endDate = self.maxSelectDate ? new Date(self.maxSelectDate) : new Date();
+            var startDate = self.maxSelectDate ? turnCalendarService.getDate(self.maxSelectDate, self.timezone) : turnCalendarService.getDate(new Date(), self.timezone),
+                endDate = self.maxSelectDate ? turnCalendarService.getDate(self.maxSelectDate, self.timezone) : turnCalendarService.getDate(new Date(), self.timezone);
 
             $scope.monthArray = generateMonthArray(endDate.getFullYear(), endDate.getMonth());
 
@@ -1560,11 +1640,11 @@ angular
         }
 
         if (selectedStartDate) {
-            $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
         }
 
         if (selectedEndDate) {
-            $scope.endDateString = selectedEndDate.date.toLocaleDateString();
+            $scope.endDateString = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
         }
 
         /**
@@ -1583,7 +1663,7 @@ angular
 
 
             var middleDateFirstMonth = $scope.monthArray[0][2][6],
-                firstDateFirstMonth = new Date(middleDateFirstMonth.date.getFullYear(), middleDateFirstMonth.date.getMonth(), 1);
+                firstDateFirstMonth = turnCalendarService.getYearMonthDate(middleDateFirstMonth.date.getFullYear(), middleDateFirstMonth.date.getMonth(), 1, self.timezone);
 
             if (day.date < firstDateFirstMonth) {
                 $scope.monthArray = generateMonthArray(day.date.getFullYear(), day.date.getMonth());
@@ -1596,7 +1676,7 @@ angular
                 setSingleDate(day);
             }
 
-            $scope.endDate = day.date.toLocaleDateString();
+            $scope.endDate = turnCalendarService.getDateString(day.date, self.timezone);
 
             if (selectedEndDate && selectedEndDate.date > day.date) {
                 colorSelectedDateRange();
@@ -1612,7 +1692,7 @@ angular
                 return;
             }
 
-            var newDate = new Date($scope.startDateString);
+            var newDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
 
             setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
         };
@@ -1633,7 +1713,7 @@ angular
             }
 
             selectedEndDate = day;
-            $scope.endDate = day.date.toLocaleDateString();
+            $scope.endDate = turnCalendarService.getDateString(day.date, self.timezone);
 
 
             discolorSelectedDateRange();
@@ -1650,7 +1730,7 @@ angular
                 return;
             }
 
-            var newDate = new Date($scope.endDateString);
+            var newDate = turnCalendarService.getDate($scope.endDateString, self.timezone);
 
             setEndDateString(generateMetaDateObject(newDate, newDate.getMonth()));
         };
@@ -1663,17 +1743,17 @@ angular
                     return;
                 }
 
-                var newDate = new Date(newVal);
+                var newDate = turnCalendarService.getDate(newVal, self.timezone);
 
                 if (attribute === 'startDate') {
                     newDate = resetStartDate(newDate);
                     selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
-                    $scope.startDateString = selectedStartDate.date.toLocaleDateString();
+                    $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
                     $scope.currentSelectedStartDate = selectedStartDate;
                 } else {
                     newDate = resetEndDate(newDate);
                     selectedEndDate = generateMetaDateObject(newDate, newDate.getMonth());
-                    $scope.endDateString = selectedEndDate.date.toLocaleDateString();
+                    $scope.endDateString = turnCalendarService.getDateString(selectedEndDate.date, self.timezone);
                     $scope.currentSelectedEndDate = selectedEndDate;
                 }
 
@@ -1688,15 +1768,15 @@ angular
         // Set the end date and start date if they are set by users
         if (turnCalendarService.validateDateInput(self.startDate) &&
             turnCalendarService.validateDateInput(self.endDate)) {
-            var startDate = resetStartDate(new Date(self.startDate)),
-                endDate = resetEndDate(new Date(self.endDate));
+            var startDate = resetStartDate(turnCalendarService.getDate(self.startDate, self.timezone)),
+                endDate = resetEndDate(turnCalendarService.getDate(self.endDate, self.timezone));
 
             selectedStartDate = generateMetaDateObject(startDate, startDate.getMonth());
             selectedEndDate = generateMetaDateObject(endDate, endDate.getMonth());
             $scope.currentSelectedStartDate = selectedStartDate;
             $scope.currentSelectedEndDate = selectedEndDate;
-            $scope.startDateString = startDate.toLocaleDateString();
-            $scope.endDateString = endDate.toLocaleDateString();
+            $scope.startDateString = turnCalendarService.getDateString(startDate, self.timezone);
+            $scope.endDateString = turnCalendarService.getDateString(endDate, self.timezone);
 
             lastSelectedDate = selectedEndDate;
             discolorSelectedDateRange();
@@ -1739,7 +1819,8 @@ angular
                 endDate: '=',
                 applyCallback: '&',
                 selectionMode: '=',
-                disabled: '&'
+                disabled: '&',
+                timezone: '@'
             },
             controller: 'CalendarController',
             templateUrl: 'turnCalendar.html'
