@@ -11,8 +11,10 @@
 </head>
 <body ng-controller="mainCtrl">
 
+
 <script src="../bower_components/jquery/dist/jquery.js"></script>
 <script src="../bower_components/angular/angular.js"></script>
+<script src="../bower_components/timezone-js/src/date.js"></script>
 <script src="../dist/turnCalendar.js"></script>
 <script>
 
@@ -57,12 +59,17 @@
 
             });
 
+
+    // Note, the tz folder has to be present on the web server, consult timezoneJS
+    // installation procedure
+    timezoneJS.timezone.zoneFileBasePath = './tz';
+    timezoneJS.timezone.init({ async: false });
+
 </script>
 <div>
     <button ng-click="setNewEndDate()" class="turn-calendar-enable-btn">Increase start date</button>
 
 </div>
-
 
 <turn-calendar start-day-of-week="4" backward-months="2" forward-months="2"
                min-select-date="'9/13/2013'"
@@ -97,14 +104,14 @@
 
 </turn-calendar>
 
-singleDate with min-backward-month
+singleDate with min-backward-month:
 <turn-calendar min-select-date="'9/13/2013'"
                min-backward-month="'08/2013'"
                selection-mode="singleDate">
 
 </turn-calendar>
 
-singleDate with 2 backward and forward months
+singleDate with 2 backward and forward months:
 <turn-calendar min-select-date="'9/13/2013'"
                backward-months="2" forward-months="2"
                min-backward-month="'08/2013'"
@@ -112,19 +119,32 @@ singleDate with 2 backward and forward months
 
 </turn-calendar>
 
-selection-mode="disableDayClick"
+selection-mode="disableDayClick":
 <turn-calendar backward-months="1"
                prior-range-presets="[{value: 7, isDefault: true}, {value: 30}]"
                selection-mode="disableDayClick">
 
 </turn-calendar>
 
-disabled="true"
+disabled="true":
 <turn-calendar backward-months="1"
                selection-mode="singleDate"
                disabled="true">
 
 </turn-calendar>
+
+timezone support:
+<turn-calendar start-day-of-week="4" backward-months="2" forward-months="2"
+               min-select-date="'1/13/2015'"
+               weekly-select-range="90"
+               monthly-select-range="180"
+               min-backward-month="'08/2013'"
+               prior-range-presets="[{value: 7}, {value: 30}, {value : 90}]"
+               start-date="startDate"
+               end-date="endDate" timezone="Asia/Ho_Chi_Minh">
+</turn-calendar>
+
+<turn-calendar end-date="1437616946000" start-date="1436486400000" timezone="Asia/Ho_Chi_Minh"></turn-calendar>
 
 </body>
 </html>

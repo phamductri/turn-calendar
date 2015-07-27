@@ -1,5 +1,5 @@
-<button ng-click="enableCalendar()" class="turn-calendar-enable-btn" ng-disabled="disabled()">{{currentSelectedStartDate.date.toLocaleDateString()}} <span
-        ng-show="currentSelectedStartDate.date && isNotSingleDateMode">- {{currentSelectedEndDate.date.toLocaleDateString()}} </span>
+<button ng-click="enableCalendar()" class="turn-calendar-enable-btn" ng-disabled="disabled()">{{getDateString(currentSelectedStartDate.date, timeZone)}} <span
+        ng-show="currentSelectedStartDate.date && isNotSingleDateMode">- {{getDateString(currentSelectedEndDate.date, timeZone)}} </span>
 </button>
 <div>
     <div class="turn-calendar-div" ng-show="calendarEnabled">
