@@ -1804,6 +1804,7 @@ angular
             }
 
             self.timezone = newVal;
+            $scope.timeZone = newVal;
 
             var newDate = turnCalendarService.getDate(self.startDate, self.timezone);
 
@@ -1850,7 +1851,7 @@ angular
                 applyCallback: '&',
                 selectionMode: '=',
                 disabled: '&',
-                timezone: '@'
+                timezone: '='
             },
             controller: 'CalendarController',
             templateUrl: 'turnCalendar.html'

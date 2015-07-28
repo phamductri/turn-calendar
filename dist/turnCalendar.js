@@ -1375,6 +1375,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         return;
       }
       self.timezone = newVal;
+      $scope.timeZone = newVal;
       var newDate = turnCalendarService.getDate(self.startDate, self.timezone);
       resetStartDate(newDate);
       selectedStartDate = generateMetaDateObject(newDate, newDate.getMonth());
@@ -1413,7 +1414,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       applyCallback: '&',
       selectionMode: '=',
       disabled: '&',
-      timezone: '@'
+      timezone: '='
     },
     controller: 'CalendarController',
     templateUrl: 'turnCalendar.html'
