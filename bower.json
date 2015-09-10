@@ -8,7 +8,7 @@
   ],
   "license": "Apache2",
   "dependencies": {
-    "angular": "1.0.8"
+    "angular": "1.2.28"
   },
   "devDependencies": {
     "angular-mocks": "~1.0.8",

@@ -3,7 +3,7 @@
   border: 1px solid #ababab;
   border-radius: 3px;
   box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
-  text-shadow: 0px 0px 5px white, 0px 1px 0.1px white;
+  text-shadow: 0px 0px 5px #fff,0px 1px .1px #fff;
   color: #666;
   cursor: pointer;
   line-height: 1.5;
@@ -14,10 +14,10 @@
   vertical-align: middle;
   white-space: nowrap; }
   .turn-calendar-enable-btn:hover {
-    background: linear-gradient(to bottom, white 0%, #e1e1e1 100%);
-    border: 1px solid #ababab;
+    background: linear-gradient(to bottom, #ffffff 0%, #E1E1E1 100%);
+    border: 1px solid #ABABAB;
     box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
-    text-shadow: 0px 0px 5px white, 0px 1px 0.1px white; }
+    text-shadow: 0px 0px 5px #FFF, 0px 1px .1px #FFF; }
   .turn-calendar-enable-btn:active {
     background: #b9b9b9;
     border: 1px solid rgba(0, 0, 0, 0.3);
@@ -33,7 +33,7 @@
 .turn-calendar-div {
   background: #fff;
   border-radius: 5px;
-  box-shadow: 0px 0px 10px #999999;
+  box-shadow: 0px 0px 10px #999;
   color: #58585b;
   display: inline-block;
   font-family: Arial, Helvetica, sans-serif;
@@ -67,7 +67,49 @@
     padding: 8px 0px 10px 8px; }
     .turn-calendar-div .turn-calendar-input-container .turn-calendar-submit {
       float: right;
-      margin-left: 10px; }
+      margin-left: 10px;
+      position: relative; }
+      .turn-calendar-div .turn-calendar-input-container .turn-calendar-submit .validation-message {
+        background: #f4efcb;
+        font-size: 11px;
+        line-height: 1.4;
+        left: -125px;
+        height: auto;
+        position: absolute;
+        text-align: center;
+        text-decoration: none;
+        width: 120px;
+        z-index: 2; }
+      .turn-calendar-div .turn-calendar-input-container .turn-calendar-submit .turn-calendar-done-btn {
+        background: linear-gradient(to bottom, #00B3ff 0%, #0096d6 100%);
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        border-radius: 3px;
+        box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2);
+        color: #e0f6ff;
+        cursor: pointer;
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 0 8px 0 0;
+        outline: 0;
+        padding: 3px 16px;
+        text-align: center;
+        text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.3), 0px 0px 5px rgba(0, 0, 0, 0.5);
+        vertical-align: middle;
+        white-space: nowrap; }
+        .turn-calendar-div .turn-calendar-input-container .turn-calendar-submit .turn-calendar-done-btn:hover, .turn-calendar-div .turn-calendar-input-container .turn-calendar-submit .turn-calendar-done-btn:focus {
+          background: linear-gradient(to bottom, #2ec0ff 0%, #00a5ec 100%);
+          text-decoration: none; }
+        .turn-calendar-div .turn-calendar-input-container .turn-calendar-submit .turn-calendar-done-btn:active {
+          background: #007bb0;
+          border: 1px solid rgba(0, 0, 0, 0.5);
+          box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.1);
+          color: #b8d9e7;
+          outline: 0;
+          text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.4); }
+        .turn-calendar-div .turn-calendar-input-container .turn-calendar-submit .turn-calendar-done-btn[disabled] {
+          cursor: not-allowed;
+          opacity: 0.5;
+          pointer-events: none; }
 
 .turn-calendar-table-container {
   text-align: center;
@@ -115,7 +157,7 @@
   float: left; }
   .turn-calendar-input .turn-calendar-input-box {
     background-color: #fff;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     color: #555;
@@ -154,11 +196,11 @@
     padding: 3px 10px;
     position: relative;
     text-align: center;
-    text-shadow: 0px 0px 5px white, 0px 1px 0.1px white;
+    text-shadow: 0px 0px 5px #FFF,0px 1px .1px #fff;
     vertical-align: middle;
     white-space: nowrap; }
     .turn-calendar-input .turn-calendar-prior:hover {
-      background: linear-gradient(to bottom, white 0%, #e1e1e1 100%);
+      background: linear-gradient(to bottom, #fff 0%, #e1e1e1 100%);
       z-index: 2; }
   .turn-calendar-input .turn-calendar-prior + .turn-calendar-prior {
     margin-left: -1px; }
@@ -177,35 +219,6 @@
     text-shadow: 0px 1px 0.1px rgba(255, 255, 255, 0.4);
     z-index: 2; }
 
-.turn-calendar-done-btn {
-  background: linear-gradient(to bottom, #00b3ff 0%, #0096d6 100%);
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  border-radius: 3px;
-  box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2);
-  color: #e0f6ff;
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 1.5;
-  margin: 0 8px 0 0;
-  outline: 0;
-  padding: 3px 16px;
-  text-align: center;
-  text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.3), 0px 0px 5px rgba(0, 0, 0, 0.5);
-  vertical-align: middle;
-  white-space: nowrap; }
-  .turn-calendar-done-btn:hover {
-    background: linear-gradient(to bottom, #2ec0ff 0%, #00a5ec 100%);
-    box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2);
-    text-decoration: none;
-    text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.3), 0px 0px 5px rgba(0, 0, 0, 0.5); }
-  .turn-calendar-done-btn:active {
-    background: #007bb0;
-    border: 1px solid rgba(0, 0, 0, 0.5);
-    box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.1);
-    color: #b8d9e7;
-    outline: 0;
-    text-shadow: 0px -1px 0.1px rgba(0, 0, 0, 0.4); }
-
 p.clear {
   margin: 0;
   padding: 0; }
@@ -215,3 +228,5 @@ p.clear {
 
 .no-left-margin {
   margin-left: 0 !important; }
+
+/*# sourceMappingURL=turnCalendar.css.map */
