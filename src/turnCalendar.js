@@ -261,12 +261,26 @@ angular
                 if (!date) {
                     return false;
                 }
+                /**
+                 *This is to handle special case
+                 * till now 30/02/2015 was valid date
+                 */
+                var d, m, y, isTimestamp = true;
+                if(isNaN(date)) {
+                    var matches = /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/.exec(date);
+                    if (matches == null) return false;
+                    d = matches[2];
+                    m = matches[1] - 1;
+                    y = matches[3];
+                    isTimestamp = false;
+                }
 
                 var dateObj = new Date(date);
 
                 if ( Object.prototype.toString.call(dateObj) !== "[object Date]" )
                     return false;
-                return !isNaN(dateObj.getTime());
+
+                return !isNaN(dateObj.getTime()) && (isTimestamp ? true : (y == dateObj.getFullYear() && m == dateObj.getMonth() && d == dateObj.getDate()));
             },
 
 
@@ -332,6 +346,7 @@ angular
              * allowMonthGeneration will allow generation of month in some edge cases:
              * 1) prior range click
              * 2) dynamically updating maxSelectDate and minSelectDate
+             * 3) setting dates from input box
              * In above cases if we don't bypass month generation, less instance of
              * month will be displayed than expected.
              *
@@ -347,6 +362,10 @@ angular
         $scope.priorButtons = null;
 
         $scope.isBothDateSelected = true;
+        
+        $scope.isValidDate = true;
+        
+        $scope.validationMessage = '';
 
         // Expose scope to getDateString service, maintain backward compatibility
         $scope.timeZone = $scope.$parent.$eval($attrs['timezone']) || $attrs['timezone'];
@@ -1160,7 +1179,7 @@ angular
         var setStartDate = function (day) {
 
             selectedStartDate = day;
-            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date);
+            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
             day.selectMode = 'daily';
             $scope.isBothDateSelected = false;
 
@@ -1219,6 +1238,8 @@ angular
             selectedEndDate = null;
             discolorSelectedDateRange();
             selectedStartDate = day;
+            $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
+            $scope.endDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
             colorDateInMonth(day.date);
             $scope.isBothDateSelected = false;
 
@@ -1267,6 +1288,8 @@ angular
             } else if (isBothSelected()) {
                 resetDayClick(day);
             }
+            $scope.isValidDate = true;
+            $scope.validationMessage = '';
 
         };
 
@@ -1676,7 +1699,6 @@ angular
                 setSingleDate(day);
             }
 
-            $scope.endDate = turnCalendarService.getDateString(day.date, self.timezone);
 
             if (selectedEndDate && selectedEndDate.date > day.date) {
                 colorSelectedDateRange();
@@ -1684,17 +1706,17 @@ angular
         };
 
         /**
-         * Invoke by ng-change when user input start date string
+         * Invoked by ng-blur when user leaves input box for start date
          */
         $scope.changeStartDate = function () {
-
-            if (!turnCalendarService.validateDateInput($scope.startDateString)) {
-                return;
+            $scope.validateDateInputs();
+            if($scope.isValidDate){
+                var newDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
+                allowMonthGeneration = true;
+                setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
+                allowMonthGeneration = false;
+                colorizePriorButtons();
             }
-
-            var newDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
-
-            setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
         };
 
         /**
@@ -1713,26 +1735,60 @@ angular
             }
 
             selectedEndDate = day;
-            $scope.endDate = turnCalendarService.getDateString(day.date, self.timezone);
+            $scope.endDate = turnCalendarService.getDate(day.date, self.timezone);
 
 
             discolorSelectedDateRange();
             colorSelectedDateRange();
 
         };
-
+        
         /**
-         * Invoke by ng-change when user invoke changes to end date string
+         * Validate startDate and endDate entered by user input
          */
-        $scope.changeEndDate = function () {
-
+        $scope.validateDateInputs = function () {
+            $scope.isValidDate = true;
+            $scope.validationMessage = '';
+            
+            if (!turnCalendarService.validateDateInput($scope.startDateString)) {
+                $scope.isValidDate = false;
+                $scope.validationMessage = 'Date should be in MM/DD/YYYY format';
+                return;
+            }
             if (!turnCalendarService.validateDateInput($scope.endDateString)) {
+                $scope.isValidDate = false;
+                $scope.validationMessage = 'Date should be in MM/DD/YYYY format';
                 return;
             }
 
-            var newDate = turnCalendarService.getDate($scope.endDateString, self.timezone);
+            var startDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
+            var endDate = turnCalendarService.getDate($scope.endDateString, self.timezone);
 
-            setEndDateString(generateMetaDateObject(newDate, newDate.getMonth()));
+            if(endDate < startDate){
+                $scope.isValidDate = false;
+                $scope.validationMessage = 'Invalid date range, please enter again';
+                return;
+            } else if(isUnavailable(startDate) || isUnavailable(endDate)) {
+                $scope.isValidDate = false;
+                $scope.validationMessage = 'Date out of range, please enter again';
+                return;
+            }
+        }
+
+        /**
+         * Invoked by ng-blur when user leaves input box for end date
+         */
+        $scope.changeEndDate = function () {
+            $scope.validateDateInputs();
+            if($scope.isValidDate){
+                var endDate = turnCalendarService.getDate($scope.endDateString, self.timezone);
+                var startDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
+                allowMonthGeneration = true;
+                setStartDateString(generateMetaDateObject(startDate, startDate.getMonth()));
+                setEndDateString(generateMetaDateObject(endDate, endDate.getMonth()));
+                allowMonthGeneration = false;
+                colorizePriorButtons();
+            }
         };
 
         angular.forEach(['startDate', 'endDate'], function (attribute) {

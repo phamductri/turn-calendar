@@ -6,9 +6,11 @@
         <div class="turn-calendar-input-container">
             <div class="turn-calendar-input">
                 <span ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="turn-calendar-from">From</span>
-                <input ng-show="!isDayClickDisabledMode" class="turn-calendar-input-box" type="text" ng-model="startDateString" ng-change="changeStartDate()" />
+                <input ng-show="!isDayClickDisabledMode" class="turn-calendar-input-box" type="text" ng-model="startDateString" 
+                        ng-change="validateDateInputs()" ng-blur="changeStartDate()" tabindex="1"/>
                 <span ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="turn-calendar-to">To</span>
-                <input ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="turn-calendar-input-box" type="text" ng-model="endDateString" ng-change="changeEndDate()" />
+                <input ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="turn-calendar-input-box" type="text" 
+                       ng-model="endDateString" ng-change="validateDateInputs()" ng-blur="changeEndDate()" tabindex="2"/>
                 <span ng-show="priorButtons.length && isNotSingleDateMode" 
                         class="turn-calendar-prior-label"
                         ng-class="{'no-left-margin': isDayClickDisabledMode}">
@@ -21,8 +23,11 @@
                                   }" turn-calendar-prior>{{range.value}}</button>
                 <span ng-show="priorButtons.length && isNotSingleDateMode" class="turn-calendar-day-label">Days</span>
             </div>
-            <div class="turn-calendar-submit">
-                <button ng-click="applyCalendar()" class="turn-calendar-done-btn" >Done</button>
+            <div class="turn-calendar-submit" ng-mouseenter="showValidationMessage = true"
+                        ng-mouseleave="showValidationMessage = false">
+                <div class="validation-message" ng-show="showValidationMessage">{{validationMessage}}</div>
+                <button ng-click="isValidDate && applyCalendar()" ng-disabled="!isValidDate" class="turn-calendar-done-btn" 
+                        title="{{validationMessage}}" tabindex="3">Done</button>
             </div>
             <p class="clear"></p>
         </div>

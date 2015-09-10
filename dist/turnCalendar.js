@@ -207,10 +207,24 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         if (!date) {
           return false;
         }
+        /**
+                 *This is to handle special case
+                 * till now 30/02/2015 was valid date
+                 */
+        var d, m, y, isTimestamp = true;
+        if (isNaN(date)) {
+          var matches = /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/.exec(date);
+          if (matches == null)
+            return false;
+          d = matches[2];
+          m = matches[1] - 1;
+          y = matches[3];
+          isTimestamp = false;
+        }
         var dateObj = new Date(date);
         if (Object.prototype.toString.call(dateObj) !== '[object Date]')
           return false;
-        return !isNaN(dateObj.getTime());
+        return !isNaN(dateObj.getTime()) && (isTimestamp ? true : y == dateObj.getFullYear() && m == dateObj.getMonth() && d == dateObj.getDate());
       },
       getDate: function (date, timezone) {
         return timezone ? new timezoneJS.Date(new timezoneJS.Date(date, timezone).setHours(0, 0, 0, 0), timezone) : new Date(new Date(date).setHours(0, 0, 0, 0));
@@ -240,6 +254,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
              * allowMonthGeneration will allow generation of month in some edge cases:
              * 1) prior range click
              * 2) dynamically updating maxSelectDate and minSelectDate
+             * 3) setting dates from input box
              * In above cases if we don't bypass month generation, less instance of
              * month will be displayed than expected.
              *
@@ -251,6 +266,8 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
     $scope.currentSelectedStartDate = null;
     $scope.priorButtons = null;
     $scope.isBothDateSelected = true;
+    $scope.isValidDate = true;
+    $scope.validationMessage = '';
     // Expose scope to getDateString service, maintain backward compatibility
     $scope.timeZone = $scope.$parent.$eval($attrs['timezone']) || $attrs['timezone'];
     $scope.getDateString = turnCalendarService.getDateString;
@@ -890,7 +907,7 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
     };
     var setStartDate = function (day) {
       selectedStartDate = day;
-      $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date);
+      $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
       day.selectMode = 'daily';
       $scope.isBothDateSelected = false;
     };
@@ -938,6 +955,8 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       selectedEndDate = null;
       discolorSelectedDateRange();
       selectedStartDate = day;
+      $scope.startDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
+      $scope.endDateString = turnCalendarService.getDateString(selectedStartDate.date, self.timezone);
       colorDateInMonth(day.date);
       $scope.isBothDateSelected = false;
     };
@@ -976,6 +995,8 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       } else if (isBothSelected()) {
         resetDayClick(day);
       }
+      $scope.isValidDate = true;
+      $scope.validationMessage = '';
     };
     $scope.monthArray = generateMonthArray(null, null);
     // Allow to show the calendar or hide it
@@ -1275,20 +1296,22 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       if (!$scope.isNotSingleDateMode) {
         setSingleDate(day);
       }
-      $scope.endDate = turnCalendarService.getDateString(day.date, self.timezone);
       if (selectedEndDate && selectedEndDate.date > day.date) {
         colorSelectedDateRange();
       }
     };
     /**
-         * Invoke by ng-change when user input start date string
+         * Invoked by ng-blur when user leaves input box for start date
          */
     $scope.changeStartDate = function () {
-      if (!turnCalendarService.validateDateInput($scope.startDateString)) {
-        return;
+      $scope.validateDateInputs();
+      if ($scope.isValidDate) {
+        var newDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
+        allowMonthGeneration = true;
+        setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
+        allowMonthGeneration = false;
+        colorizePriorButtons();
       }
-      var newDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
-      setStartDateString(generateMetaDateObject(newDate, newDate.getMonth()));
     };
     /**
          * Change the end date, provoke by ng-change
@@ -1303,19 +1326,52 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         return;
       }
       selectedEndDate = day;
-      $scope.endDate = turnCalendarService.getDateString(day.date, self.timezone);
+      $scope.endDate = turnCalendarService.getDate(day.date, self.timezone);
       discolorSelectedDateRange();
       colorSelectedDateRange();
     };
     /**
-         * Invoke by ng-change when user invoke changes to end date string
+         * Validate startDate and endDate entered by user input
          */
-    $scope.changeEndDate = function () {
-      if (!turnCalendarService.validateDateInput($scope.endDateString)) {
+    $scope.validateDateInputs = function () {
+      $scope.isValidDate = true;
+      $scope.validationMessage = '';
+      if (!turnCalendarService.validateDateInput($scope.startDateString)) {
+        $scope.isValidDate = false;
+        $scope.validationMessage = 'Date should be in MM/DD/YYYY format';
         return;
       }
-      var newDate = turnCalendarService.getDate($scope.endDateString, self.timezone);
-      setEndDateString(generateMetaDateObject(newDate, newDate.getMonth()));
+      if (!turnCalendarService.validateDateInput($scope.endDateString)) {
+        $scope.isValidDate = false;
+        $scope.validationMessage = 'Date should be in MM/DD/YYYY format';
+        return;
+      }
+      var startDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
+      var endDate = turnCalendarService.getDate($scope.endDateString, self.timezone);
+      if (endDate < startDate) {
+        $scope.isValidDate = false;
+        $scope.validationMessage = 'Invalid date range, please enter again';
+        return;
+      } else if (isUnavailable(startDate) || isUnavailable(endDate)) {
+        $scope.isValidDate = false;
+        $scope.validationMessage = 'Date out of range, please enter again';
+        return;
+      }
+    };
+    /**
+         * Invoked by ng-blur when user leaves input box for end date
+         */
+    $scope.changeEndDate = function () {
+      $scope.validateDateInputs();
+      if ($scope.isValidDate) {
+        var endDate = turnCalendarService.getDate($scope.endDateString, self.timezone);
+        var startDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
+        allowMonthGeneration = true;
+        setStartDateString(generateMetaDateObject(startDate, startDate.getMonth()));
+        setEndDateString(generateMetaDateObject(endDate, endDate.getMonth()));
+        allowMonthGeneration = false;
+        colorizePriorButtons();
+      }
     };
     angular.forEach([
       'startDate',
@@ -1432,9 +1488,11 @@ angular.module("turnCalendar.html", []).run(["$templateCache", function($templat
     "        <div class=\"turn-calendar-input-container\">\n" +
     "            <div class=\"turn-calendar-input\">\n" +
     "                <span ng-show=\"isNotSingleDateMode && !isDayClickDisabledMode\" class=\"turn-calendar-from\">From</span>\n" +
-    "                <input ng-show=\"!isDayClickDisabledMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"startDateString\" ng-change=\"changeStartDate()\" />\n" +
+    "                <input ng-show=\"!isDayClickDisabledMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"startDateString\" \n" +
+    "                        ng-change=\"validateDateInputs()\" ng-blur=\"changeStartDate()\" tabindex=\"1\"/>\n" +
     "                <span ng-show=\"isNotSingleDateMode && !isDayClickDisabledMode\" class=\"turn-calendar-to\">To</span>\n" +
-    "                <input ng-show=\"isNotSingleDateMode && !isDayClickDisabledMode\" class=\"turn-calendar-input-box\" type=\"text\" ng-model=\"endDateString\" ng-change=\"changeEndDate()\" />\n" +
+    "                <input ng-show=\"isNotSingleDateMode && !isDayClickDisabledMode\" class=\"turn-calendar-input-box\" type=\"text\" \n" +
+    "                       ng-model=\"endDateString\" ng-change=\"validateDateInputs()\" ng-blur=\"changeEndDate()\" tabindex=\"2\"/>\n" +
     "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" \n" +
     "                        class=\"turn-calendar-prior-label\"\n" +
     "                        ng-class=\"{'no-left-margin': isDayClickDisabledMode}\">\n" +
@@ -1447,8 +1505,11 @@ angular.module("turnCalendar.html", []).run(["$templateCache", function($templat
     "                                  }\" turn-calendar-prior>{{range.value}}</button>\n" +
     "                <span ng-show=\"priorButtons.length && isNotSingleDateMode\" class=\"turn-calendar-day-label\">Days</span>\n" +
     "            </div>\n" +
-    "            <div class=\"turn-calendar-submit\">\n" +
-    "                <button ng-click=\"applyCalendar()\" class=\"turn-calendar-done-btn\" >Done</button>\n" +
+    "            <div class=\"turn-calendar-submit\" ng-mouseenter=\"showValidationMessage = true\"\n" +
+    "                        ng-mouseleave=\"showValidationMessage = false\">\n" +
+    "                <div class=\"validation-message\" ng-show=\"showValidationMessage\">{{validationMessage}}</div>\n" +
+    "                <button ng-click=\"isValidDate && applyCalendar()\" ng-disabled=\"!isValidDate\" class=\"turn-calendar-done-btn\" \n" +
+    "                        title=\"{{validationMessage}}\" tabindex=\"3\">Done</button>\n" +
     "            </div>\n" +
     "            <p class=\"clear\"></p>\n" +
     "        </div>\n" +
