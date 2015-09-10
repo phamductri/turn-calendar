@@ -1392,6 +1392,8 @@ angular
             }
 
             $scope.calendarEnabled = false;
+            $scope.isValidDate = true;
+            $scope.validationMessage = '';
         };
 
         /**

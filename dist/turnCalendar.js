@@ -1075,6 +1075,8 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         colorSelectedDateRange();
       }
       $scope.calendarEnabled = false;
+      $scope.isValidDate = true;
+      $scope.validationMessage = '';
     };
     /**
          * Function to color just this exact date, the mode will always be daily
