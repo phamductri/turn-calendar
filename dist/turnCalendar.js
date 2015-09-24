@@ -1419,13 +1419,19 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
          * This will make sure that click outside of calendar will close the calendar
          * (behave same as cancel button click)
          */
-    $document.bind('click', function (event) {
-      if (!angular.element('turn-calendar').find(event.target).length) {
-        $scope.$apply(function () {
-          if ($scope.currentSelectedStartDate && $scope.currentSelectedEndDate) {
-            $scope.cancel();
+    $scope.$watch('calendarEnabled', function (isEnabled) {
+      if (isEnabled) {
+        $document.on('mouseup', function (event) {
+          if (!angular.element('turn-calendar').find(event.target).length) {
+            $scope.$apply(function () {
+              if ($scope.currentSelectedStartDate && $scope.currentSelectedEndDate) {
+                $scope.cancel();
+              }
+            });
           }
         });
+      } else {
+        $document.off('mouseup');
       }
     });
     $scope.$watch('timezone', function (newVal) {
