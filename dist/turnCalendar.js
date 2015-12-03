@@ -1328,7 +1328,6 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
         return;
       }
       selectedEndDate = day;
-      $scope.endDate = turnCalendarService.getDate(day.date, self.timezone);
       discolorSelectedDateRange();
       colorSelectedDateRange();
     };
