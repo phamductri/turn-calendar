@@ -1248,6 +1248,8 @@ angular.module('turn/calendar', ['calendarTemplates']).constant('turnCalendarDef
       lastSelectedDate = selectedEndDate;
       setEndDate(endDay);
       allowMonthGeneration = false;
+      $scope.isValidDate = true;
+      $scope.validationMessage = '';
     };
     /**
          * Function to set the default selection if the user specify a default
