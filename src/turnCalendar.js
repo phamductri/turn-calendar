@@ -1630,6 +1630,8 @@ angular
             setEndDate(endDay);
 
             allowMonthGeneration = false;
+            $scope.isValidDate = true;
+            $scope.validationMessage = '';
         };
 
         /**
