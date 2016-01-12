@@ -71,6 +71,7 @@
 
 </div>
 
+first example, supports arbitrary start day of week, multiple instances, min/max select date, weekly and monthly select range, prior range presets, and user selected start, end date:
 <turn-calendar start-day-of-week="4" backward-months="2" forward-months="2"
                min-select-date="'9/13/2013'"
                weekly-select-range="90"
@@ -79,13 +80,24 @@
                prior-range-presets="[{value: 7}, {value: 30}, {value : 90}]"
                start-date="startDate"
                end-date="endDate">
-
 </turn-calendar>
 
+options object support:
 <turn-calendar calendar-options="calendarOptions"></turn-calendar>
-<turn-calendar start-date="'9/1/2014'" end-date="'10/15/2014'" apply-callback="callback(1, 2)"></turn-calendar>
-<turn-calendar starting-month="11" starting-year="2014" backward-months="1" forward-months="1" weekly-select-range="30" start-date="'11/15/2014'" end-date="'01/08/2015'"> </turn-calendar>
 
+callback support:
+<turn-calendar start-date="'9/1/2014'" end-date="'10/15/2014'" apply-callback="callback(1, 2)"></turn-calendar>
+
+static start, end date, starting month and year support:
+<turn-calendar starting-month="11"
+               starting-year="2014"
+               backward-months="1"
+               forward-months="1"
+               weekly-select-range="30"
+               start-date="'11/15/2014'"
+               end-date="'01/08/2015'"> </turn-calendar>
+
+lastSelectedDate selection mode:
 <turn-calendar start-day-of-week="4" backward-months="2" forward-months="2"
                min-select-date="'9/13/2013'"
                weekly-select-range="90"
@@ -96,6 +108,7 @@
 
 </turn-calendar>
 
+singleDate selection mode:
 <turn-calendar start-day-of-week="4"
                min-select-date="'9/13/2013'"
                min-backward-month="'08/2013'"
@@ -126,7 +139,7 @@ selection-mode="disableDayClick":
 
 </turn-calendar>
 
-disabled="true":
+disabled="true" support:
 <turn-calendar backward-months="1"
                selection-mode="singleDate"
                disabled="true">
@@ -144,6 +157,7 @@ timezone support:
                end-date="endDate" timezone="Asia/Ho_Chi_Minh">
 </turn-calendar>
 
+timezone support with timestamp:
 <turn-calendar end-date="1437616946000" start-date="1436486400000" timezone="Asia/Ho_Chi_Minh"></turn-calendar>
 
 </body>

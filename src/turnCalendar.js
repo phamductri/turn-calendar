@@ -1016,7 +1016,7 @@ angular
         var generateMetaDateObject = function (date, currentMonth) {
 
             // If the month does not match, return empty object
-            if (date.getMonth() !== currentMonth) {
+            if (parseInt(date.getMonth()) !== parseInt(currentMonth)) {
                 return {};
             }
 
