@@ -57,6 +57,16 @@
                     console.log(arg2);
                 }
 
+
+                $scope.priorRangePresets =  [
+                    {value: 1, text: 'Yesterday'},
+                    {value: 7, text: 'Prior 7 days'},
+                    {value: 30, isDefault: true, text: 'Prior 30 days'},
+                    {value : 90, text: 'Prior 90 days'},
+                    {value: 180, text: 'All time'},
+                    {value: -1, text: 'Custom'}];
+
+
             });
 
 
@@ -89,13 +99,14 @@ callback support:
 <turn-calendar start-date="'9/1/2014'" end-date="'10/15/2014'" apply-callback="callback(1, 2)"></turn-calendar>
 
 static start, end date, starting month and year support:
-<turn-calendar starting-month="11"
-               starting-year="2014"
+
+<turn-calendar starting-month="0"
+               starting-year="2016"
                backward-months="1"
                forward-months="1"
                weekly-select-range="30"
-               start-date="'11/15/2014'"
-               end-date="'01/08/2015'"> </turn-calendar>
+               start-date="'12/23/2015'"
+               end-date="'02/25/2016'"> </turn-calendar>
 
 lastSelectedDate selection mode:
 <turn-calendar start-day-of-week="4" backward-months="2" forward-months="2"
@@ -159,6 +170,14 @@ timezone support:
 
 timezone support with timestamp:
 <turn-calendar end-date="1437616946000" start-date="1436486400000" timezone="Asia/Ho_Chi_Minh"></turn-calendar>
+
+new prior range preset:
+<turn-calendar backward-months="1"
+               min-select-date="'9/13/2013'"
+               min-backward-month="'08/2013'"
+               range-side-mode="true"
+               prior-range-presets="priorRangePresets"
+               selection-mode="twoClick">
 
 </body>
 </html>

@@ -147,10 +147,41 @@ $selected-color: #0aa4d2;
 .turn-calendar-table-container {
   text-align: center;
   margin: 0 7px;
+  display: flex;
 
   .turn-calendar-table-central-aligner {
     position: relative;
     display: inline-block;
+  }
+
+  .turn-calendar-selector-container {
+    position: relative;
+    display: inline-block;
+
+    .turn-calendar-prior-range {
+
+      text-align: left;
+      width: 175px;
+      color: #0aa4d2;
+      padding: 5px;
+      margin-left: 10px;
+      margin-top: 5px;
+
+
+
+    }
+
+    .range-active {
+
+      background: linear-gradient(to bottom, #00B3ff 0%, #0096d6 100%);
+      text-align: left;
+      width: 170px;
+      color: white;
+      padding: 5px;
+      border-radius: 3px;
+      margin-left: 10px;
+      margin-top: 5px;
+    }
   }
 
   .turn-calendar-table {
@@ -204,10 +235,20 @@ $selected-color: #0aa4d2;
   }  
 }
 
+svg {
+  position:absolute;
+  display:inline-block;
+  left: 4px;
+  top: 0.5px;
+}
 .turn-calendar-input {
   color: #333;
   float: left;
-  
+
+  .calendar-svg {
+    position: relative;
+  }
+
   .turn-calendar-input-box {  
     background-color: #fff;
     border: 1px solid #ccc;
@@ -217,10 +258,10 @@ $selected-color: #0aa4d2;
     height: 24px;
     line-height: 1.4;
     margin: 0;
-    padding: 0px 6px;
+    padding: 0px 6px 0px 24px;
     transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
     vertical-align: middle;  
-    width: 70px;
+    width: 100px;
 
     &:focus {
       border-color: #66afe9;
@@ -250,7 +291,7 @@ $selected-color: #0aa4d2;
   }
 
   .turn-calendar-prior {
-    background: linear-gradient(to bottom, #f2f2f2 0%,#d4d4d4 100%);
+    background: linear-gradient(to bottom, #f2f2f2 0%, #d4d4d4 100%);
     border: 1px solid #ababab;
     box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
     color: #666;
@@ -260,10 +301,10 @@ $selected-color: #0aa4d2;
     font-weight: normal;
     line-height: 1.5;
     margin: 0;
-    padding: 3px 10px;    
+    padding: 3px 10px;
     position: relative;
     text-align: center;
-    text-shadow: 0px 0px 5px #FFF,0px 1px .1px #fff;
+    text-shadow: 0px 0px 5px #FFF, 0px 1px .1px #fff;
     vertical-align: middle;
     white-space: nowrap;
   
@@ -272,6 +313,8 @@ $selected-color: #0aa4d2;
       z-index: 2;
     }  
   }
+
+
 
   .turn-calendar-prior + .turn-calendar-prior {
     margin-left: -1px;
