@@ -170,7 +170,8 @@ angular
         dayName: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
         startingMonth: new Date().getMonth(),
         startingYear: new Date().getFullYear(),
-        startDayOfWeek: 0
+        startDayOfWeek: 0,
+        rangeSideMode: false
     })
 
     /**
@@ -407,9 +408,11 @@ angular
             'forwardMonths', 'startDayOfWeek', 'minSelectDate', 'maxSelectDate',
             'weeklySelectRange', 'monthlySelectRange', 'priorRangePresets',
             'maxForwardMonth', 'minBackwardMonth', 'startDate', 'endDate',
-            'selectionMode', 'disabled', 'timezone'], function(key) {
+            'selectionMode', 'disabled', 'timezone', 'rangeSideMode'], function(key) {
             self[key] = pickValue(key);
         });
+
+      $scope.rangeSideMode = self.rangeSideMode;
 
         var currentDate = self.timezone ? new timezoneJS.Date(new timezoneJS.Date(new Date(), self.timezone).setHours(0, 0, 0, 0), self.timezone)
             : new Date(new Date().setHours(0, 0, 0, 0));
@@ -550,7 +553,7 @@ angular
 
             for (var i = 1; i <= self.forwardMonths; i++) {
 
-                var newMonth = month + i;
+                var newMonth = parseInt(month) + i;
 
                 // Bigger than 11 means moving to next year
                 if (newMonth > 11) {
@@ -568,6 +571,7 @@ angular
                 }
 
                 monthArray.push(generateDayArray(year, newMonth));
+
                 $scope.monthNames.push(MONTH_NAME[newMonth]);
 
             }
@@ -598,7 +602,7 @@ angular
 
             for (var i = 1; i <= self.backwardMonths; i++) {
 
-                var newMonth = month - i;
+                var newMonth = parseInt(month) - i;
 
                 // The year has been reset, use newMonthCount, not i
                 if (yearReset) {
@@ -1130,7 +1134,7 @@ angular
             if (day.date < selectedStartDate.date) {
                 selectedEndDate = selectedStartDate;
                 selectedStartDate = day;
-            } else if (day.date > selectedStartDate.date) {
+            } else if (day.date >= selectedStartDate.date) {
                 selectedEndDate = day;
             }
 
@@ -1256,6 +1260,7 @@ angular
                 default:
                     resetSelectionTwoClickMode(day);
             }
+
         };
 
         /**
@@ -1313,20 +1318,52 @@ angular
          * active style will be applied to that button
          */
         var colorizePriorButtons = function () {
+
+            var todayDate = new Date();
+
+            // Special case, the selected is current date
+            if (selectedStartDate.date.toDateString() === selectedEndDate.date.toDateString()
+            &&  selectedStartDate.date.toDateString() === todayDate.toDateString()) {
+                angular.forEach($scope.priorButtons, function (rangePreset, index) {
+                    if (rangePreset.value === 0) {
+                        $scope.selectedPriorButtonIndex = index;
+                    }
+                });
+                return;
+            }
+
+            todayDate.setDate(todayDate.getDate() - 1);
+            // Special case, the selected is yesterday
+            if (selectedStartDate.date.toDateString() === selectedEndDate.date.toDateString()
+              &&  selectedStartDate.date.toDateString() === todayDate.toDateString()) {
+                angular.forEach($scope.priorButtons, function (rangePreset, index) {
+                    if (rangePreset.value === 1) {
+                        $scope.selectedPriorButtonIndex = index;
+                    }
+                });
+                return;
+            }
+
             $scope.selectedPriorButtonIndex = null;
 
             var endDate = self.maxSelectDate ? turnCalendarService.getDate(self.maxSelectDate, self.timezone) : turnCalendarService.getDate(new Date(), self.timezone);
             var dayDiff = Math.round((endDate.setHours(0, 0, 0, 0) - selectedStartDate.date.setHours(0, 0, 0, 0)) / 864e5);
-
-            if (endDate.toDateString() !== selectedEndDate.date.toDateString()) {
-                return;
-            }
 
             angular.forEach($scope.priorButtons, function (rangePreset, index) {
                 if ((rangePreset.value - 1) === dayDiff) {
                     $scope.selectedPriorButtonIndex = index;
                 }
             });
+
+            if (angular.isDefined($scope.selectedPriorButtonIndex) && $scope.selectedPriorButtonIndex !== null) {
+                return;
+            } else {
+                angular.forEach($scope.priorButtons, function (rangePreset, index) {
+                    if (rangePreset.value === -1) {
+                        $scope.selectedPriorButtonIndex = index;
+                    }
+                });
+            }
         };
 
         var setStartEndDate = function () {
@@ -1602,20 +1639,38 @@ angular
          * range from the current date
          *
          * @param {object} range - A range object to be set
+         * @param {integer} index - The index of prior button array
          */
         $scope.selectRange = function (range, index) {
 
             $scope.selectedPriorButtonIndex = index;
             allowMonthGeneration = true;
 
-            discolorSelectedDateRange();
-
             var startDate = self.maxSelectDate ? turnCalendarService.getDate(self.maxSelectDate, self.timezone) : turnCalendarService.getDate(new Date(), self.timezone),
                 endDate = self.maxSelectDate ? turnCalendarService.getDate(self.maxSelectDate, self.timezone) : turnCalendarService.getDate(new Date(), self.timezone);
 
-            $scope.monthArray = generateMonthArray(endDate.getFullYear(), endDate.getMonth());
+            var rangeSelection = parseInt(range.value);
 
-            startDate.setDate(startDate.getDate() - (range.value - 1));
+            /**
+             * Take care of special cases
+             *
+             * 0 : means today
+             * 1 : means yesterday
+             * -1: custom mode, should leave everything alone
+             */
+            if (rangeSelection === 0) {
+                startDate.setDate(startDate.getDate());
+            } else if (rangeSelection === 1) {
+                startDate.setDate(startDate.getDate() - 1);
+                endDate = startDate;
+            } else if (rangeSelection === -1) {
+                return;
+            } else {
+                startDate.setDate(startDate.getDate() - (rangeSelection - 1));
+            }
+
+            discolorSelectedDateRange();
+            $scope.monthArray = generateMonthArray(endDate.getFullYear(), endDate.getMonth());
 
             startDate = resetStartDate(startDate);
             var startDay = generateMetaDateObject(startDate, startDate.getMonth());
@@ -1713,6 +1768,7 @@ angular
          * Invoked by ng-blur when user leaves input box for start date
          */
         $scope.changeStartDate = function () {
+
             $scope.validateDateInputs();
             if($scope.isValidDate){
                 var newDate = turnCalendarService.getDate($scope.startDateString, self.timezone);
@@ -1774,7 +1830,7 @@ angular
                 $scope.validationMessage = 'Date out of range, please enter again';
                 return;
             }
-        }
+        };
 
         /**
          * Invoked by ng-blur when user leaves input box for end date
