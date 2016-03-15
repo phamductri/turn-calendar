@@ -1,4 +1,5 @@
-<button ng-click="enableCalendar()" class="turn-calendar-enable-btn" ng-disabled="disabled()">{{getDateString(currentSelectedStartDate.date, timeZone)}} <span
+<button ng-click="enableCalendar()" class="turn-calendar-enable-btn" ng-disabled="disabled()">
+    {{getDateString(currentSelectedStartDate.date, timeZone)}} <span
         ng-show="currentSelectedStartDate.date && isNotSingleDateMode">- {{getDateString(currentSelectedEndDate.date, timeZone)}} </span>
 </button>
 <div>
@@ -8,20 +9,25 @@
                 <span ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="turn-calendar-from">From</span>
 
                 <span ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="calendar-svg">
-                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                    <span class="calendar-block-svg">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="16px" height="16px" viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
 <path style="fill:#231F20;" d="M13,3c0,1.104-0.896,2-2,2S9,4.104,9,3H7c0,1.104-0.896,2-2,2S3,4.104,3,3H0v13h15V3H13z M4,14H2v-2
 	h2V14z M4,11H2V9h2V11z M4,8H2V6h2V8z M7,14H5v-2h2V14z M7,11H5V9h2V11z M7,8H5V6h2V8z M10,14H8v-2h2V14z M10,11H8V9h2V11z M10,8H8
 	V6h2V8z M13,14h-2v-2h2V14z M13,11h-2V9h2V11z M13,8h-2V6h2V8z M4,3V1c0-0.553,0.447-1,1-1s1,0.447,1,1v2c0,0.553-0.447,1-1,1
 	S4,3.553,4,3z M10,3V1c0-0.553,0.447-1,1-1s1,0.447,1,1v2c0,0.553-0.447,1-1,1S10,3.553,10,3z"/>
-</svg>
-                    <input ng-show="!isDayClickDisabledMode" class="turn-calendar-input-box" type="text" ng-model="startDateString"
+                        </svg>
+                    </span>
+
+                    <input ng-show="!isDayClickDisabledMode" class="turn-calendar-input-box" type="text"
+                           ng-model="startDateString"
                            ng-change="changeStartDate()" ng-blur="changeStartDate()" tabindex="1"/>
                 </span>
 
 
                 <span ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="turn-calendar-to">To</span>
                 <span ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="calendar-svg">
+                    <span class="calendar-block-svg">
                     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="16px" height="16px" viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
 <path style="fill:#231F20;" d="M13,3c0,1.104-0.896,2-2,2S9,4.104,9,3H7c0,1.104-0.896,2-2,2S3,4.104,3,3H0v13h15V3H13z M4,14H2v-2
@@ -29,7 +35,9 @@
 	V6h2V8z M13,14h-2v-2h2V14z M13,11h-2V9h2V11z M13,8h-2V6h2V8z M4,3V1c0-0.553,0.447-1,1-1s1,0.447,1,1v2c0,0.553-0.447,1-1,1
 	S4,3.553,4,3z M10,3V1c0-0.553,0.447-1,1-1s1,0.447,1,1v2c0,0.553-0.447,1-1,1S10,3.553,10,3z"/>
 </svg>
-                    <input ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="turn-calendar-input-box" type="text"
+                        </span>
+                    <input ng-show="isNotSingleDateMode && !isDayClickDisabledMode" class="turn-calendar-input-box"
+                           type="text"
                            ng-model="endDateString" ng-change="changeEndDate()" ng-blur="changeEndDate()" tabindex="2"/>
                 </span>
 
@@ -43,16 +51,19 @@
                         ng-class="{'turn-calendar-prior-left': $index == 0,
                                    'turn-calendar-prior-right': $index == priorButtons.length-1,
                                    'active': $index == selectedPriorButtonIndex
-                                  }" turn-calendar-prior>{{range.value}}</button>
+                                  }" turn-calendar-prior>{{range.value}}
+                </button>
                 <span ng-show="priorButtons.length && isNotSingleDateMode" class="turn-calendar-day-label">Days</span>
                 </span>
 
             </div>
             <div class="turn-calendar-submit" ng-mouseenter="showValidationMessage = true"
-                        ng-mouseleave="showValidationMessage = false">
+                 ng-mouseleave="showValidationMessage = false">
                 <div class="validation-message" ng-show="showValidationMessage">{{validationMessage}}</div>
-                <button ng-click="isValidDate && applyCalendar()" ng-disabled="!isValidDate" class="turn-calendar-done-btn" 
-                        title="{{validationMessage}}" tabindex="3">Done</button>
+                <button ng-click="isValidDate && applyCalendar()" ng-disabled="!isValidDate"
+                        class="turn-calendar-done-btn"
+                        title="{{validationMessage}}" tabindex="3">Done
+                </button>
             </div>
             <p class="clear"></p>
         </div>
@@ -63,28 +74,28 @@
                 </div>
                 <table class="turn-calendar-table" ng-repeat="month in monthArray">
                     <thead>
-                        <tr>
-                            <th colspan="{{DAYS_IN_WEEK}}" class="turn-calendar-month">{{monthNames[$index]}}</th>
-                        </tr>
-                        <tr>
-                            <th ng-repeat="dayName in dayNames" class="turn-calendar-day">{{dayName}}</th>
-                        </tr>
+                    <tr>
+                        <th colspan="{{DAYS_IN_WEEK}}" class="turn-calendar-month">{{monthNames[$index]}}</th>
+                    </tr>
+                    <tr>
+                        <th ng-repeat="dayName in dayNames" class="turn-calendar-day">{{dayName}}</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="days in month">
-                            <td ng-repeat="day in days"
-                                ng-class="{'turn-calendar-mouse-over': day.isHover,
+                    <tr ng-repeat="days in month">
+                        <td ng-repeat="day in days"
+                            ng-class="{'turn-calendar-mouse-over': day.isHover,
                                            'turn-calendar-selected-daily': day.selectMode == 'daily',
                                            'turn-calendar-selected-weekly': day.selectMode == 'weekly',
                                            'turn-calendar-selected-monthly': day.selectMode == 'monthly',
                                            'turn-calendar-unavailable': day.isUnavailable || isDayClickDisabledMode,
                                            'turn-calendar-unclickable': isDayClickDisabledMode,
                                            'turn-calendar-date': day.date.getDate()}"
-                                ng-mouseenter="mouseEnter(day)"
-                                ng-mouseleave="mouseLeave(day)"
-                                ng-click="setDayClick(day)">{{day.date.getDate()}}
-                            </td>
-                        </tr>
+                            ng-mouseenter="mouseEnter(day)"
+                            ng-mouseleave="mouseLeave(day)"
+                            ng-click="setDayClick(day)">{{day.date.getDate()}}
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
                 <div class="turn-calendar-navigation-right" ng-click="nextMonth()" ng-hide="isDayClickDisabledMode">
@@ -95,9 +106,10 @@
                 <span ng-show="priorButtons.length && isNotSingleDateMode">
                      <span ng-repeat="range in priorButtons">
                         <div ng-show="isNotSingleDateMode" class="turn-calendar-prior-range"
-                                ng-click="selectRange(range, $index)"
-                                ng-class="{'range-active': $index == selectedPriorButtonIndex
-                                }">{{ range.text }}</div>
+                             ng-click="selectRange(range, $index)"
+                             ng-class="{'range-active': $index == selectedPriorButtonIndex
+                                }">{{ range.text }}
+                        </div>
                      </span>
                 </span>
 

@@ -172,17 +172,15 @@
       background-color: #0aa4d2;
       color: #fff; }
 
-svg {
-  position: absolute;
-  display: inline-block;
-  left: 4px;
-  top: 0.5px; }
-
 .turn-calendar-input {
   color: #333;
   float: left; }
   .turn-calendar-input .calendar-svg {
     position: relative; }
+    .turn-calendar-input .calendar-svg .calendar-block-svg {
+      position: absolute;
+      left: 4px;
+      top: 0.5px; }
   .turn-calendar-input .turn-calendar-input-box {
     background-color: #fff;
     border: 1px solid #cccccc;

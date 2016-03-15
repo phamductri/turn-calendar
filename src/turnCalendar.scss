@@ -235,18 +235,18 @@ $selected-color: #0aa4d2;
   }  
 }
 
-svg {
-  position:absolute;
-  display:inline-block;
-  left: 4px;
-  top: 0.5px;
-}
 .turn-calendar-input {
   color: #333;
   float: left;
 
   .calendar-svg {
     position: relative;
+
+      .calendar-block-svg {
+          position:absolute;
+          left: 4px;
+          top: 0.5px;
+      }
   }
 
   .turn-calendar-input-box {  
