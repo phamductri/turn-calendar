@@ -2,7 +2,7 @@
   "name": "calendar",
   "version": "0.0.4",
   "description": "Generic calendar component for Turn",
-  "main": "dist/calendar.js",
+  "main": "dist/turnCalendar.js",
   "scripts": {
     "test": "grunt test --verbose"
   },
